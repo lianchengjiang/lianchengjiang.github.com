@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>AVFoundation(一):基础知识 | Hexo</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="forsigner,前端,设计,Hexo主题,前端开发,用户体验,设计,frontend,design,nodejs,JavaScript" />
+  
+
+  <meta name="description" content="说好的一周一篇博客，还是懈怠了，博客这个事儿，得自己抓紧，从今天开始争取努力完成这个目标。最近在玩一个类似小咖秀的项目，所以对AVFoundation有了一些的研究。这是AVFoundation的第一篇，准备先介绍一些AVFoundation中的基础知识  音频采样大自然中的声音，他的形态是一种波。我们通过采样，将这种波量化成数据，记录下来，如下图所示： 如上图所示，采样的数据并不能完整的还原出原">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AVFoundation(一):基础知识">
+<meta property="og:url" content="http://yoursite.com/2015/10/17/AVFoundation(一)：基础知识/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="说好的一周一篇博客，还是懈怠了，博客这个事儿，得自己抓紧，从今天开始争取努力完成这个目标。最近在玩一个类似小咖秀的项目，所以对AVFoundation有了一些的研究。这是AVFoundation的第一篇，准备先介绍一些AVFoundation中的基础知识  音频采样大自然中的声音，他的形态是一种波。我们通过采样，将这种波量化成数据，记录下来，如下图所示： 如上图所示，采样的数据并不能完整的还原出原">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://jiangliancheng.gitcafe.io/images/AVFoundation/dicaiyang.png">
+<meta property="og:image" content="http://jiangliancheng.gitcafe.io/images/AVFoundation/gaocaiyang.png">
+<meta property="og:updated_time" content="2016-02-23T11:09:56.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="AVFoundation(一):基础知识">
+<meta name="twitter:description" content="说好的一周一篇博客，还是懈怠了，博客这个事儿，得自己抓紧，从今天开始争取努力完成这个目标。最近在玩一个类似小咖秀的项目，所以对AVFoundation有了一些的研究。这是AVFoundation的第一篇，准备先介绍一些AVFoundation中的基础知识  音频采样大自然中的声音，他的形态是一种波。我们通过采样，将这种波量化成数据，记录下来，如下图所示： 如上图所示，采样的数据并不能完整的还原出原">
+<meta name="twitter:image" content="http://jiangliancheng.gitcafe.io/images/AVFoundation/dicaiyang.png">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=c114cben" rel="stylesheet">
+
+
+  
+    <link rel="stylesheet" href="/css/personal-style.css">
+  
+
+  
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+  
+  <script type="text/javascript">
+	(function(){
+	    var bp = document.createElement('script');
+	    var curProtocol = window.location.protocol.split(':')[0];
+	    if (curProtocol === 'https') {
+	        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+	    }
+	    else {
+	        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+	    }
+	    var s = document.getElementsByTagName("script")[0];
+	    s.parentNode.insertBefore(bp, s);
+	})();
+  </script>
+
+
+
+  
+    <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+
+  
+    <link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  
+</head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">盒子</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/link/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            友链
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/atom.xml"
+            rel="noopener noreferrer"
+            target="_blank"
+            >
+            RSS
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#音频采样"><span class="toc-text">音频采样</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#音频压缩"><span class="toc-text">音频压缩</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#色彩二次抽样"><span class="toc-text">色彩二次抽样</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#H-264"><span class="toc-text">H.264</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#视频码率-bitRate"><span class="toc-text">视频码率(bitRate)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Reference"><span class="toc-text">Reference</span></a></li></ol>
+  </div>
+
+
+
+<div class="content content-post CENTER">
+   <article id="post-AVFoundation(一)：基础知识" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">AVFoundation(一):基础知识</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2015.10.17</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>John Doe</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/AVFoundation/">AVFoundation</a>
+  </span>
+
+
+
+      
+        <span>
+          <i class="icon-comment"></i>
+          <a href="http://www.forsigner.com/2015/10/17/AVFoundation(一)：基础知识/#disqus_thread"></a>
+        </span>
+      
+
+      
+      <i class="fa fa-eye"></i> 
+        <span id="busuanzi_container_page_pv">
+           &nbsp热度 <span id="busuanzi_value_page_pv">
+           <i class="fa fa-spinner fa-spin"></i></span>℃
+        </span>
+      
+      
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <p>说好的一周一篇博客，还是懈怠了，博客这个事儿，得自己抓紧，从今天开始争取努力完成这个目标。<br>最近在玩一个类似小咖秀的项目，所以对AVFoundation有了一些的研究。这是AVFoundation的第一篇，准备先介绍一些AVFoundation中的基础知识</p>
+<hr>
+<h3 id="音频采样"><a href="#音频采样" class="headerlink" title="音频采样"></a>音频采样</h3><p>大自然中的声音，他的形态是一种波。我们通过采样，将这种波量化成数据，记录下来，如下图所示：<br><img src="http://jiangliancheng.gitcafe.io/images/AVFoundation/dicaiyang.png" alt=""><br><img src="http://jiangliancheng.gitcafe.io/images/AVFoundation/gaocaiyang.png" alt=""></p>
+<p>如上图所示，采样的数据并不能完整的还原出原来的波形，只能做到尽量接近原波形。并且采样率（采样的次数）越高，波形越接近原波形。不过采样的次数增多，必然会导致存储的数据量要增加，所以我们不可能无限提升采样率。经过长期的研究人们发现，当采样率等于波形中最高频率的2倍时，已经足够将波形还原到可接受的程度了。这个频率称为<a href="http://baike.baidu.com/link?url=uznAc6udCar8O7I3kwBt_QZhRByp4_79Y-TaGDoCAmp_jCYyNCFqkLAdZ_mVwkmbKxuhLwEM4gErQy01HwkgL_" target="_blank" rel="noopener">奈奎斯特频率</a>。人耳能接受的最高频率为20kHz，所以只要采样率超过40kHz，就可以呈现出可接受的声音。目前常见的CD采样率为44.1kHz。</p>
+<p>除了采样率之外，音频采样还有一个重要参数叫做<a href="http://zhidao.baidu.com/link?url=Af7OKj4bCFEp5LK3nGgIrrAOcv8wP0onN_u_fevah0ENxmSQl-HOSGeylSrpJrp6IO1ETCtGA6IKUCXhGiuAwHVvjovypCOYar_zOQaXnQa" target="_blank" rel="noopener">音频的位元深度</a>。表示用多少位(bit)定义线性维度上的离散度来保存一个音频样本。位数越高，离散度越多，表示的声音越精确（音质越好）。一般来说16bit比较常见，可以表示65536个离散度。</p>
+<p>一个音频文件的体积，有如下算法：<code>体积=采样率*位元深度*音道数*时间</code>。</p>
+<h3 id="音频压缩"><a href="#音频压缩" class="headerlink" title="音频压缩"></a>音频压缩</h3><p>对声音进行采样、量化过程被称为脉冲编码调制（Pulse Code Modulation），直接脉冲编码调制(Linear Pulse Code Modulation)产生的数据称为Linear PCM数据，LPCM数据是最原始的音频数据完全无损，但是他的体积非常大，比如一个44.1kHz，16bit，双音道的音频文件，每分钟的数据量为44.1*16*2*60kbit=10.3M。一个普通5分钟的音乐就得50M，这个数据量对普通用户来说是过于庞大的。</p>
+<p>为了解决这个问题，诞生了一系列的压缩算法，其中主要分为有无损压缩（ALAC、APE、FLAC）和有损压缩（MP3、AAC、OGG、WMA）两种。其具体的压缩算法对应到AVFoundation的<code>CoreAudioTypes.h</code>中有：</p>
+<pre><code>CF_ENUM(AudioFormatID)
+{
+    kAudioFormatLinearPCM               = &apos;lpcm&apos;,
+    kAudioFormatAC3                     = &apos;ac-3&apos;,
+    kAudioFormat60958AC3                = &apos;cac3&apos;,
+    kAudioFormatAppleIMA4               = &apos;ima4&apos;,
+    kAudioFormatMPEG4AAC                = &apos;aac &apos;,
+    kAudioFormatMPEG4CELP               = &apos;celp&apos;,
+    kAudioFormatMPEG4HVXC               = &apos;hvxc&apos;,
+    kAudioFormatMPEG4TwinVQ             = &apos;twvq&apos;,
+    kAudioFormatMACE3                   = &apos;MAC3&apos;,
+    kAudioFormatMACE6                   = &apos;MAC6&apos;,
+    kAudioFormatULaw                    = &apos;ulaw&apos;,
+    kAudioFormatALaw                    = &apos;alaw&apos;,
+    kAudioFormatQDesign                 = &apos;QDMC&apos;,
+    kAudioFormatQDesign2                = &apos;QDM2&apos;,
+    kAudioFormatQUALCOMM                = &apos;Qclp&apos;,
+    kAudioFormatMPEGLayer1              = &apos;.mp1&apos;,
+    kAudioFormatMPEGLayer2              = &apos;.mp2&apos;,
+    kAudioFormatMPEGLayer3              = &apos;.mp3&apos;,
+    kAudioFormatTimeCode                = &apos;time&apos;,
+    kAudioFormatMIDIStream              = &apos;midi&apos;,
+    kAudioFormatParameterValueStream    = &apos;apvs&apos;,
+    kAudioFormatAppleLossless           = &apos;alac&apos;,
+    kAudioFormatMPEG4AAC_HE             = &apos;aach&apos;,
+    kAudioFormatMPEG4AAC_LD             = &apos;aacl&apos;,
+    kAudioFormatMPEG4AAC_ELD            = &apos;aace&apos;,
+    kAudioFormatMPEG4AAC_ELD_SBR        = &apos;aacf&apos;,
+    kAudioFormatMPEG4AAC_ELD_V2         = &apos;aacg&apos;,    
+    kAudioFormatMPEG4AAC_HE_V2          = &apos;aacp&apos;,
+    kAudioFormatMPEG4AAC_Spatial        = &apos;aacs&apos;,
+    kAudioFormatAMR                     = &apos;samr&apos;,
+    kAudioFormatAMR_WB                  = &apos;sawb&apos;,
+    kAudioFormatAudible                 = &apos;AUDB&apos;,
+    kAudioFormatiLBC                    = &apos;ilbc&apos;,
+    kAudioFormatDVIIntelIMA             = 0x6D730011,
+    kAudioFormatMicrosoftGSM            = 0x6D730031,
+    kAudioFormatAES3                    = &apos;aes3&apos;,
+    kAudioFormatEnhancedAC3             = &apos;ec-3&apos;
+};
+</code></pre><h3 id="色彩二次抽样"><a href="#色彩二次抽样" class="headerlink" title="色彩二次抽样"></a>色彩二次抽样</h3><p>经过大量的研究表明，人的眼睛对亮度非常敏感，但是对色彩信息比较迟钝。<a href="http://baike.baidu.com/link?url=uzAKqqx5WHQ8uzf3nof6psfXhwYFiK_58kq7RzahQn0FINyBydspn0922il4TlBAyjgRlftdHkmdzoGIqbBr8q" target="_blank" rel="noopener">色彩二次抽样</a>是指在原有的图片样本中，二次抽样，减少对色彩信息的抽样，而达到减小图片体积（样本数减小），又不怎么影响图片质量（眼睛对色彩不敏感）的效果。</p>
+<p>视频数据使用的是YCbCr的颜色模型，<a href="http://baike.baidu.com/link?url=akHeVBwkpYoLuiv0Y5It_O1IeeO34zWl2PwR1MkdjBtbvP0pdidUA0iXZQCDiCFf-HkrWk5mohBkwOQ0rxRcG_" target="_blank" rel="noopener">YCbCr</a>也称为YUV。其中Y表示亮度分量，Cb表示蓝色分量，Cr表示红色分量。<br>常用的YCbCr有4:4:4、4:2:2、4:2:0、4:1:1。</p>
+<ol>
+<li>4:4:4 亮度和色彩信息的比值为1:1，所有色彩信息都会被抽样，也就是全彩。</li>
+<li>4:2:2 亮度和色彩信息的比值为2:1，只有1/2的色彩信息被抽样</li>
+<li>4:2:0和4:1:1 亮度和色彩信息比值为4:1，只有1/4的色彩信息被抽样</li>
+</ol>
+<p>对应到AVFoundation的<code>CVImageBuffer.h</code>中有：</p>
+<pre><code>CV_EXPORT const CFStringRef CV_NONNULL kCVImageBufferChromaSubsamplingKey __OSX_AVAILABLE_STARTING(__MAC_10_5,__IPHONE_4_0);        // CFString/CFNumber with one of the following values
+CV_EXPORT const CFStringRef CV_NONNULL kCVImageBufferChromaSubsampling_420 __OSX_AVAILABLE_STARTING(__MAC_10_5,__IPHONE_4_0);
+CV_EXPORT const CFStringRef CV_NONNULL kCVImageBufferChromaSubsampling_422 __OSX_AVAILABLE_STARTING(__MAC_10_5,__IPHONE_4_0);
+CV_EXPORT const CFStringRef CV_NONNULL kCVImageBufferChromaSubsampling_411 __OSX_AVAILABLE_STARTING(__MAC_10_5,__IPHONE_4_0);
+</code></pre><p>一些特别专业的相机可能会用到4:4:4参数捕捉图片，大部分情况下会用4:2:2参数，普通的摄像头（如：iPhone摄像头）一般都是4:2:0、4:1:1</p>
+<h3 id="H-264"><a href="#H-264" class="headerlink" title="H.264"></a>H.264</h3><p>跟音频文件相比，视频文件体积更大。我们平时使用的视频文件都是经过压缩处理的。大部分音视频都使用编解码器(codec)来进行压缩和解压，iOS中使用的主要编解码器标准为<a href="http://baike.baidu.com/link?url=t7bMVaWYsO9F8HEOAol5xcSYo6y0Yzno_y2lY_AsL8KADZkkH3XHCIvdi0kEaPIZA1FfhX2Wlkl2_lS0SLiDRq" target="_blank" rel="noopener">H.264</a>，H.264对应AVFoundation的<code>AVVideoSettings.h</code>中：</p>
+<pre><code>AVF_EXPORT NSString *const AVVideoCodecKey /* NSString (CMVideoCodecType) */                NS_AVAILABLE(10_7, 4_0);
+    AVF_EXPORT NSString *const AVVideoCodecH264 /* @&quot;avc1&quot; */                                NS_AVAILABLE(10_7, 4_0);
+</code></pre><p>H.264通过空间和时间2个维度来压缩体积：</p>
+<ol>
+<li>空间：空间上的压缩独立于视频帧，也称为帧内压缩。主要通过压缩图片的方式（如色彩二次抽样等）来减小体积，帧内压缩一般为有损压缩</li>
+<li>时间：时间上的压缩也称为帧间压缩。视频是由连续的帧（图片）组成。一段视频中（很多张图片）有很多不变的冗余元素，通过减小这些冗余元素来达到压缩的目的，这就是帧间压缩，帧间压缩一般为无损压缩</li>
+</ol>
+<p>H.264有3种profile，用于确定编码过程中帧间压缩使用的算法:</p>
+<ol>
+<li>BaseLine：这个标准提供了最低效的压缩，经过这个标准压缩后的文件体积任然比较大，但是这种算法计算强度最小</li>
+<li>Main：这个标准的计算强度比BaseLine大，但是能达到更高的压缩效果</li>
+<li>High：这个标准能达到最高质量的压缩效果，但他的压缩算法最复杂</li>
+</ol>
+<p>H.264除了profile还有一个等级(Level)标准，Level是对自身特性的一些描述(码率，分辨率,fps等)，Level越高，视频的码率、分辨率、fps越高。</p>
+<p>对应AVfoundation的<code>AVVideoSettings.h</code>中：</p>
+<pre><code>AVF_EXPORT NSString *const AVVideoProfileLevelKey /* NSString, H.264 only, one of: */                    NS_AVAILABLE(10_8, 4_0);
+    AVF_EXPORT NSString *const AVVideoProfileLevelH264Baseline30 /* Baseline Profile Level 3.0 */        NS_AVAILABLE(10_8, 4_0);
+    AVF_EXPORT NSString *const AVVideoProfileLevelH264Baseline31 /* Baseline Profile Level 3.1 */        NS_AVAILABLE(10_8, 4_0);
+       AVF_EXPORT NSString *const AVVideoProfileLevelH264Baseline41 /* Baseline Profile Level 4.1 */        NS_AVAILABLE(10_8, 5_0);
+    AVF_EXPORT NSString *const AVVideoProfileLevelH264BaselineAutoLevel /* Baseline Profile Auto Level */ NS_AVAILABLE(10_9, 7_0);
+    AVF_EXPORT NSString *const AVVideoProfileLevelH264Main30 /* Main Profile Level 3.0 */                NS_AVAILABLE(10_8, 4_0);
+    AVF_EXPORT NSString *const AVVideoProfileLevelH264Main31 /* Main Profile Level 3.1 */                NS_AVAILABLE(10_8, 4_0);
+    AVF_EXPORT NSString *const AVVideoProfileLevelH264Main32 /* Main Profile Level 3.2 */                NS_AVAILABLE(10_8, 5_0);
+    AVF_EXPORT NSString *const AVVideoProfileLevelH264Main41 /* Main Profile Level 4.1 */                NS_AVAILABLE(10_8, 5_0);
+    AVF_EXPORT NSString *const AVVideoProfileLevelH264MainAutoLevel /* Main Profile Auto Level */        NS_AVAILABLE(10_9, 7_0);
+    AVF_EXPORT NSString *const AVVideoProfileLevelH264High40 /* High Profile Level 4.0 */                NS_AVAILABLE(10_9, 6_0);
+    AVF_EXPORT NSString *const AVVideoProfileLevelH264High41 /* High Profile Level 4.1 */                NS_AVAILABLE(10_9, 6_0);
+    AVF_EXPORT NSString *const AVVideoProfileLevelH264HighAutoLevel /* High Profile Auto Level */        NS_AVAILABLE(10_9, 7_0);
+</code></pre><p>一些移动设备（手机、游戏机、PMP）由于性能有限，不支持全部高级视频压缩特性和高分辨率图像，只支持基础压缩特性和分辨率低一些的图像。</p>
+<h3 id="视频码率-bitRate"><a href="#视频码率-bitRate" class="headerlink" title="视频码率(bitRate)"></a>视频码率(bitRate)</h3><p>码率是指单位时间内传输的数据位数。<code>视频体积=视频码率*时间</code>，由此可见固定长度的视频，码率是决定大小的唯一因素。视频码率决定着视频的压缩效果，也决定了视频是质量。码率越高，质量越好，体积越大。码率越低，体积越小，视频质量也越差。<br>编码时，根据码率可以分为固定码率(CBR)编码和可变码率(VBR)编码。</p>
+<ol>
+<li>固定码率：指编码器输出的码率一直为一个固定值，这种编码方式计算量小，编码速度快，但是编码效果不怎么好。对于画面变化大的视频片段，由于码率限制，导致视频非常模糊，然而对于画面变化小的片段，却会造成码率浪费。</li>
+<li>可变码率：指编码器的输出码率可以根据编码器的输入源信号的复杂度自适应的调整，这种方式编码效果比较好</li>
+</ol>
+<p>码率对应于AVFoundation中<code>AVVideoSettings.h</code>：</p>
+<pre><code>AVF_EXPORT NSString *const AVVideoAverageBitRateKey /* NSNumber (bits per second, H.264 only) */         NS_AVAILABLE(10_7, 4_0);
+</code></pre><h3 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h3><p><a href="http://item.jd.com/11742630.html" target="_blank" rel="noopener">AV Foundation 开发秘籍</a><br><a href="http://msching.github.io/blog/2014/07/07/audio-in-ios/" target="_blank" rel="noopener">iOS音频播放 (一)：概述</a><br><a href="https://en.wikipedia.org/wiki/H.264/MPEG-4_AVC" target="_blank" rel="noopener">H.264中profile和level</a><br><a href="http://zhidao.baidu.com/link?url=Af7OKj4bCFEp5LK3nGgIrrAOcv8wP0onN_u_fevah0ENxmSQl-HOSGeylSrpJrp6IO1ETCtGA6IKUCXhGiuAwHVvjovypCOYar_zOQaXnQa" target="_blank" rel="noopener">音频的位元深度</a><br><a href="http://baike.baidu.com/link?url=uznAc6udCar8O7I3kwBt_QZhRByp4_79Y-TaGDoCAmp_jCYyNCFqkLAdZ_mVwkmbKxuhLwEM4gErQy01HwkgL_" target="_blank" rel="noopener">奈奎斯特频率</a></p>
+
+    
+  </div>
+
+</article>
+
+
+   
+  <div class="text-center donation">
+    <div class="inner-donation">
+      <span class="btn-donation">支持一下</span>
+      <div class="donation-body">
+        <div class="tip text-center">扫一扫，支持forsigner</div>
+        <ul>
+        
+          <li class="item">
+            
+              <span>微信扫一扫</span>
+            
+            <img src="/images/qr-wechat.png" alt="">
+          </li>
+        
+          <li class="item">
+            
+              <span>支付宝扫一扫</span>
+            
+            <img src="/images/qr-alipay.png" alt="">
+          </li>
+        
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+   
+  <div class="box-prev-next clearfix">
+    <a class="show pull-left" href="/2015/08/14/JSONModel的使用（二）/">
+        <i class="icon icon-angle-left"></i>
+    </a>
+    <a class="show pull-right" href="/2015/10/27/Xcode7新特性AddressSanitizer/">
+        <i class="icon icon-angle-right"></i>
+    </a>
+  </div>
+
+
+
+
+
+   
+      <div class="git"></div>
+   
+</div>
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/link/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              友链
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/atom.xml"
+              rel="noopener noreferrer"
+              target="_blank"
+              >
+              RSS
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+  <section class="disqus-comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+  </section>
+
+  <script>
+    var disqus_shortname = 'forsigner';
+    
+    var disqus_url = 'http://yoursite.com/2015/10/17/AVFoundation(一)：基础知识/';
+    
+    (function(){
+      var dsq = document.createElement('script');
+      dsq.type = 'text/javascript';
+      dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+
+  <script id="dsq-count-scr" src="//forsigner.disqus.com/count.js" async></script>
+
+
+
+    
+    
+
+    
+    
+
+    
+
+    
+    
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>

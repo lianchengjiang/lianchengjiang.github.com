@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>MethodSwizzling(二) | Hexo</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="forsigner,前端,设计,Hexo主题,前端开发,用户体验,设计,frontend,design,nodejs,JavaScript" />
+  
+
+  <meta name="description" content="上一篇博客中我们简单介绍了Method Swizzling，看过上一篇文章也许大家会觉得Method Swizzling is so easy，不过事情没那么简单。有很多细节任然需要我们注意！！！ 细节在ARC之前，我们经常备受内存管理的困扰，有时候一些对象莫名其妙就被释放了，都不知道在哪儿释放的。在任何对象dealloc的时候都打印一个log，这样只要看log就知道在哪儿被释放了。由于对象的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MethodSwizzling(二)">
+<meta property="og:url" content="http://yoursite.com/2015/02/25/MethodSwizzling2/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="上一篇博客中我们简单介绍了Method Swizzling，看过上一篇文章也许大家会觉得Method Swizzling is so easy，不过事情没那么简单。有很多细节任然需要我们注意！！！ 细节在ARC之前，我们经常备受内存管理的困扰，有时候一些对象莫名其妙就被释放了，都不知道在哪儿释放的。在任何对象dealloc的时候都打印一个log，这样只要看log就知道在哪儿被释放了。由于对象的">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://cn.cocos2d-x.org/uploads/20141018/1413628797629491.png">
+<meta property="og:updated_time" content="2015-10-31T16:10:49.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="MethodSwizzling(二)">
+<meta name="twitter:description" content="上一篇博客中我们简单介绍了Method Swizzling，看过上一篇文章也许大家会觉得Method Swizzling is so easy，不过事情没那么简单。有很多细节任然需要我们注意！！！ 细节在ARC之前，我们经常备受内存管理的困扰，有时候一些对象莫名其妙就被释放了，都不知道在哪儿释放的。在任何对象dealloc的时候都打印一个log，这样只要看log就知道在哪儿被释放了。由于对象的">
+<meta name="twitter:image" content="http://cn.cocos2d-x.org/uploads/20141018/1413628797629491.png">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=c114cben" rel="stylesheet">
+
+
+  
+    <link rel="stylesheet" href="/css/personal-style.css">
+  
+
+  
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+  
+  <script type="text/javascript">
+	(function(){
+	    var bp = document.createElement('script');
+	    var curProtocol = window.location.protocol.split(':')[0];
+	    if (curProtocol === 'https') {
+	        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+	    }
+	    else {
+	        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+	    }
+	    var s = document.getElementsByTagName("script")[0];
+	    s.parentNode.insertBefore(bp, s);
+	})();
+  </script>
+
+
+
+  
+    <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+
+  
+    <link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  
+</head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">盒子</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/link/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            友链
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/atom.xml"
+            rel="noopener noreferrer"
+            target="_blank"
+            >
+            RSS
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#细节"><span class="toc-text">细节</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-load-VS-initialize"><span class="toc-text">1. +load VS +initialize</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-dispatch-once"><span class="toc-text">2. dispatch_once</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-Swizzling-Class-Method"><span class="toc-text">3. Swizzling Class Method</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Danger"><span class="toc-text">Danger</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-Refused-by-AppStore"><span class="toc-text">1.Refused by AppStore</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-Class-Cluster"><span class="toc-text">2.Class Cluster</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-Swizzling-changes-the-method’s-arguments"><span class="toc-text">3. Swizzling changes the method’s arguments</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-others"><span class="toc-text">4.others</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考"><span class="toc-text">参考</span></a></li></ol>
+  </div>
+
+
+
+<div class="content content-post CENTER">
+   <article id="post-MethodSwizzling2" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">MethodSwizzling(二)</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2015.02.25</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>John Doe</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/刨根究底iOS/">刨根究底iOS</a>
+  </span>
+
+
+
+      
+        <span>
+          <i class="icon-comment"></i>
+          <a href="http://www.forsigner.com/2015/02/25/MethodSwizzling2/#disqus_thread"></a>
+        </span>
+      
+
+      
+      <i class="fa fa-eye"></i> 
+        <span id="busuanzi_container_page_pv">
+           &nbsp热度 <span id="busuanzi_value_page_pv">
+           <i class="fa fa-spinner fa-spin"></i></span>℃
+        </span>
+      
+      
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <p>  <a href="http://jiangliancheng.gitcafe.io/2015/01/31/MethodSwizzling1/" target="_blank" rel="noopener">上一篇博客</a>中我们简单介绍了Method Swizzling，看过上一篇文章也许大家会觉得<code>Method Swizzling is so easy</code>，不过事情没那么简单。有很多细节任然需要我们注意！！！</p>
+<h2 id="细节"><a href="#细节" class="headerlink" title="细节"></a>细节</h2><p>在ARC之前，我们经常备受内存管理的困扰，有时候一些对象莫名其妙就被释放了，都不知道在哪儿释放的。在任何对象dealloc的时候都打印一个log，这样只要看log就知道在哪儿被释放了。由于对象的类众多，重写dealloc工作量巨大，所以我们决定用Swizzling。</p>
+<p>上代码~~~</p>
+<pre><code>@implementation NSObject(Swizzling)
+void methodSwizzling(Class class,SEL originSel,SEL overrideSel)
+{
+    Method originMethod = class_getInstanceMethod(class, originSel);
+    Method overrideMethod = class_getInstanceMethod(class, overrideSel);
+
+    if (class_addMethod(class,
+                        originSel,
+                        method_getImplementation(overrideMethod),
+                        method_getTypeEncoding(originMethod)))
+    {
+        /** case1:NSMutableDictionary中没有-setObject:forKey:的实现 */
+        class_replaceMethod(class,
+                            overrideSel,
+                            method_getImplementation(originMethod),
+                            method_getTypeEncoding(originMethod));
+    }else{
+        /** case2:NSMutableDictionary中有-setObject:forKey:的实现   */
+        method_exchangeImplementations(originMethod, overrideMethod);
+    }
+}
+
++ (void)load
+{
+    static dispatch_once_t onceToken;
+    dispatch_once(&amp;onceToken, ^{
+        methodSwizzling([NSObject class], @selector(dealloc), @selector(swzzling_dealloc));
+    });
+}
+
+- (void)swzzling_dealloc
+{
+    printf(&quot;我在这里被释放了&quot;);
+    [self swzzling_dealloc];
+}
+@end
+</code></pre><blockquote>
+<p>例子必须在非ARC下运行，因为@selector(dealloc)在ARC下编译器会报错</p>
+</blockquote>
+<p>例子有些简单和幼稚，现实中可能没有这样的需求，不过这都不是重点，重点是……</p>
+<h4 id="1-load-VS-initialize"><a href="#1-load-VS-initialize" class="headerlink" title="1. +load VS +initialize"></a>1. <code>+load</code> VS <code>+initialize</code></h4><p>有没有人想过为什么Swizzling的代码要放在+load中？why？</p>
+<p>=&gt; 因为Swizzling的代码必须要在方法执行之前，否则方法都执行了，再Swizzling就没有意义了，而+load方法是main函数之前调用的(class添加runtime中的时候调用)，所以可以保证在方法执行前Swizzling……</p>
+<p>+initialize方法也可以保证在方法执行前调用，那是否可以将Swizzling的代码放在这个里面？</p>
+<p>=&gt; 放在+initialize里面大多数时候是不会有问题的，不过这样做会有风险。我们知道，+initialize方法是在Class接到第一个消息之前执行，也就是说，多个有继承关系的类，他们的+initialize方法执行的顺序取决于具体的代码，哪个类先接收到第一个消息，哪个类的+initialize方法就先执行。如果这几个类都对同一个Method执行了Swizzling，这就会导致他们行为的不确定性，我们不知道哪个Swizzling先执行，从而可能会产生隐藏的难以发现的bug。而+load执行的顺序是确定的。父类的+load先执行，之后才执行子类</p>
+<h4 id="2-dispatch-once"><a href="#2-dispatch-once" class="headerlink" title="2. dispatch_once"></a>2. dispatch_once</h4><p>显而易见，如果多个线程同时执行同一段Swizzling的代码，有可能造成混乱，产生我们不希望的结果，所以一般Swizzling的代码都需要放在dispatch_once中，不过由于系统保证了+load方法不会同时执行多次，所以在+load中不加dispatch_once也影响不大，不过为了养成良好的代码系统，加上dispatch_once是最好的</p>
+<h4 id="3-Swizzling-Class-Method"><a href="#3-Swizzling-Class-Method" class="headerlink" title="3. Swizzling Class Method"></a>3. Swizzling Class Method</h4><p>一直以来，我们都仅仅是对InstanceMethod（实例方法）进行Swizzling，如果我们需要对Class Method（类方法）进行Swizzling，那该怎么做呢？<br>首先我们来看看答案吧：</p>
+<pre><code>void classMethodSwizzling(Class class,SEL originSel,SEL overrideSel)
+{
+    Class metalClass = object_getClass(class);
+    methodSwizzling(metalClass, originSel, overrideSel);
+}
+</code></pre><p>我们可以看到，只需要将原来的Class替换成metalClass即可对ClassMethod进行Swizzling。<br>but why？<br>要解释这个，首先我们需要了解一下Class。</p>
+<p><img src="http://cn.cocos2d-x.org/uploads/20141018/1413628797629491.png" alt="Class 关系图"></p>
+<p>Instance，Class，MetalClass的关系如图所示，下面2点我需要解释一下：</p>
+<ol>
+<li>Instance的class指针指向Class，Class的class指针指向MetalClass。简单来说可以理解为MetalClass的实例为Class，Class的实例为真正的实例Instance。</li>
+<li>MetalClass的结构与Class的结构完全相同，他们的区别只是Class中存放实例方法，MetalClass中存放类方法。</li>
+</ol>
+<p>所以首先，object_getClass()方法传入一个实例对象，返回实例对象的Class。由1可知，传入class，返回MetalClass。</p>
+<p>由于Class中只存放实例方法，所以要对类方法进行Swizzling必须要在MetalClass上进行，并且MetalClass和Class的结构完全相同，所以只需要将原来的Class替换成metalClass即可对ClassMethod进行Swizzling。</p>
+<h2 id="Danger"><a href="#Danger" class="headerlink" title="Danger"></a>Danger</h2><p>大家可能都知道Method Swizzling是有风险的，但是具体风险在哪里，可能大家就不太明确了。我查找了一些资料，收集了一些Swizzling存在风险的地方，如果大家还发现其他的风险，请联系我。</p>
+<h4 id="1-Refused-by-AppStore"><a href="#1-Refused-by-AppStore" class="headerlink" title="1.Refused by AppStore"></a>1.Refused by AppStore</h4><p>危险系数：★★★★★<br>遭遇概率：★☆☆☆☆<br>曾经出现过由于Swizzling系统API而被AppStore拒绝的事情，不过我在网上查了很长时间，这个事件仅发生了一次，并且后面的人做同样的事并没有遭到拒绝，这个应该也和审核的人有关。一般情况下应该是不会被拒的，所以这个危险系数极高，但是遭遇概率也非常低。<a href="http://stackoverflow.com/questions/8834294/app-store-method-swizzling-legality" target="_blank" rel="noopener">事件的详细情况看这里</a></p>
+<h4 id="2-Class-Cluster"><a href="#2-Class-Cluster" class="headerlink" title="2.Class Cluster"></a>2.Class Cluster</h4><p>危险系数：★★★★☆<br>遭遇概率：★★☆☆☆<br>类族的概念在上一篇博客里说起过。简单的说，类族就是表面上我们似乎只是在用一个类，例如NSString(NSNumber,NSArray,NSDictionary等类似)，实际我们使用的是他们的子类，如：__NSCFConstantString,NSPathStore2,NSBigMutableString等，由于这些子类并不公开，我们不知道到底有多少子类，以后还会不会增加子类，从而Swizzling的时候无法对所有子类覆盖，导致可能有的情况下使用NSString的方法是Swizzling过的，有的情况下调用的是未Swizzling的方法。所以对于这种情况，建议放弃使用Method Swizzling。</p>
+<h4 id="3-Swizzling-changes-the-method’s-arguments"><a href="#3-Swizzling-changes-the-method’s-arguments" class="headerlink" title="3. Swizzling changes the method’s arguments"></a>3. Swizzling changes the method’s arguments</h4><p>危险系数：★★☆☆☆<br>遭遇概率：★★★★☆<br>Swizzling改变了方法的参数。我们知道，当我们调用一个方法时[obj test]，系统会将其转化为消息发送objc_msgSend(obj,@selector(test))，并将obj和SEL传送到方法中，在方法中，可以通过<code>_cmd</code>获取传入的SEL，通过刚刚的传统Swizzling方法Swizzling过后，传入原函数的SEL改变了，若原函数中使用了<code>_cmd</code>,就有可能发生错误。幸好，这个风险是可以避免的，通过以下的修改即可避免这个风险。</p>
+<pre><code>- (void)swzzling_dealloc
+{
+    printf(&quot;我在这里被释放了&quot;);
+//    [self swzzling_dealloc];
+    IMP originImp = class_getMethodImplementation([self class], @selector(swzzling_dealloc));
+    originImp(self,_cmd);
+}
+</code></pre><p>我们直接调用IMP，将正确的<code>_cmd</code>传入其中即可。</p>
+<blockquote>
+<p><del>直接调用IMP的写法有些粗鲁，过几天有时间可以研究一下将其封装成一个方法，再过来更新</del><br>更新：由于IMP传入的参数是可变长参数，因此封装的方法传入的参数必须也为可变长参数，然而目前无法做到将可变长参数专递给另一函数，所以这个地方暂时无法封装成一个方法。如果你有什么其他办法可以做到，请联系我</p>
+</blockquote>
+<h4 id="4-others"><a href="#4-others" class="headerlink" title="4.others"></a>4.others</h4><p><a href="http://stackoverflow.com/questions/5339276/what-are-the-dangers-of-method-swizzling-in-objective-c" target="_blank" rel="noopener">这里</a>还列出了一些其他的风险，念茜大神在<a href="http://blog.csdn.net/yiyaaixuexi/article/details/9374411" target="_blank" rel="noopener">这里</a>对他进行了翻译，我就不在这里赘述了。感兴趣的朋友可以看看，里面还提供了另外一种Method Swizzling的方法，同样也可以解决3中这个问题。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="http://nshipster.com/method-swizzling/" target="_blank" rel="noopener">Method Swizzling in nshipster</a></p>
+<p><a href="http://www.codeproject.com/Articles/604344/MethodplusSwizzling" target="_blank" rel="noopener">Method Swizzling in codeproject</a></p>
+<p><a href="http://stackoverflow.com/questions/5339276/what-are-the-dangers-of-method-swizzling-in-objective-c" target="_blank" rel="noopener">What are the Dangers of Method Swizzling in Objective C?</a></p>
+<p><a href="http://blog.csdn.net/yiyaaixuexi/article/details/9374411" target="_blank" rel="noopener">Objective-C的hook方案（一）:  Method Swizzling</a></p>
+
+    
+  </div>
+
+</article>
+
+
+   
+  <div class="text-center donation">
+    <div class="inner-donation">
+      <span class="btn-donation">支持一下</span>
+      <div class="donation-body">
+        <div class="tip text-center">扫一扫，支持forsigner</div>
+        <ul>
+        
+          <li class="item">
+            
+              <span>微信扫一扫</span>
+            
+            <img src="/images/qr-wechat.png" alt="">
+          </li>
+        
+          <li class="item">
+            
+              <span>支付宝扫一扫</span>
+            
+            <img src="/images/qr-alipay.png" alt="">
+          </li>
+        
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+   
+  <div class="box-prev-next clearfix">
+    <a class="show pull-left" href="/2015/01/31/MethodSwizzling1/">
+        <i class="icon icon-angle-left"></i>
+    </a>
+    <a class="show pull-right" href="/2015/03/02/blcok的那些事/">
+        <i class="icon icon-angle-right"></i>
+    </a>
+  </div>
+
+
+
+
+
+   
+      <div class="git"></div>
+   
+</div>
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/link/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              友链
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/atom.xml"
+              rel="noopener noreferrer"
+              target="_blank"
+              >
+              RSS
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+  <section class="disqus-comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+  </section>
+
+  <script>
+    var disqus_shortname = 'forsigner';
+    
+    var disqus_url = 'http://yoursite.com/2015/02/25/MethodSwizzling2/';
+    
+    (function(){
+      var dsq = document.createElement('script');
+      dsq.type = 'text/javascript';
+      dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+
+  <script id="dsq-count-scr" src="//forsigner.disqus.com/count.js" async></script>
+
+
+
+    
+    
+
+    
+    
+
+    
+
+    
+    
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>

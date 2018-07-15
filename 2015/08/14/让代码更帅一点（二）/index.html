@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>让代码更帅一点（二） | Hexo</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="forsigner,前端,设计,Hexo主题,前端开发,用户体验,设计,frontend,design,nodejs,JavaScript" />
+  
+
+  <meta name="description" content="可变集合永远不要枚举可变集合推荐： NSArray *staticArray = [multableArray copy]; for (id item in staticArray) {     .... } 不推荐： for (id item in multableArray) {     .... } 可变集合在枚举时如果发生改变，会引起crash。永远不要枚举可变集合，不管你有多么确定这个集">
+<meta property="og:type" content="article">
+<meta property="og:title" content="让代码更帅一点（二）">
+<meta property="og:url" content="http://yoursite.com/2015/08/14/让代码更帅一点（二）/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="可变集合永远不要枚举可变集合推荐： NSArray *staticArray = [multableArray copy]; for (id item in staticArray) {     .... } 不推荐： for (id item in multableArray) {     .... } 可变集合在枚举时如果发生改变，会引起crash。永远不要枚举可变集合，不管你有多么确定这个集">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2015-10-31T16:06:39.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="让代码更帅一点（二）">
+<meta name="twitter:description" content="可变集合永远不要枚举可变集合推荐： NSArray *staticArray = [multableArray copy]; for (id item in staticArray) {     .... } 不推荐： for (id item in multableArray) {     .... } 可变集合在枚举时如果发生改变，会引起crash。永远不要枚举可变集合，不管你有多么确定这个集">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=c114cben" rel="stylesheet">
+
+
+  
+    <link rel="stylesheet" href="/css/personal-style.css">
+  
+
+  
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+  
+  <script type="text/javascript">
+	(function(){
+	    var bp = document.createElement('script');
+	    var curProtocol = window.location.protocol.split(':')[0];
+	    if (curProtocol === 'https') {
+	        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+	    }
+	    else {
+	        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+	    }
+	    var s = document.getElementsByTagName("script")[0];
+	    s.parentNode.insertBefore(bp, s);
+	})();
+  </script>
+
+
+
+  
+    <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+
+  
+    <link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  
+</head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">盒子</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/link/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            友链
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/atom.xml"
+            rel="noopener noreferrer"
+            target="_blank"
+            >
+            RSS
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#可变集合"><span class="toc-text">可变集合</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#永远不要枚举可变集合"><span class="toc-text">永远不要枚举可变集合</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#不要将可变集合暴露成公共属性"><span class="toc-text">不要将可变集合暴露成公共属性</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#NSNotification"><span class="toc-text">NSNotification</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#remove"><span class="toc-text">remove</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#多次注册"><span class="toc-text">多次注册</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Reference"><span class="toc-text">Reference</span></a></li></ol>
+  </div>
+
+
+
+<div class="content content-post CENTER">
+   <article id="post-让代码更帅一点（二）" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">让代码更帅一点（二）</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2015.08.14</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>John Doe</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/代码规范和技巧/">代码规范和技巧</a>
+  </span>
+
+
+
+      
+        <span>
+          <i class="icon-comment"></i>
+          <a href="http://www.forsigner.com/2015/08/14/让代码更帅一点（二）/#disqus_thread"></a>
+        </span>
+      
+
+      
+      <i class="fa fa-eye"></i> 
+        <span id="busuanzi_container_page_pv">
+           &nbsp热度 <span id="busuanzi_value_page_pv">
+           <i class="fa fa-spinner fa-spin"></i></span>℃
+        </span>
+      
+      
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <h2 id="可变集合"><a href="#可变集合" class="headerlink" title="可变集合"></a>可变集合</h2><h4 id="永远不要枚举可变集合"><a href="#永远不要枚举可变集合" class="headerlink" title="永远不要枚举可变集合"></a>永远不要枚举可变集合</h4><p>推荐：</p>
+<pre><code>NSArray *staticArray = [multableArray copy];
+for (id item in staticArray) {
+    ....
+}
+</code></pre><p>不推荐：</p>
+<pre><code>for (id item in multableArray) {
+    ....
+}
+</code></pre><p>可变集合在枚举时如果发生改变，会引起crash。<br>永远不要枚举可变集合，不管你有多么确定这个集合不会改变。因为代码也许以后会被修改，也许有别的线程会改变这个集合，太多意外可能会发生，唯一能保证不会有意外的就是永远不要枚举可变集合</p>
+<h4 id="不要将可变集合暴露成公共属性"><a href="#不要将可变集合暴露成公共属性" class="headerlink" title="不要将可变集合暴露成公共属性"></a>不要将可变集合暴露成公共属性</h4><p>推荐：</p>
+<pre><code>// .h
+@property(nonatomic, readonly) NSArray *staticArray;
+
+// .m
+@property(nonatomic, strong) NSMutableArray *mutableArray;
+
+- (NSArray *)staticArray
+{
+    return [self.mutableArray copy];
+}
+</code></pre><p>不推荐①：</p>
+<pre><code>// .h
+@property(nonatomic, readonly)NSMutableArray *mutableArray;
+</code></pre><p>不推荐②：</p>
+<pre><code>// .h
+@property(nonatomic, readonly) NSArray *staticArray;
+
+// .m
+@property(nonatomic, strong) NSMutableArray *mutableArray;
+
+- (NSArray *)staticArray
+{
+    return self.mutableArray;
+}
+</code></pre><p>你永远不知道外面会怎么用这个mutableArray，假设外面正在枚举这个mutableArray，在其他线程mutableArray被改变了。嘭，Crash了，还不是毕现，又是加班的节奏了…</p>
+<p>如果在外部需要改变这个Array里面的item，添加改变item的方法：</p>
+<pre><code>// .h
+@property(nonatomic, readonly) NSArray *staticArray;
+
+- (void)addItem:(id)item;
+- (void)removeItem:(id)item;
+
+//.m
+@property(nonatomic, strong) NSMutableArray *mutableArray;
+
+- (void)addItem:(id)item
+{
+    [self.mutableArray addObject:item];
+}
+
+- (void)removeItem:(id)item
+{
+    [self.mutableArray removeObject:item];
+}
+</code></pre><h2 id="NSNotification"><a href="#NSNotification" class="headerlink" title="NSNotification"></a>NSNotification</h2><h4 id="remove"><a href="#remove" class="headerlink" title="remove"></a>remove</h4><p>notification一定要remove！<br>notification一定要remove！！<br>notification一定要remove！！！<br>重要的东西一定要说三遍，Notification不remove很容易crash，包括KVO，也一定要记得remove，否则会有crash在前方等着你…</p>
+<h4 id="多次注册"><a href="#多次注册" class="headerlink" title="多次注册"></a>多次注册</h4><p>notification如果多次注册会导致一次post，方法多次被调用，所以注意注册通知的时候一定要看清楚，是否通知只注册了一次，建议在init中注册通知，dealloc中remove通知</p>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><p><a href="http://inessential.com/2015/06/10/how_not_to_crash_9_mindset" target="_blank" rel="noopener">How Not to Crash</a></p>
+
+    
+  </div>
+
+</article>
+
+
+   
+  <div class="text-center donation">
+    <div class="inner-donation">
+      <span class="btn-donation">支持一下</span>
+      <div class="donation-body">
+        <div class="tip text-center">扫一扫，支持forsigner</div>
+        <ul>
+        
+          <li class="item">
+            
+              <span>微信扫一扫</span>
+            
+            <img src="/images/qr-wechat.png" alt="">
+          </li>
+        
+          <li class="item">
+            
+              <span>支付宝扫一扫</span>
+            
+            <img src="/images/qr-alipay.png" alt="">
+          </li>
+        
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+   
+  <div class="box-prev-next clearfix">
+    <a class="show pull-left" href="/2015/08/09/让代码更帅一点/">
+        <i class="icon icon-angle-left"></i>
+    </a>
+    <a class="show pull-right" href="/2015/08/14/JSONModel的使用（二）/">
+        <i class="icon icon-angle-right"></i>
+    </a>
+  </div>
+
+
+
+
+
+   
+      <div class="git"></div>
+   
+</div>
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/link/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              友链
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/atom.xml"
+              rel="noopener noreferrer"
+              target="_blank"
+              >
+              RSS
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+  <section class="disqus-comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+  </section>
+
+  <script>
+    var disqus_shortname = 'forsigner';
+    
+    var disqus_url = 'http://yoursite.com/2015/08/14/让代码更帅一点（二）/';
+    
+    (function(){
+      var dsq = document.createElement('script');
+      dsq.type = 'text/javascript';
+      dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+
+  <script id="dsq-count-scr" src="//forsigner.disqus.com/count.js" async></script>
+
+
+
+    
+    
+
+    
+    
+
+    
+
+    
+    
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>

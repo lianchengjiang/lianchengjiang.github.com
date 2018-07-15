@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>小笨狼漫谈多线程：NSThread | Hexo</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="forsigner,前端,设计,Hexo主题,前端开发,用户体验,设计,frontend,design,nodejs,JavaScript" />
+  
+
+  <meta name="description" content="多线程是程序开发中非常基础的一个概念，大家在开发过程中应该或多或少用过相关的东西。同时这恰恰又是一个比较棘手的概念，一切跟多线程挂钩的东西都会变得复杂。如果使用过程中对多线程不够熟悉，很可能会埋下一些难以预料的坑。 iOS中的多线程技术主要有NSThread, GCD和NSOperation。他们的封装层次依次递增，其中  NSThread封装性最差，最偏向于底层，主要基于thread使用 GCD">
+<meta property="og:type" content="article">
+<meta property="og:title" content="小笨狼漫谈多线程：NSThread">
+<meta property="og:url" content="http://yoursite.com/2016/01/16/小笨狼漫谈多线程-NSThread/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="多线程是程序开发中非常基础的一个概念，大家在开发过程中应该或多或少用过相关的东西。同时这恰恰又是一个比较棘手的概念，一切跟多线程挂钩的东西都会变得复杂。如果使用过程中对多线程不够熟悉，很可能会埋下一些难以预料的坑。 iOS中的多线程技术主要有NSThread, GCD和NSOperation。他们的封装层次依次递增，其中  NSThread封装性最差，最偏向于底层，主要基于thread使用 GCD">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://jiangliancheng.gitcafe.io/images/NSThread/thread.png">
+<meta property="og:updated_time" content="2016-01-23T06:09:30.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="小笨狼漫谈多线程：NSThread">
+<meta name="twitter:description" content="多线程是程序开发中非常基础的一个概念，大家在开发过程中应该或多或少用过相关的东西。同时这恰恰又是一个比较棘手的概念，一切跟多线程挂钩的东西都会变得复杂。如果使用过程中对多线程不够熟悉，很可能会埋下一些难以预料的坑。 iOS中的多线程技术主要有NSThread, GCD和NSOperation。他们的封装层次依次递增，其中  NSThread封装性最差，最偏向于底层，主要基于thread使用 GCD">
+<meta name="twitter:image" content="http://jiangliancheng.gitcafe.io/images/NSThread/thread.png">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=c114cben" rel="stylesheet">
+
+
+  
+    <link rel="stylesheet" href="/css/personal-style.css">
+  
+
+  
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+  
+  <script type="text/javascript">
+	(function(){
+	    var bp = document.createElement('script');
+	    var curProtocol = window.location.protocol.split(':')[0];
+	    if (curProtocol === 'https') {
+	        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+	    }
+	    else {
+	        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+	    }
+	    var s = document.getElementsByTagName("script")[0];
+	    s.parentNode.insertBefore(bp, s);
+	})();
+  </script>
+
+
+
+  
+    <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+
+  
+    <link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  
+</head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">盒子</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/link/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            友链
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/atom.xml"
+            rel="noopener noreferrer"
+            target="_blank"
+            >
+            RSS
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#多线程的概念"><span class="toc-text">多线程的概念</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#NSThread-API"><span class="toc-text">NSThread API</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#线程创建"><span class="toc-text">线程创建</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#线程操作"><span class="toc-text">线程操作</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#启动"><span class="toc-text">启动</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#睡眠"><span class="toc-text">睡眠</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#取消"><span class="toc-text">取消</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#退出"><span class="toc-text">退出</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#线程通讯"><span class="toc-text">线程通讯</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#线程优先级"><span class="toc-text">线程优先级</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#主线程和当前线程"><span class="toc-text">主线程和当前线程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#线程通知"><span class="toc-text">线程通知</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#NSThread实例"><span class="toc-text">NSThread实例</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#线程创建-1"><span class="toc-text">线程创建</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#线程通讯-1"><span class="toc-text">线程通讯</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#结束线程"><span class="toc-text">结束线程</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Extension"><span class="toc-text">Extension</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#About-Me"><span class="toc-text">About Me</span></a></li></ol>
+  </div>
+
+
+
+<div class="content content-post CENTER">
+   <article id="post-小笨狼漫谈多线程-NSThread" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">小笨狼漫谈多线程：NSThread</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2016.01.16</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>John Doe</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/多线程/">多线程</a>
+  </span>
+
+
+
+      
+        <span>
+          <i class="icon-comment"></i>
+          <a href="http://www.forsigner.com/2016/01/16/小笨狼漫谈多线程-NSThread/#disqus_thread"></a>
+        </span>
+      
+
+      
+      <i class="fa fa-eye"></i> 
+        <span id="busuanzi_container_page_pv">
+           &nbsp热度 <span id="busuanzi_value_page_pv">
+           <i class="fa fa-spinner fa-spin"></i></span>℃
+        </span>
+      
+      
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <p>多线程是程序开发中非常基础的一个概念，大家在开发过程中应该或多或少用过相关的东西。同时这恰恰又是一个比较棘手的概念，一切跟多线程挂钩的东西都会变得复杂。如果使用过程中对多线程不够熟悉，很可能会埋下一些难以预料的坑。</p>
+<p>iOS中的多线程技术主要有NSThread, GCD和NSOperation。他们的封装层次依次递增，其中</p>
+<ul>
+<li>NSThread封装性最差，最偏向于底层，主要基于thread使用</li>
+<li>GCD是基于C的API，直接使用比较方便，主要基于task使用</li>
+<li>NSOperation是基于GCD封装的NSObject对象，对于复杂的多线程项目使用比较方便，主要基于队列使用</li>
+</ul>
+<p>这篇文章是这个多线程系列的第一篇，主要介绍NSThread, NSThread是上面三项技术中唯一基于thread的，每一个NSThread对象代表着一个线程，理解NSThread更有利于理解多线程的含义</p>
+<h1 id="多线程的概念"><a href="#多线程的概念" class="headerlink" title="多线程的概念"></a>多线程的概念</h1><p>曾经面试的时候被问到过什么是线程和进程？当时感觉自己似乎知道这是什么东西，但是比划了半天就是说不上来</p>
+<p>根据Apple官方的定义：</p>
+<pre><code>The term thread is used to refer to a separate path of execution for code.
+The term process is used to refer to a running executable, which can encompass multiple threads.
+</code></pre><ul>
+<li>线程用于指代一个独立执行的代码路径</li>
+<li>进程用于指代一个可执行程序，他可以包含多个线程</li>
+</ul>
+<p>当一个可执行程序中拥有多个独立执行的代码路径的时候，这就叫做多线程<br><img src="http://jiangliancheng.gitcafe.io/images/NSThread/thread.png" alt=""></p>
+<h1 id="NSThread-API"><a href="#NSThread-API" class="headerlink" title="NSThread API"></a>NSThread API</h1><h2 id="线程创建"><a href="#线程创建" class="headerlink" title="线程创建"></a>线程创建</h2><p>对于NSThread来说，每一个对象就代表着一个线程，NSThread提供了2种创建线程的方法:</p>
+<pre><code>+ (void)detachNewThreadSelector:(SEL)selector toTarget:(id)target withObject:(nullable id)argument;
+- (instancetype)initWithTarget:(id)target selector:(SEL)selector object:(nullable id)argument NS_AVAILABLE(10_5, 2_0);
+</code></pre><ul>
+<li>detach方法直接创建并启动一个线程去Selector，由于没有返回值，如果需要获取新创建的Thread，需要在执行的Selector中调用<code>-[NSThread currentThread]</code>获取</li>
+<li>init方法初始化线程并返回，线程的入口函数由Selector传入。线程创建出来之后需要手动调用<code>-start</code>方法启动</li>
+</ul>
+<h2 id="线程操作"><a href="#线程操作" class="headerlink" title="线程操作"></a>线程操作</h2><p>创建好线程之后当然需要对线程进行操作，NSThread给线程提供的主要操作方法有启动，睡眠，取消，退出</p>
+<h3 id="启动"><a href="#启动" class="headerlink" title="启动"></a>启动</h3><p>我们使用init方法将线程创建出来之后，线程并不会立即运行，只有我们手动调用<code>-start</code>方法才会启动线程</p>
+<pre><code>- (void)start NS_AVAILABLE(10_5, 2_0);
+</code></pre><p>这里要注意的是：部分线程属性需要在启动前设置，线程启动之后再设置会无效。如<code>qualityOfService</code>属性</p>
+<h3 id="睡眠"><a href="#睡眠" class="headerlink" title="睡眠"></a>睡眠</h3><p>NSThread提供了2个让线程睡眠的方法，一个是根据NSDate传入睡眠时间，一个是直接传入NSTimeInterval</p>
+<pre><code>+ (void)sleepUntilDate:(NSDate *)date;
++ (void)sleepForTimeInterval:(NSTimeInterval)ti;
+</code></pre><p>看到<code>sleepUntilDate:</code>大家可能会想起runloop的<code>runUntilDate:</code>。他们都有阻塞线程的效果，但是阻塞之后的行为又有不一样的地方，使用的时候，我们需要根据具体需求选择合适的API。</p>
+<ul>
+<li><code>sleepUntilDate:</code>相当于执行一个sleep的任务。在执行过程中，即使有其他任务传入runloop，runloop也不会立即响应，必须sleep任务完成之后，才会响应其他任务</li>
+<li><code>runUntilDate:</code>虽然会阻塞线程，阻塞过程中并不妨碍新任务的执行。当有新任务的时候，会先执行接收到的新任务，新任务执行完之后，如果时间到了，再继续执行<code>runUntilDate:</code>之后的代码</li>
+</ul>
+<h3 id="取消"><a href="#取消" class="headerlink" title="取消"></a>取消</h3><p>对于线程的取消，NSThread提供了一个取消的方法和一个属性</p>
+<pre><code>@property (readonly, getter=isCancelled) BOOL cancelled NS_AVAILABLE(10_5, 2_0);
+
+- (void)cancel NS_AVAILABLE(10_5, 2_0);
+</code></pre><p>不过大家千万不要被它的名字迷惑，调用<code>-cancel</code>方法并不会立刻取消线程，它仅仅是将<code>cancelled</code>属性设置为YES。<code>cancelled</code>也仅仅是一个用于记录状态的属性。线程取消的功能需要我们在main函数中自己实现</p>
+<p>要实现取消的功能，我们需要自己在线程的main函数中定期检查<code>isCancelled</code>状态来判断线程是否需要退出，当<code>isCancelled</code>为YES的时候，我们手动退出。如果我们没有在main函数中检查<code>isCancelled</code>状态，那么调用<code>-cancel</code>将没有任何意义</p>
+<h3 id="退出"><a href="#退出" class="headerlink" title="退出"></a>退出</h3><p>与充满不确定性的<code>-cancel</code>相比，<code>-exit</code>函数可以让线程立即退出。</p>
+<pre><code>+ (void)exit;
+</code></pre><p><code>-exit</code>属于核弹级别终极API，调用之后会立即终止线程，即使任务还没有执行完成也会中断。这就非常有可能导致内存泄露等严重问题，所以一般不推荐使用。</p>
+<blockquote>
+<p>对于有runloop的线程，可以使用<code>CFRunLoopStop()</code>结束runloop配合<code>-cancel</code>结束线程</p>
+<p>[2016.1.19更新]<br>感谢@NSHYJ的提醒。runloop启动的方法中<code>run</code>和<code>runUntilDate:</code>都无法使用<code>CFRunLoopStop()</code>退出，只有<code>runMode:beforeDate:</code>可以响应<code>CFRunLoopStop()</code>，所以要想使用<code>CFRunLoopStop()</code>退出runloop，必须使用<code>runMode:beforeDate:</code>启动</p>
+</blockquote>
+<h2 id="线程通讯"><a href="#线程通讯" class="headerlink" title="线程通讯"></a>线程通讯</h2><p>线程准备好之后，经常需要从主线程把耗时的任务丢给辅助线程，当任务完成之后辅助线程再把结果传回主线程传，这些线程通讯一般用的都是perform方法</p>
+<pre><code>//①
+- (void)performSelectorOnMainThread:(SEL)aSelector withObject:(nullable id)arg waitUntilDone:(BOOL)wait modes:(nullable NSArray&lt;NSString *&gt; *)array; 
+//②
+- (void)performSelectorOnMainThread:(SEL)aSelector withObject:(nullable id)arg waitUntilDone:(BOOL)wait; 
+
+//③
+- (void)performSelector:(SEL)aSelector onThread:(NSThread *)thr withObject:(nullable id)arg waitUntilDone:(BOOL)wait modes:(nullable NSArray&lt;NSString *&gt; *)array NS_AVAILABLE(10_5, 2_0);
+//④
+- (void)performSelector:(SEL)aSelector onThread:(NSThread *)thr withObject:(nullable id)arg waitUntilDone:(BOOL)wait NS_AVAILABLE(10_5, 2_0); 
+</code></pre><ul>
+<li>①：将selector丢给主线程执行，可以指定runloop mode</li>
+<li>②：将selector丢给主线程执行，runloop mode默认为common mode</li>
+<li>③：将selector丢个指定线程执行，可以指定runloop mode</li>
+<li>④：将selector丢个指定线程执行，runloop mode默认为default mode</li>
+</ul>
+<p>所以我们一般用③④方法将任务丢给辅助线程，任务执行完成之后再使用①②方法将结果传回主线程。</p>
+<blockquote>
+<p>注意：perform方法只对拥有runloop的线程有效，如果创建的线程没有添加runloop，perform的selector将无法执行。</p>
+</blockquote>
+<h2 id="线程优先级"><a href="#线程优先级" class="headerlink" title="线程优先级"></a>线程优先级</h2><p>每个线程的紧急程度是不一样的，有的线程中任务你也许希望尽快执行，有的线程中任务也许并不是那么紧急，所以线程需要有优先级。优先级高线程中的任务会比优先级低的线程先执行</p>
+<p>NSThread有4个优先级的API</p>
+<pre><code>+ (double)threadPriority;
++ (BOOL)setThreadPriority:(double)p;
+
+@property double threadPriority NS_AVAILABLE(10_6, 4_0); // To be deprecated; use qualityOfService below
+
+@property NSQualityOfService qualityOfService NS_AVAILABLE(10_10, 8_0); // read-only after the thread is started
+</code></pre><ul>
+<li>前2个是类方法，用于设置和获取当前线程的优先级</li>
+<li>threadPriority属性可以通过对象设置和获取优先级</li>
+<li>由于线程优先级是一个比较抽线的东西，没人能知道0.5和0.6到底有多大区别，所以iOS8之后新增了qualityOfService枚举属性，大家可以通过枚举值设置优先级</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">typedef NS_ENUM(NSInteger, NSQualityOfService) &#123;</span><br><span class="line">    NSQualityOfServiceUserInteractive = 0x21,</span><br><span class="line">    NSQualityOfServiceUserInitiated = 0x19,</span><br><span class="line">    NSQualityOfServiceDefault = -1</span><br><span class="line">    NSQualityOfServiceUtility = 0x11,</span><br><span class="line">    NSQualityOfServiceBackground = 0x09,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>NSQualityOfService主要有5个枚举值，优先级别从高到低排布：</p>
+<ul>
+<li>NSQualityOfServiceUserInteractive：最高优先级，主要用于提供交互UI的操作，比如处理点击事件，绘制图像到屏幕上</li>
+<li>NSQualityOfServiceUserInitiated：次高优先级，主要用于执行需要立即返回的任务</li>
+<li>NSQualityOfServiceDefault：默认优先级，当没有设置优先级的时候，线程默认优先级</li>
+<li>NSQualityOfServiceUtility：普通优先级，主要用于不需要立即返回的任务</li>
+<li>NSQualityOfServiceBackground：后台优先级，用于完全不紧急的任务</li>
+</ul>
+<p>一般主线程和没有设置优先级的线程都是默认优先级</p>
+<h2 id="主线程和当前线程"><a href="#主线程和当前线程" class="headerlink" title="主线程和当前线程"></a>主线程和当前线程</h2><p>NSThread也提供了非常方便的获取和判断主线程的API</p>
+<pre><code>@property (readonly) BOOL isMainThread NS_AVAILABLE(10_5, 2_0);
++ (BOOL)isMainThread NS_AVAILABLE(10_5, 2_0); // reports whether current thread is main
++ (NSThread *)mainThread NS_AVAILABLE(10_5, 2_0);
+</code></pre><ul>
+<li>isMainThread：判断当前线程是否是主线程</li>
+<li>mainThread：获取主线程的thread</li>
+</ul>
+<p>除了获取主线程，我们也可以使用<code>-currentThread</code>获取当前线程</p>
+<pre><code>+ (NSThread *)currentThread;
+</code></pre><h2 id="线程通知"><a href="#线程通知" class="headerlink" title="线程通知"></a>线程通知</h2><p>NSThread有三个线程相关的通知</p>
+<pre><code>NSString * const NSWillBecomeMultiThreadedNotification;
+NSString * const NSDidBecomeSingleThreadedNotification;
+NSString * const NSThreadWillExitNotification;
+</code></pre><ul>
+<li>NSWillBecomeMultiThreadedNotification：由当前线程派生出第一个其他线程时发送，一般一个线程只发送一次</li>
+<li>NSDidBecomeSingleThreadedNotification：这个通知目前没有实际意义，可以忽略</li>
+<li>NSThreadWillExitNotification线程退出之前发送这个通知</li>
+</ul>
+<h1 id="NSThread实例"><a href="#NSThread实例" class="headerlink" title="NSThread实例"></a>NSThread实例</h1><p>只看API毕竟比较抽象，下面我用一个例子给大家展示NSThread的使用方法</p>
+<h2 id="线程创建-1"><a href="#线程创建-1" class="headerlink" title="线程创建"></a>线程创建</h2><p>我们首先来创建一个线程，并用self.thread持有，以便后面操作线程和线程通讯使用</p>
+<pre><code>self.thread = [[NSThread alloc] initWithTarget:self selector:@selector(threadMain) object:nil]; // ①创建线程
+self.thread.qualityOfService = NSQualityOfServiceDefault; //②设置线程优先级
+[self.thread start]; //③启动线程
+</code></pre><ul>
+<li>①：创建线程，并指定入口main函数为<code>-threadMain</code></li>
+<li>②：设置线程的优先级，qualityOfService属性必须在线程启动之前设置，启动之后将无法再设置</li>
+<li>③：调用<code>start</code>方法启动线程。</li>
+</ul>
+<p>由于线程的创建和销毁非常消耗性能，大多情况下，我们需要复用一个长期运行的线程来执行任务。</p>
+<p>在线程启动之后会首先执行<code>-threadMain</code>，正常情况下threadMain方法执行结束之后，线程就会退出。为了线程可以长期复用接收消息，我们需要在threadMain中给thread添加runloop</p>
+<pre><code>- (void)threadMain {
+    [[NSThread currentThread] setName:@&quot;myThread&quot;]; // ①给线程设置名字
+    NSRunLoop *runLoop = [NSRunLoop currentRunLoop];    // ②给线程添加runloop
+    [runLoop addPort:[NSMachPort port] forMode:NSDefaultRunLoopMode];   //③给runloop添加数据源
+    while (![[NSThread currentThread] isCancelled]) {           //④：检查isCancelled
+        [runLoop runMode:NSDefaultRunLoopMode beforeDate:[NSDate dateWithTimeIntervalSinceNow:10]];  //⑤启动runloop
+    }
+}
+</code></pre><ul>
+<li>①：设置线程的名字，这一步不是必须的，主要是为了debug的时候更方便，可以直接看出这是哪个线程</li>
+<li>②：自定义的线程默认是没有runloop的，调用<code>-currentRunLoop</code>，方法内部会为线程创建runloop</li>
+<li>③：如果没有数据源，runloop会在启动之后会立刻退出。所以需要给runloop添加一个数据源，这里添加的是NSPort数据源</li>
+<li>④：定期检查isCancelled，当外部调用<code>-cancel</code>方法将isCancelled置为YES的时候，线程可以退出</li>
+<li>⑤：启动runloop</li>
+</ul>
+<h2 id="线程通讯-1"><a href="#线程通讯-1" class="headerlink" title="线程通讯"></a>线程通讯</h2><p>线程创建好了之后我们就可以给线程丢任务了，当我们有一个需要比较耗时的任务的时候，我们可以调用perform方法将task丢给这个线程。</p>
+<pre><code>[self performSelector:@selector(threadTask) onThread:self.thread withObject:nil waitUntilDone:NO]
+</code></pre><h2 id="结束线程"><a href="#结束线程" class="headerlink" title="结束线程"></a>结束线程</h2><p>当我们想要结束线程的时候，我们可以使用<code>CFRunLoopStop()</code>配合<code>-cancel</code>来结束线程。</p>
+<pre><code>- (void)cancelThread
+{
+    [[NSThread currentThread] cancel];
+    CFRunLoopStop(CFRunLoopGetCurrent());
+}
+</code></pre><p>不过这个方法必须在self.thread线程下调用。如果当前是主线程。可以perform到self.thread下调用这个方法结束线程</p>
+<h1 id="Extension"><a href="#Extension" class="headerlink" title="Extension"></a>Extension</h1><ul>
+<li>runloop相关知识可以阅读ibireme的<a href="http://blog.ibireme.com/2015/05/18/runloop/" target="_blank" rel="noopener">深入理解RunLoop</a></li>
+<li>NSThread使用实例可以阅读<a href="https://github.com/AFNetworking/AFNetworking/tree/2.6.3" target="_blank" rel="noopener">AFNetWroking 2的源码</a></li>
+</ul>
+<h1 id="About-Me"><a href="#About-Me" class="headerlink" title="About Me"></a>About Me</h1><p><a href="http://jiangliancheng.gitcafe.io/" target="_blank" rel="noopener">个人博客</a> <a href="http://www.jianshu.com/users/1f93e3b1f3da" target="_blank" rel="noopener">简书</a> <a href="http://weibo.com/u/5592239559" target="_blank" rel="noopener">微博</a> QQ群：159974494</p>
+<p>欢迎大家关注我，共同学习iOS~</p>
+
+    
+  </div>
+
+</article>
+
+
+   
+  <div class="text-center donation">
+    <div class="inner-donation">
+      <span class="btn-donation">支持一下</span>
+      <div class="donation-body">
+        <div class="tip text-center">扫一扫，支持forsigner</div>
+        <ul>
+        
+          <li class="item">
+            
+              <span>微信扫一扫</span>
+            
+            <img src="/images/qr-wechat.png" alt="">
+          </li>
+        
+          <li class="item">
+            
+              <span>支付宝扫一扫</span>
+            
+            <img src="/images/qr-alipay.png" alt="">
+          </li>
+        
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+   
+  <div class="box-prev-next clearfix">
+    <a class="show pull-left" href="/2015/12/19/小笨狼的LLDB技巧：chisel/">
+        <i class="icon icon-angle-left"></i>
+    </a>
+    <a class="show pull-right" href="/2016/01/23/小笨狼漫谈多线程：GCD-queue/">
+        <i class="icon icon-angle-right"></i>
+    </a>
+  </div>
+
+
+
+
+
+   
+      <div class="git"></div>
+   
+</div>
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/link/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              友链
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/atom.xml"
+              rel="noopener noreferrer"
+              target="_blank"
+              >
+              RSS
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+  <section class="disqus-comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+  </section>
+
+  <script>
+    var disqus_shortname = 'forsigner';
+    
+    var disqus_url = 'http://yoursite.com/2016/01/16/小笨狼漫谈多线程-NSThread/';
+    
+    (function(){
+      var dsq = document.createElement('script');
+      dsq.type = 'text/javascript';
+      dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+
+  <script id="dsq-count-scr" src="//forsigner.disqus.com/count.js" async></script>
+
+
+
+    
+    
+
+    
+    
+
+    
+
+    
+    
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>小笨狼漫谈多线程：GCD(一) | Hexo</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="forsigner,前端,设计,Hexo主题,前端开发,用户体验,设计,frontend,design,nodejs,JavaScript" />
+  
+
+  <meta name="description" content="多线程是程序开发中非常基础的一个概念，大家在开发过程中应该或多或少用过相关的东西。同时这恰恰又是一个比较棘手的概念，一切跟多线程挂钩的东西都会变得复杂。如果使用过程中对多线程不够熟悉，很可能会埋下一些难以预料的坑。 iOS中的多线程技术主要有NSThread, GCD和NSOperation。他们的封装层次依次递增，其中  NSThread封装性最差，最偏向于底层，主要基于thread使用 GCD">
+<meta property="og:type" content="article">
+<meta property="og:title" content="小笨狼漫谈多线程：GCD(一)">
+<meta property="og:url" content="http://yoursite.com/2016/01/23/小笨狼漫谈多线程：GCD-queue/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="多线程是程序开发中非常基础的一个概念，大家在开发过程中应该或多或少用过相关的东西。同时这恰恰又是一个比较棘手的概念，一切跟多线程挂钩的东西都会变得复杂。如果使用过程中对多线程不够熟悉，很可能会埋下一些难以预料的坑。 iOS中的多线程技术主要有NSThread, GCD和NSOperation。他们的封装层次依次递增，其中  NSThread封装性最差，最偏向于底层，主要基于thread使用 GCD">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://camo.githubusercontent.com/e337c0cb657dde8d7eeb5468a1724c751cedb484/687474703a2f2f63646e342e72617977656e6465726c6963682e636f6d2f77702d636f6e74656e742f75706c6f6164732f323031342f30312f53657269616c2d51756575652d343830783237322e706e67">
+<meta property="og:image" content="https://camo.githubusercontent.com/607942d30c4701a1a721781264fa815f100668a5/687474703a2f2f63646e332e72617977656e6465726c6963682e636f6d2f77702d636f6e74656e742f75706c6f6164732f323031342f30312f436f6e63757272656e742d51756575652d343830783237322e706e67">
+<meta property="og:image" content="http://jiangliancheng.gitcafe.io/images/GCD/async.gif">
+<meta property="og:image" content="http://jiangliancheng.gitcafe.io/images/GCD/sync.gif">
+<meta property="og:image" content="http://jiangliancheng.gitcafe.io/images/GCD/deadLock.png">
+<meta property="og:image" content="http://jiangliancheng.gitcafe.io/images/GCD/target.png">
+<meta property="og:image" content="http://jiangliancheng.gitcafe.io/images/GCD/barrier.png">
+<meta property="og:updated_time" content="2016-02-25T07:21:20.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="小笨狼漫谈多线程：GCD(一)">
+<meta name="twitter:description" content="多线程是程序开发中非常基础的一个概念，大家在开发过程中应该或多或少用过相关的东西。同时这恰恰又是一个比较棘手的概念，一切跟多线程挂钩的东西都会变得复杂。如果使用过程中对多线程不够熟悉，很可能会埋下一些难以预料的坑。 iOS中的多线程技术主要有NSThread, GCD和NSOperation。他们的封装层次依次递增，其中  NSThread封装性最差，最偏向于底层，主要基于thread使用 GCD">
+<meta name="twitter:image" content="https://camo.githubusercontent.com/e337c0cb657dde8d7eeb5468a1724c751cedb484/687474703a2f2f63646e342e72617977656e6465726c6963682e636f6d2f77702d636f6e74656e742f75706c6f6164732f323031342f30312f53657269616c2d51756575652d343830783237322e706e67">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=c114cben" rel="stylesheet">
+
+
+  
+    <link rel="stylesheet" href="/css/personal-style.css">
+  
+
+  
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+  
+  <script type="text/javascript">
+	(function(){
+	    var bp = document.createElement('script');
+	    var curProtocol = window.location.protocol.split(':')[0];
+	    if (curProtocol === 'https') {
+	        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+	    }
+	    else {
+	        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+	    }
+	    var s = document.getElementsByTagName("script")[0];
+	    s.parentNode.insertBefore(bp, s);
+	})();
+  </script>
+
+
+
+  
+    <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+
+  
+    <link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  
+</head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">盒子</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/link/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            友链
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/atom.xml"
+            rel="noopener noreferrer"
+            target="_blank"
+            >
+            RSS
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#dispatch-queue-t"><span class="toc-text">dispatch_queue_t</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#async"><span class="toc-text">async</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#sync"><span class="toc-text">sync</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#获取队列"><span class="toc-text">获取队列</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#获取主线程队列"><span class="toc-text">获取主线程队列</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#获取全局队列"><span class="toc-text">获取全局队列</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#创建队列"><span class="toc-text">创建队列</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#设置目标队列（2-25日更新，感谢-杨萧玉HIT-指出问题，原文章有误给大家致歉）"><span class="toc-text">设置目标队列（2.25日更新，感谢@杨萧玉HIT 指出问题，原文章有误给大家致歉）</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#延时"><span class="toc-text">延时</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#dispatch-barrier"><span class="toc-text">dispatch_barrier</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#set-specific-amp-get-specific"><span class="toc-text">set_specific &amp; get_specific</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#END"><span class="toc-text">END</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#About-Me"><span class="toc-text">About Me</span></a></li></ol>
+  </div>
+
+
+
+<div class="content content-post CENTER">
+   <article id="post-小笨狼漫谈多线程：GCD-queue" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">小笨狼漫谈多线程：GCD(一)</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2016.01.23</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>John Doe</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/多线程/">多线程</a>
+  </span>
+
+
+
+      
+        <span>
+          <i class="icon-comment"></i>
+          <a href="http://www.forsigner.com/2016/01/23/小笨狼漫谈多线程：GCD-queue/#disqus_thread"></a>
+        </span>
+      
+
+      
+      <i class="fa fa-eye"></i> 
+        <span id="busuanzi_container_page_pv">
+           &nbsp热度 <span id="busuanzi_value_page_pv">
+           <i class="fa fa-spinner fa-spin"></i></span>℃
+        </span>
+      
+      
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <p>多线程是程序开发中非常基础的一个概念，大家在开发过程中应该或多或少用过相关的东西。同时这恰恰又是一个比较棘手的概念，一切跟多线程挂钩的东西都会变得复杂。如果使用过程中对多线程不够熟悉，很可能会埋下一些难以预料的坑。</p>
+<p>iOS中的多线程技术主要有NSThread, GCD和NSOperation。他们的封装层次依次递增，其中</p>
+<ul>
+<li>NSThread封装性最差，最偏向于底层，主要基于thread使用</li>
+<li>GCD是基于C的API，直接使用比较方便，主要基于task使用</li>
+<li>NSOperation是基于GCD封装的NSObject对象，对于复杂的多线程项目使用比较方便，主要基于队列使用</li>
+</ul>
+<p><a href="http://jiangliancheng.gitcafe.io/2016/01/16/%E5%B0%8F%E7%AC%A8%E7%8B%BC%E6%BC%AB%E8%B0%88%E5%A4%9A%E7%BA%BF%E7%A8%8B-NSThread/" target="_blank" rel="noopener">上篇文章</a>介绍了NSThread的用法，NSThread已经属于古董级别的东西了，欣赏一下可以，真正使用就不要麻烦他了。GCD是多线程中的新贵，比起NSThread更加强大，也更容易使用。由于GCD的东西比较多，我会分好几篇文章介绍，这篇文章主要介绍GCD中的queue相关知识。</p>
+<h1 id="dispatch-queue-t"><a href="#dispatch-queue-t" class="headerlink" title="dispatch_queue_t"></a>dispatch_queue_t</h1><p>使用GCD之后，你可以不用再浪费精力去关注线程，GCD会帮你管理好一切。你只需要想清楚任务的执行方法（同步还是异步）和队列的运行方式（串行还是并行）即可。</p>
+<p>任务是一个比较抽象的概念，表示一段用来执行的代码，他对应到代码里就是一个block或者一个函数。</p>
+<p>队列分为串行队列和并行队列：</p>
+<ul>
+<li><p>串行队列一次只能执行一个任务。只有一个任务执行完成之后，下一个任务才能执行，主线程就是一个串行的队列。<br><img src="https://camo.githubusercontent.com/e337c0cb657dde8d7eeb5468a1724c751cedb484/687474703a2f2f63646e342e72617977656e6465726c6963682e636f6d2f77702d636f6e74656e742f75706c6f6164732f323031342f30312f53657269616c2d51756575652d343830783237322e706e67" alt=""></p>
+</li>
+<li><p>并行队列可以同时执行多个任务，系统会维护一个线程池来保证并行队列的执行。线程池会根据当前任务量自行安排线程的数量，以确保任务尽快执行。<br><img src="https://camo.githubusercontent.com/607942d30c4701a1a721781264fa815f100668a5/687474703a2f2f63646e332e72617977656e6465726c6963682e636f6d2f77702d636f6e74656e742f75706c6f6164732f323031342f30312f436f6e63757272656e742d51756575652d343830783237322e706e67" alt=""></p>
+</li>
+</ul>
+<p>队列对应到代码里是一个<code>dispatch_queue_t</code>对象:</p>
+<pre><code>dispatch_queue_t queue;
+</code></pre><p>对象就有内存。跟普通OC对象类似，我们可以用<code>dispatch_retain()</code>和<code>dispatch_release()</code>对其进行内存管理，当一个任务加入到一个<code>queue</code>中的时候，任务会<code>retain</code>这个<code>queue</code>，直到任务执行完成才会<code>release</code>。</p>
+<p>值得高兴的是，iOS6之后，dispatch对象已经支持ARC，所以在ARC工程之下，我们可以不用担心他的内存，想怎么玩就怎么玩。</p>
+<p>要申明一个dispatch的属性。一般情况下我们只需要用<code>strong</code>即可。</p>
+<pre><code>@property (nonatomic, strong) dispatch_queue_t queue;
+</code></pre><p>如果你是写一个framework，framework的使用者的SDK有可能还是古董级的iOS6之前。那么你需要根据<code>OS_OBJECT_USE_OBJC</code>做一个判断是使用<code>strong</code>还是<code>assign</code>。（一般github上的优秀第三方库都会这么做）</p>
+<pre><code>#if OS_OBJECT_USE_OBJC
+@property (nonatomic, strong) dispatch_queue_t queue;
+#else
+@property (nonatomic, assign) dispatch_queue_t queue;
+#endif
+</code></pre><h1 id="async"><a href="#async" class="headerlink" title="async"></a>async</h1><p>GCD中有2个异步的API</p>
+<pre><code>void dispatch_async(dispatch_queue_t queue, dispatch_block_t block);
+void dispatch_async_f(dispatch_queue_t queue, void *context, dispatch_function_t work);
+</code></pre><p>他们都是将一个任务提交到queue中，提交之后立即返回，不等待任务的的执行。提交之后，系统会对queue做retain操作，任务执行完成之后，queue再被release。两个函数实际的功能是一样的，唯一的区别在于<code>dispatch_async</code>接受block作为参数，<code>dispatch_async_f</code>接受函数。</p>
+<p>使用<code>dispatch_async</code>的时候block会被copy，在block执行完成之后block再release，由于是系统持有block，所以不用担心循环引用的问题，block里面的self不需要weak</p>
+<p>在<code>dispatch_async_f</code>中，<code>context</code>会作为第一个参数传给<code>work</code>函数。如果<code>work</code>不需要参数，<code>context</code>可以传入NULL。<code>work</code>参数不能传入NULL，否则可能发生无法预料的事儿</p>
+<p>异步是一个比较抽象的概念，简单的说就是将任务加入到队列中之后，立即返回，不需要等待任务的执行。语言的描述比较抽象，我们用代码加深一下对概念的理解</p>
+<pre><code>NSLog(@&quot;this is main queue, i want to throw a task to global queue&quot;);
+dispatch_queue_t globalQueue = dispatch_queue_create(&quot;com.liancheng.global_queue&quot;, DISPATCH_QUEUE_SERIAL);
+dispatch_async(globalQueue, ^{
+    // task
+});
+NSLog(@&quot;this is main queue, throw task completed&quot;);
+</code></pre><p>上面这段代码，会以这样的方式运行，红色表示正在执行的模块，灰色表示未执行或者已经执行完成的模块。</p>
+<p><img src="http://jiangliancheng.gitcafe.io/images/GCD/async.gif" alt=""></p>
+<ol>
+<li>先在main queue中执行第一个nslog</li>
+<li>dispatch_async会将block提交到globalQueue中，提交成功之后立即返回</li>
+<li>main queue执行第二个nslog</li>
+<li>等global queue中block前面的任务执行完成之后，block被执行。</li>
+</ol>
+<h1 id="sync"><a href="#sync" class="headerlink" title="sync"></a>sync</h1><p>与异步相似，GCD中同步的API也是2个</p>
+<pre><code>void dispatch_sync(dispatch_queue_t queue, dispatch_block_t block);
+void dispatch_sync_f(dispatch_queue_t queue, void *context, dispatch_function_t work);
+</code></pre><p>2个API作用相同：将任务提交到queue中，任务加入queue之后不会立即返回，等待任务执行完成之后再返回。同sync类似，<code>dispatch_sync</code>与<code>dispatch_sync_f</code>唯一的区别在于<code>dispatch_sync</code>接收block作为参数，block被系统持有，不需要对self使用weak。<code>dispatch_sync_f</code>接受函数<code>work</code>作为参数，context作为传给<code>work</code>函数的第一个参数。同样，work参数也不能传入NULL，否则会发生无法预料的事儿</p>
+<p>同步表示任务加入到队列中之后不会立即返回，等待任务完成再返回。语言的描述比较抽象，我们再次用代码加深一下对概念的理解</p>
+<pre><code>NSLog(@&quot;this is main queue, i want to throw a task to global queue&quot;);
+dispatch_queue_t globalQueue = dispatch_queue_create(&quot;com.liancheng.global_queue&quot;, DISPATCH_QUEUE_SERIAL);
+dispatch_sync(globalQueue, ^{
+    // task
+});
+NSLog(@&quot;this is main queue, throw task completed&quot;);
+</code></pre><p>我们来看看代码的运行方式：</p>
+<p><img src="http://jiangliancheng.gitcafe.io/images/GCD/sync.gif" alt=""></p>
+<ol>
+<li>先在main queue中执行第一个nslog</li>
+<li>dispatch_sync会将block提交到global queue中，等待block的执行</li>
+<li>global queue中block前面的任务执行完成之后，block执行</li>
+<li>block执行完成之后，dispatch_sync返回</li>
+<li>dispatch_sync之后的代码执行</li>
+</ol>
+<p>由于dispatch_sync需要等待block被执行，这就非常容易发生死锁。如果一个串行队列，使用dispatch_sync提交block到自己队列中，就会发生死锁</p>
+<pre><code>dispatch_queue_t queue = dispatch_queue_create(&quot;com.liancheng.serial_queue&quot;, DISPATCH_QUEUE_SERIAL);
+
+dispatch_async(queue, ^{
+    // 到达串行队列
+
+    dispatch_sync(queue, ^{     //发生死锁
+
+    });
+});
+</code></pre><p><code>dispatch_sync</code>的代码执行如图所示</p>
+<p><img src="http://jiangliancheng.gitcafe.io/images/GCD/deadLock.png" alt=""></p>
+<p>dispatch_sync需要等待block执行完成，同时由于队列串行，block的执行需要等待前面的任务，也就是dispatch_sync执行完成。两者互相等待，永远也不会执行完成，死锁就这样发生了</p>
+<p>从这里看发生死锁需要2个条件：</p>
+<ol>
+<li>代码运行的当前队列是串行队列</li>
+<li>使用sync将任务加入到自己队列中</li>
+</ol>
+<p>如果queue是并行队列，或者将任务加入到其他队列中，这是不会发生死锁的。</p>
+<h1 id="获取队列"><a href="#获取队列" class="headerlink" title="获取队列"></a>获取队列</h1><h2 id="获取主线程队列"><a href="#获取主线程队列" class="headerlink" title="获取主线程队列"></a>获取主线程队列</h2><p>主线程是我们最常用的线程，GCD提供了非常简单的获取主线程队列的方法。</p>
+<pre><code>dispatch_queue_t dispatch_get_main_queue(void)
+</code></pre><p>方法不需要传入参数，直接返回主线程队列。<br>假设我们要在主线程更新UI：</p>
+<pre><code>dispatch_async(dispatch_get_main_queue(), ^{
+    [self updateUI];
+});
+</code></pre><p>执行加入到主线程队列的block，App会调用<code>dispatch_main()</code>, <code>NSApplicationMain()</code>，或者在主线程使用<code>CFRunLoop</code>。</p>
+<h2 id="获取全局队列"><a href="#获取全局队列" class="headerlink" title="获取全局队列"></a>获取全局队列</h2><p>除了主线程队列，GCD提供了几个全局队列，可以直接获取使用</p>
+<pre><code>dispatch_queue_t dispatch_get_global_queue(long identifier, unsigned long flags);
+</code></pre><p><code>dispatch_get_global_queue</code>方法获取的全局队列都是并行队列，并且队列不能被修改，也就是说对全局队列调用dispatch_suspend(), dispatch_resume(), dispatch_set_context()等方法无效</p>
+<ul>
+<li><code>identifier</code>: 用以标识队列优先级，推荐用<code>qos_class</code>枚举作为参数，也可以使用<code>dispatch_queue_priority_t</code></li>
+<li><code>flags</code>: 预留字段，传入任何非0的值都可能导致返回NULL</li>
+</ul>
+<p>可以看到<code>dispatch_get_global_queue</code>根据<code>identifier</code>参数返回相应的全局队列。<code>identifier</code>推荐使用<code>qos_class</code>枚举</p>
+<pre><code>__QOS_ENUM(qos_class, unsigned int,
+    QOS_CLASS_USER_INTERACTIVE
+            __QOS_CLASS_AVAILABLE_STARTING(__MAC_10_10, __IPHONE_8_0) = 0x21,
+    QOS_CLASS_USER_INITIATED
+            __QOS_CLASS_AVAILABLE_STARTING(__MAC_10_10, __IPHONE_8_0) = 0x19,
+    QOS_CLASS_DEFAULT
+            __QOS_CLASS_AVAILABLE_STARTING(__MAC_10_10, __IPHONE_8_0) = 0x15,
+    QOS_CLASS_UTILITY
+            __QOS_CLASS_AVAILABLE_STARTING(__MAC_10_10, __IPHONE_8_0) = 0x11,
+    QOS_CLASS_BACKGROUND
+            __QOS_CLASS_AVAILABLE_STARTING(__MAC_10_10, __IPHONE_8_0) = 0x09,
+    QOS_CLASS_UNSPECIFIED
+            __QOS_CLASS_AVAILABLE_STARTING(__MAC_10_10, __IPHONE_8_0) = 0x00,
+);
+</code></pre><p>这个枚举与<code>NSThread</code>中的<code>NSQualityOfService</code>类似</p>
+<ul>
+<li><code>QOS_CLASS_USER_INTERACTIVE</code>: 最高优先级，交互级别。使用这个优先级会占用几乎所有的系统CUP和I/O带宽，仅限用于交互的UI操作，比如处理点击事件，绘制图像到屏幕上，动画等</li>
+<li><code>QOS_CLASS_USER_INITIATED</code>: 次高优先级，用于执行类似初始化等需要立即返回的事件</li>
+<li><code>QOS_CLASS_DEFAULT</code>: 默认优先级，当没有设置优先级的时候，线程默认优先级。一般情况下用的都是这个优先级</li>
+<li><code>QOS_CLASS_UTILITY</code>: 普通优先级，主要用于不需要立即返回的任务</li>
+<li><code>QOS_CLASS_BACKGROUND</code>: 后台优先级，用于用户几乎不感知的任务。</li>
+<li><code>QOS_CLASS_UNSPECIFIED</code>: 未知优先级，表示服务质量信息缺失</li>
+</ul>
+<p><code>identifier</code>除了使用<code>qos_class</code>枚举，也可以用<code>dispatch_queue_priority_t</code>作为参数。</p>
+<pre><code>#define DISPATCH_QUEUE_PRIORITY_HIGH 2
+#define DISPATCH_QUEUE_PRIORITY_DEFAULT 0
+#define DISPATCH_QUEUE_PRIORITY_LOW (-2)
+#define DISPATCH_QUEUE_PRIORITY_BACKGROUND INT16_MIN
+
+typedef long dispatch_queue_priority_t;
+</code></pre><p><code>dispatch_queue_priority_t</code>对应到<code>qos_class</code>枚举有：</p>
+<pre><code>- DISPATCH_QUEUE_PRIORITY_HIGH:         QOS_CLASS_USER_INITIATED
+- DISPATCH_QUEUE_PRIORITY_DEFAULT:      QOS_CLASS_DEFAULT
+- DISPATCH_QUEUE_PRIORITY_LOW:          QOS_CLASS_UTILITY
+- DISPATCH_QUEUE_PRIORITY_BACKGROUND:   QOS_CLASS_BACKGROUND
+</code></pre><p>很多时候我们喜欢将0或者NULL传入作为参数</p>
+<pre><code>dispatch_get_global_queue(NULL, NULL)
+</code></pre><p>由于NULL等于0，也就是<code>DISPATCH_QUEUE_PRIORITY_DEFAULT</code>，所以返回的是默认优先级</p>
+<h2 id="创建队列"><a href="#创建队列" class="headerlink" title="创建队列"></a>创建队列</h2><p>当无法获取到理想的队列时，我们可以自己创建队列。</p>
+<pre><code>dispatch_queue_t dispatch_queue_create(const char *label, dispatch_queue_attr_t attr);
+</code></pre><p>如果未使用ARC，<code>dispatch_queue_create</code>创建的queue在使用结束之后需要调用<code>dispatch_release</code>。</p>
+<ul>
+<li><code>label</code>: 队列的名称，调试的时候可以区分其他的队列</li>
+<li><code>attr</code>: 队列的属性，<code>dispatch_queue_attr_t</code>类型。用以标识队列串行，并行，以及优先级等信息</li>
+</ul>
+<p><code>attr</code>参数有三种传值方式：</p>
+<pre><code>// 串行
+#define DISPATCH_QUEUE_SERIAL NULL
+
+// 并行
+#define DISPATCH_QUEUE_CONCURRENT \
+        DISPATCH_GLOBAL_OBJECT(dispatch_queue_attr_t, \
+        _dispatch_queue_attr_concurrent)
+
+// 自定义属性值
+dispatch_queue_attr_t dispatch_queue_attr_make_with_qos_class(dispatch_queue_attr_t attr, dispatch_qos_class_t qos_class, int relative_priority);
+</code></pre><p><code>DISPATCH_QUEUE_SERIAL</code>或者<code>NULL</code>，表示创建串行队列，优先级为目标队列优先级。<code>DISPATCH_QUEUE_CONCURRENT</code>表示创建并行队列，优先级也为目标队列优先级。</p>
+<p><code>dispatch_queue_attr_make_with_qos_class</code>函数可以创建带有优先级的dispatch_queue_attr_t对象。通过这个对象可以自定义queue的优先级。</p>
+<ul>
+<li><code>attr</code>: 传入<code>DISPATCH_QUEUE_SERIAL</code>、<code>NULL</code>或者<code>DISPATCH_QUEUE_CONCURRENT</code>，表示串行或者并行</li>
+<li><code>qos_class</code>: 传入<code>qos_class</code>枚举，表示优先级级别</li>
+<li><code>relative_priority</code>: 相对于<code>qos_class</code>的相对优先级，<code>qos_class</code>用于区分大的优先级级别，<code>relative_priority</code>表示大级别下的小级别。<code>relative_priority</code>必须大于<code>QOS_MIN_RELATIVE_PRIORITY</code>小于0，否则将返回NULL。从GCD源码中可以查到<code>QOS_MIN_RELATIVE_PRIORITY</code>等于-15</li>
+</ul>
+<p>使用<code>dispatch_queue_attr_make_with_qos_class</code>创建队列时，需要注意，非法的参数可能导致<code>dispatch_queue_attr_make_with_qos_class</code>返回NULL，<code>dispatch_queue_create</code>传入NULL会创建出串行队列。写代码过程中需要确保这是否是预期的结果</p>
+<h1 id="设置目标队列（2-25日更新，感谢-杨萧玉HIT-指出问题，原文章有误给大家致歉）"><a href="#设置目标队列（2-25日更新，感谢-杨萧玉HIT-指出问题，原文章有误给大家致歉）" class="headerlink" title="设置目标队列（2.25日更新，感谢@杨萧玉HIT 指出问题，原文章有误给大家致歉）"></a>设置目标队列（2.25日更新，感谢@杨萧玉HIT 指出问题，原文章有误给大家致歉）</h1><p>除了通过<code>dispatch_queue_attr_make_with_qos_class</code>设置队列的优先级之外，也可以使用设置目标队列的方法，设置队列的优先级。当队列创建时未设置优先级，队列将继承目标队列的优先级。（不过一般情况下还是推荐使用<code>dispatch_queue_attr_make_with_qos_class</code>设置队列的优先级）</p>
+<pre><code>void dispatch_set_target_queue(dispatch_object_t object, dispatch_queue_t queue);
+</code></pre><p>调用<code>dispatch_set_target_queue</code>会retain新目标队列queue，release原有目标队列。设置目标队列之后，block将会在目标队列中执行。注意：当目标队列串行时，任何在目标队列中执行的block都会串行执行，无论原队列是否串行</p>
+<p>假设有队列A、B是并行队列，C为串行队列。A,B的目标队列均设置为C，那么A、B、C中的block在设置目标队列之后最终都会串行执行</p>
+<p><img src="http://jiangliancheng.gitcafe.io/images/GCD/target.png" alt=""></p>
+<p>例：<br>    队列1并行，队列2串行</p>
+<pre><code>dispatch_queue_t queue1 = dispatch_queue_create(&quot;com.company.queue1&quot;, DISPATCH_QUEUE_CONCURRENT);
+dispatch_queue_t queue2 = dispatch_queue_create(&quot;com.company.queue2&quot;, DISPATCH_QUEUE_SERIAL);
+
+dispatch_async(queue1, ^{    // block1
+    for (int i = 0; i &lt; 5; i ++) {
+        NSLog(@&quot;+++++&quot;);
+    }
+});
+dispatch_async(queue1, ^{ // block2
+    for (int i = 0; i &lt; 5; i ++) {
+        NSLog(@&quot;=====&quot;);
+    }
+});
+dispatch_async(queue2, ^{    // block3
+    for (int i = 0; i &lt; 5; i ++) {
+        NSLog(@&quot;----&quot;);
+    }
+});
+</code></pre><p>运行一下可知block1,block2,block3并行执行</p>
+<pre><code>2016-02-25 15:05:20.024 TGCD[1940:99120] +++++
+2016-02-25 15:05:20.024 TGCD[1940:99122] =====
+2016-02-25 15:05:20.024 TGCD[1940:99121] ----
+2016-02-25 15:05:20.025 TGCD[1940:99120] +++++
+2016-02-25 15:05:20.025 TGCD[1940:99121] ----
+2016-02-25 15:05:20.025 TGCD[1940:99122] =====
+2016-02-25 15:05:20.025 TGCD[1940:99120] +++++
+2016-02-25 15:05:20.025 TGCD[1940:99121] ----
+2016-02-25 15:05:20.025 TGCD[1940:99122] =====
+2016-02-25 15:05:20.025 TGCD[1940:99120] +++++
+2016-02-25 15:05:20.025 TGCD[1940:99121] ----
+2016-02-25 15:05:20.025 TGCD[1940:99122] =====
+2016-02-25 15:05:20.025 TGCD[1940:99120] +++++
+2016-02-25 15:05:20.025 TGCD[1940:99121] ----
+2016-02-25 15:05:20.025 TGCD[1940:99122] =====
+</code></pre><p>如果将队列1的目标队列设置为队列2，会发生什么情况呢？</p>
+<pre><code>dispatch_queue_t queue1 = dispatch_queue_create(&quot;com.company.queue1&quot;, DISPATCH_QUEUE_CONCURRENT);
+dispatch_queue_t queue2 = dispatch_queue_create(&quot;com.company.queue2&quot;, DISPATCH_QUEUE_SERIAL);
+
+dispatch_set_target_queue(queue1, queue2);
+
+dispatch_async(queue1, ^{
+    for (int i = 0; i &lt; 5; i ++) {
+        NSLog(@&quot;+++++&quot;);
+    }
+});
+dispatch_async(queue1, ^{
+    for (int i = 0; i &lt; 5; i ++) {
+        NSLog(@&quot;=====&quot;);
+    }
+});
+dispatch_async(queue2, ^{
+    for (int i = 0; i &lt; 5; i ++) {
+        NSLog(@&quot;----&quot;);
+    }
+});
+</code></pre><p>block1，block2，block3变为了串行</p>
+<pre><code>2016-02-25 15:06:57.215 TGCD[1974:100675] +++++
+2016-02-25 15:06:57.215 TGCD[1974:100675] +++++
+2016-02-25 15:06:57.215 TGCD[1974:100675] +++++
+2016-02-25 15:06:57.215 TGCD[1974:100675] +++++
+2016-02-25 15:06:57.216 TGCD[1974:100675] +++++
+2016-02-25 15:06:57.216 TGCD[1974:100675] =====
+2016-02-25 15:06:57.216 TGCD[1974:100675] =====
+2016-02-25 15:06:57.216 TGCD[1974:100675] =====
+2016-02-25 15:06:57.216 TGCD[1974:100675] =====
+2016-02-25 15:06:57.216 TGCD[1974:100675] =====
+2016-02-25 15:06:57.216 TGCD[1974:100675] ----
+2016-02-25 15:06:57.216 TGCD[1974:100675] ----
+2016-02-25 15:06:57.216 TGCD[1974:100675] ----
+2016-02-25 15:06:57.217 TGCD[1974:100675] ----
+2016-02-25 15:06:57.217 TGCD[1974:100675] ----
+</code></pre><blockquote>
+<p>注意不要循环设置目标队列，如A的目标队列为B，B的目标队列为A。这将会导致无法预知的错误</p>
+</blockquote>
+<h1 id="延时"><a href="#延时" class="headerlink" title="延时"></a>延时</h1><p>GCD中有2个延时的API</p>
+<pre><code>dispatch_after(dispatch_time_t when, dispatch_queue_t queue, dispatch_block_t block);
+void dispatch_after_f(dispatch_time_t when, dispatch_queue_t queue, void *context, dispatch_function_t work);
+</code></pre><p>一定时间之后将block加入到queue中。when用于表示时间，如果传入<code>DISPATCH_TIME_NOW</code>会等同于<code>dispatch_async</code>。另外不允许传入<code>DISPATCH_TIME_FOREVER</code>，这会永远阻塞线程。</p>
+<p>通前面其他方法类似。<code>dispatch_after</code>接收block作为参数，系统持有block，block中self不需要weak。<code>dispatch_after_f</code>接收work函数作为参数，context作为work函数的第一个参数</p>
+<p>需要注意的是这里的延时是不精确的，因为加入队列不一定会立即执行。延时1s可能会1.5s甚至2s之后才会执行。</p>
+<h1 id="dispatch-barrier"><a href="#dispatch-barrier" class="headerlink" title="dispatch_barrier"></a>dispatch_barrier</h1><p>在并行队列中，有的时候我们需要让某个任务单独执行，也就是他执行的时候不允许其他任务执行。这时候dispatch_barrier就派上了用场。</p>
+<p>使用dispatch_barrier将任务加入到并行队列之后，任务会在前面任务全部执行完成之后执行，任务执行过程中，其他任务无法执行，直到barrier任务执行完成</p>
+<p><img src="http://jiangliancheng.gitcafe.io/images/GCD/barrier.png" alt=""></p>
+<p>dispatch_barrier在GCD中有4个API</p>
+<pre><code>void dispatch_barrier_async(dispatch_queue_t queue, dispatch_block_t block);
+void dispatch_barrier_async_f(dispatch_queue_t queue, void *context, dispatch_function_t work);
+void dispatch_barrier_sync(dispatch_queue_t queue, dispatch_block_t block);
+void dispatch_barrier_sync_f(dispatch_queue_t queue, void *context, dispatch_function_t work); 
+</code></pre><p>如果API在串行队列中调用，将等同于<code>dispatch_async</code>、<code>dispatch_async_f</code>、<code>dispatch_sync</code>、<code>dispatch_sync_f</code>，不会有任何影响。</p>
+<p><code>dispatch_barrier</code>最典型的使用场景是读写问题，NSMutableDictionary在多个线程中如果同时写入，或者一个线程写入一个线程读取，会发生无法预料的错误。但是他可以在多个线程中同时读取。如果多个线程同时使用同一个NSMutableDictionary。怎样才能保护NSMutableDictionary不发生意外呢？</p>
+<pre><code>- (void)setObject:(id)anObject forKey:(id&lt;NSCopying&gt;)aKey
+{
+    dispatch_barrier_async(self.concurrentQueue, ^{
+        [self.mutableDictionary setObject:anObject forKey:aKey];
+    });
+}
+
+- (id)objectForKey:(id)aKey
+{
+    __block id object = nil;
+    dispatch_sync(self.concurrentQueue, ^{
+        object = [self.mutableDictionary objectForKey:aKey];
+    });
+    return  object;
+}
+</code></pre><p>当NSMutableDictionary写入的时候，我们使用dispatch_barrier_async，让其单独执行写入操作，不允许其他写入操作或者读取操作同时执行。当读取的时候，我们只需要直接使用dispatch_sync，让其正常读取即可。这样就可以保证写入时不被打扰，读取时可以多个线程同时进行</p>
+<h1 id="set-specific-amp-get-specific"><a href="#set-specific-amp-get-specific" class="headerlink" title="set_specific &amp; get_specific"></a>set_specific &amp; get_specific</h1><p>有时候我们需要将某些东西关联到队列上，比如我们想在某个队列上存一个东西，或者我们想区分2个队列。GCD提供了<code>dispatch_queue_set_specific</code>方法，通过key，将context关联到queue上</p>
+<pre><code>void dispatch_queue_set_specific(dispatch_queue_t queue, const void *key, void *context, dispatch_function_t destructor);
+</code></pre><ul>
+<li><code>queue</code>：需要关联的queue，不允许传入NULL</li>
+<li><code>key</code>：唯一的关键字</li>
+<li><code>context</code>：要关联的内容，可以为NULL</li>
+<li><code>destructor</code>：释放<code>context</code>的函数，当新的context被设置时，<code>destructor</code>会被调用</li>
+</ul>
+<p>有存就有取，将context关联到queue上之后，可以通过<code>dispatch_queue_get_specific</code>或者<code>dispatch_get_specific</code>方法将值取出来。</p>
+<pre><code>void *dispatch_queue_get_specific(dispatch_queue_t queue, const void *key);
+void *dispatch_get_specific(const void *key);
+</code></pre><ul>
+<li><code>dispatch_queue_get_specific</code>: 根据queue和key取出context，queue参数不能传入全局队列</li>
+<li><code>dispatch_get_specific</code>: 根据唯一的key取出当前queue的context。如果当前queue没有key对应的context，则去queue的target queue取，取不着返回NULL，如果对全局队列取，也会返回NULL</li>
+</ul>
+<p>iOS6之后<code>dispatch_get_current_queue()</code>被废弃（废弃的原因这里不多解释，如果想了解可以看<a href="http://stackoverflow.com/questions/23955948/why-did-apple-deprecate-dispatch-get-current-queue" target="_blank" rel="noopener">这里</a>），如果我们需要区分不同的queue，可以使用<code>set_specific</code>方法。根据对应的key是否有值来区分</p>
+<h1 id="END"><a href="#END" class="headerlink" title="END"></a>END</h1><p>节后第一弹，queue相关的内容就介绍到这里，GCD的东西挺多，其他东西之后如果有时间我会慢慢介绍，敬请期待</p>
+<h1 id="About-Me"><a href="#About-Me" class="headerlink" title="About Me"></a>About Me</h1><p><a href="http://jiangliancheng.gitcafe.io/" target="_blank" rel="noopener">个人博客</a> <a href="http://www.jianshu.com/users/1f93e3b1f3da" target="_blank" rel="noopener">简书</a> <a href="http://weibo.com/u/5592239559" target="_blank" rel="noopener">微博</a> QQ群：159974494</p>
+<p>欢迎大家关注我，共同学习iOS~</p>
+
+    
+  </div>
+
+</article>
+
+
+   
+  <div class="text-center donation">
+    <div class="inner-donation">
+      <span class="btn-donation">支持一下</span>
+      <div class="donation-body">
+        <div class="tip text-center">扫一扫，支持forsigner</div>
+        <ul>
+        
+          <li class="item">
+            
+              <span>微信扫一扫</span>
+            
+            <img src="/images/qr-wechat.png" alt="">
+          </li>
+        
+          <li class="item">
+            
+              <span>支付宝扫一扫</span>
+            
+            <img src="/images/qr-alipay.png" alt="">
+          </li>
+        
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+   
+  <div class="box-prev-next clearfix">
+    <a class="show pull-left" href="/2016/01/16/小笨狼漫谈多线程-NSThread/">
+        <i class="icon icon-angle-left"></i>
+    </a>
+    <a class="hide pull-right" href="/">
+        <i class="icon icon-angle-right"></i>
+    </a>
+  </div>
+
+
+
+
+
+   
+      <div class="git"></div>
+   
+</div>
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/link/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              友链
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/atom.xml"
+              rel="noopener noreferrer"
+              target="_blank"
+              >
+              RSS
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+  <section class="disqus-comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+  </section>
+
+  <script>
+    var disqus_shortname = 'forsigner';
+    
+    var disqus_url = 'http://yoursite.com/2016/01/23/小笨狼漫谈多线程：GCD-queue/';
+    
+    (function(){
+      var dsq = document.createElement('script');
+      dsq.type = 'text/javascript';
+      dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+
+  <script id="dsq-count-scr" src="//forsigner.disqus.com/count.js" async></script>
+
+
+
+    
+    
+
+    
+    
+
+    
+
+    
+    
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>

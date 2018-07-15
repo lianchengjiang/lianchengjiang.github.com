@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>JSONModel的使用（二） | Hexo</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="JSONModel," />
+  
+
+  <meta name="description" content="前面已经说过JSONModel的基本用法，下面我们来看看更多的东西 简单逻辑这是JSONModel的逻辑图简化版。JSONModel从NSDictionary转化为property主要分为四步：  获取self的property的名字 通过keyMapper将property的String转化为NSDictionary的key 通过key获取NSDictionary的value 将value赋值给">
+<meta name="keywords" content="JSONModel">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JSONModel的使用（二）">
+<meta property="og:url" content="http://yoursite.com/2015/08/14/JSONModel的使用（二）/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="前面已经说过JSONModel的基本用法，下面我们来看看更多的东西 简单逻辑这是JSONModel的逻辑图简化版。JSONModel从NSDictionary转化为property主要分为四步：  获取self的property的名字 通过keyMapper将property的String转化为NSDictionary的key 通过key获取NSDictionary的value 将value赋值给">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://yoursite.com/images/jsonmodel_logic.png">
+<meta property="og:updated_time" content="2015-10-31T16:09:29.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="JSONModel的使用（二）">
+<meta name="twitter:description" content="前面已经说过JSONModel的基本用法，下面我们来看看更多的东西 简单逻辑这是JSONModel的逻辑图简化版。JSONModel从NSDictionary转化为property主要分为四步：  获取self的property的名字 通过keyMapper将property的String转化为NSDictionary的key 通过key获取NSDictionary的value 将value赋值给">
+<meta name="twitter:image" content="http://yoursite.com/images/jsonmodel_logic.png">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=c114cben" rel="stylesheet">
+
+
+  
+    <link rel="stylesheet" href="/css/personal-style.css">
+  
+
+  
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+  
+  <script type="text/javascript">
+	(function(){
+	    var bp = document.createElement('script');
+	    var curProtocol = window.location.protocol.split(':')[0];
+	    if (curProtocol === 'https') {
+	        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+	    }
+	    else {
+	        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+	    }
+	    var s = document.getElementsByTagName("script")[0];
+	    s.parentNode.insertBefore(bp, s);
+	})();
+  </script>
+
+
+
+  
+    <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+
+  
+    <link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  
+</head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">盒子</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/link/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            友链
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/atom.xml"
+            rel="noopener noreferrer"
+            target="_blank"
+            >
+            RSS
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#简单逻辑"><span class="toc-text">简单逻辑</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#简单类型"><span class="toc-text">简单类型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#End"><span class="toc-text">End</span></a></li></ol>
+  </div>
+
+
+
+<div class="content content-post CENTER">
+   <article id="post-JSONModel的使用（二）" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">JSONModel的使用（二）</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2015.08.14</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>John Doe</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/JSONModel/">JSONModel</a>
+  </span>
+
+
+
+      
+        <span>
+          <i class="icon-comment"></i>
+          <a href="http://www.forsigner.com/2015/08/14/JSONModel的使用（二）/#disqus_thread"></a>
+        </span>
+      
+
+      
+      <i class="fa fa-eye"></i> 
+        <span id="busuanzi_container_page_pv">
+           &nbsp热度 <span id="busuanzi_value_page_pv">
+           <i class="fa fa-spinner fa-spin"></i></span>℃
+        </span>
+      
+      
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <p>前面已经说过<a href="http://jiangliancheng.gitcafe.io/2015/01/01/JSONModel%E7%9A%84%E4%BD%BF%E7%94%A8/" target="_blank" rel="noopener">JSONModel的基本用法</a>，下面我们来看看更多的东西</p>
+<h3 id="简单逻辑"><a href="#简单逻辑" class="headerlink" title="简单逻辑"></a>简单逻辑</h3><p><img src="/images/jsonmodel_logic.png" alt=""><br>这是JSONModel的逻辑图简化版。JSONModel从NSDictionary转化为property主要分为四步：</p>
+<ol>
+<li>获取self的property的名字</li>
+<li>通过keyMapper将property的String转化为NSDictionary的key</li>
+<li>通过key获取NSDictionary的value</li>
+<li>将value赋值给property</li>
+</ol>
+<p>当然具体的实现过程中需要考虑很多其他的东西。比如readonly和ignore的属性会被忽略。如果属性没有找到对应的value，会抛出异常，并返回nil等等</p>
+<h3 id="简单类型"><a href="#简单类型" class="headerlink" title="简单类型"></a>简单类型</h3><p>对于一个对象类型，如果我们想声明ignore或者option，可以这样</p>
+<pre><code>@property(nonatomic, strong) NSString&lt;Ignore&gt; *name;
+</code></pre><p>然而如果一个简单类型，比如int，也需要ignore属性怎么办呢？</p>
+<pre><code>@property(nonatomic, assign) int&lt;Ignore&gt; score; //编译器会报错
+</code></pre><p>对于简单类型，编译器不让这样玩。如果这时候又有这样的需求怎么办呢？<br>其实JSONModel已经考虑到了这种情况，这种情况下可以通过-propertyIsIgnored:方法来玩</p>
+<pre><code>+ (BOOL)propertyIsIgnored:(NSString *)propertyName
+{
+    if ([propertyName isEqualToString:@&quot;score&quot;]) {
+        return YES;
+    }
+    return NO;
+}
+</code></pre><p>-propertyIsIgnored:返回YES等同于使用<code>&lt;Ignore&gt;</code>，并且只要有一个使用了，就会有效</p>
+<p>同理跟<code>&lt;Optional&gt;</code>对应的也有一个方法</p>
+<pre><code>/**
+ * Indicates whether the property with the given name is Optional.
+ * To have a model with all of its properties being Optional just return YES.
+ * This method returns by default NO, since the default behaviour is to have all properties required.
+ * @param propertyName the name of the property
+ * @return a BOOL result indicating whether the property is optional
+ */
++(BOOL)propertyIsOptional:(NSString*)propertyName;
+</code></pre><p><code>&lt;Optional&gt;</code>和<code>-propertyIsOptional:</code>只要有一个使用了，就会生效</p>
+<blockquote>
+<p><code>Ignore</code>的优先级比<code>Optional</code>高，如果<code>Ignore</code>和<code>Optional</code>同时使用，等同于使用<code>Ignore</code></p>
+</blockquote>
+<h3 id="End"><a href="#End" class="headerlink" title="End"></a>End</h3><p>简单记下一些东西，以后想到其他的再补充</p>
+
+    
+  </div>
+
+</article>
+
+
+   
+  <div class="text-center donation">
+    <div class="inner-donation">
+      <span class="btn-donation">支持一下</span>
+      <div class="donation-body">
+        <div class="tip text-center">扫一扫，支持forsigner</div>
+        <ul>
+        
+          <li class="item">
+            
+              <span>微信扫一扫</span>
+            
+            <img src="/images/qr-wechat.png" alt="">
+          </li>
+        
+          <li class="item">
+            
+              <span>支付宝扫一扫</span>
+            
+            <img src="/images/qr-alipay.png" alt="">
+          </li>
+        
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+   
+  <div class="box-prev-next clearfix">
+    <a class="show pull-left" href="/2015/08/14/让代码更帅一点（二）/">
+        <i class="icon icon-angle-left"></i>
+    </a>
+    <a class="show pull-right" href="/2015/10/17/AVFoundation(一)：基础知识/">
+        <i class="icon icon-angle-right"></i>
+    </a>
+  </div>
+
+
+
+
+
+   
+      <div class="git"></div>
+   
+</div>
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/link/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              友链
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/atom.xml"
+              rel="noopener noreferrer"
+              target="_blank"
+              >
+              RSS
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+  <section class="disqus-comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+  </section>
+
+  <script>
+    var disqus_shortname = 'forsigner';
+    
+    var disqus_url = 'http://yoursite.com/2015/08/14/JSONModel的使用（二）/';
+    
+    (function(){
+      var dsq = document.createElement('script');
+      dsq.type = 'text/javascript';
+      dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+
+  <script id="dsq-count-scr" src="//forsigner.disqus.com/count.js" async></script>
+
+
+
+    
+    
+
+    
+    
+
+    
+
+    
+    
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>

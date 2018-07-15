@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>小笨狼的LLDB技巧:chisel | Hexo</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="LLDB," />
+  
+
+  <meta name="description" content="不玩LLDB，不知道chisel有多强大。chisel之于LLDB，就像iPhone之于手机，前者几乎给后者重新下了一次定义。如果你还不知道什么是LLDB，请看我上一篇文章小笨狼与LLDB的故事 安装安装Homebrewchisel的安装需要使用Homebrew，如果还没有安装Homebrew，可以使用下面的命令安装，如果你已经安装了，可以跳过这一步 1ruby -e &amp;quot;$(curl -">
+<meta name="keywords" content="LLDB">
+<meta property="og:type" content="article">
+<meta property="og:title" content="小笨狼的LLDB技巧:chisel">
+<meta property="og:url" content="http://yoursite.com/2015/12/19/小笨狼的LLDB技巧：chisel/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="不玩LLDB，不知道chisel有多强大。chisel之于LLDB，就像iPhone之于手机，前者几乎给后者重新下了一次定义。如果你还不知道什么是LLDB，请看我上一篇文章小笨狼与LLDB的故事 安装安装Homebrewchisel的安装需要使用Homebrew，如果还没有安装Homebrew，可以使用下面的命令安装，如果你已经安装了，可以跳过这一步 1ruby -e &amp;quot;$(curl -">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://jiangliancheng.gitcafe.io/images/chisel/alamborder.png">
+<meta property="og:image" content="http://jiangliancheng.gitcafe.io/images/chisel/flicker.gif">
+<meta property="og:image" content="http://jiangliancheng.gitcafe.io/images/chisel/vs.png">
+<meta property="og:image" content="http://jiangliancheng.gitcafe.io/images/chisel/caflush.png">
+<meta property="og:image" content="http://jiangliancheng.gitcafe.io/images/chisel/border.png">
+<meta property="og:image" content="http://jiangliancheng.gitcafe.io/images/chisel/unborder.png">
+<meta property="og:image" content="http://jiangliancheng.gitcafe.io/images/chisel/mask.png">
+<meta property="og:image" content="http://jiangliancheng.gitcafe.io/images/chisel/show.png">
+<meta property="og:image" content="http://jiangliancheng.gitcafe.io/images/chisel/slowanim.gif">
+<meta property="og:image" content="http://jiangliancheng.gitcafe.io/images/chisel/unslowanim.gif">
+<meta property="og:image" content="http://jiangliancheng.gitcafe.io/images/chisel/visualize.png">
+<meta property="og:image" content="http://jiangliancheng.gitcafe.io/images/chisel/wivar.png">
+<meta property="og:updated_time" content="2016-01-18T09:43:35.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="小笨狼的LLDB技巧:chisel">
+<meta name="twitter:description" content="不玩LLDB，不知道chisel有多强大。chisel之于LLDB，就像iPhone之于手机，前者几乎给后者重新下了一次定义。如果你还不知道什么是LLDB，请看我上一篇文章小笨狼与LLDB的故事 安装安装Homebrewchisel的安装需要使用Homebrew，如果还没有安装Homebrew，可以使用下面的命令安装，如果你已经安装了，可以跳过这一步 1ruby -e &amp;quot;$(curl -">
+<meta name="twitter:image" content="http://jiangliancheng.gitcafe.io/images/chisel/alamborder.png">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=c114cben" rel="stylesheet">
+
+
+  
+    <link rel="stylesheet" href="/css/personal-style.css">
+  
+
+  
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+  
+  <script type="text/javascript">
+	(function(){
+	    var bp = document.createElement('script');
+	    var curProtocol = window.location.protocol.split(':')[0];
+	    if (curProtocol === 'https') {
+	        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+	    }
+	    else {
+	        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+	    }
+	    var s = document.getElementsByTagName("script")[0];
+	    s.parentNode.insertBefore(bp, s);
+	})();
+  </script>
+
+
+
+  
+    <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+
+  
+    <link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  
+</head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">盒子</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/link/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            友链
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/atom.xml"
+            rel="noopener noreferrer"
+            target="_blank"
+            >
+            RSS
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#安装"><span class="toc-text">安装</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#安装Homebrew"><span class="toc-text">安装Homebrew</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#用Homebrew安装chisel"><span class="toc-text">用Homebrew安装chisel</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#在-lldbinit中添加命令"><span class="toc-text">在~/.lldbinit中添加命令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#更新"><span class="toc-text">更新</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#命令"><span class="toc-text">命令</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Autolayout"><span class="toc-text">Autolayout</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#alamborder"><span class="toc-text">alamborder</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#alamunborder"><span class="toc-text">alamunborder</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#paltrace"><span class="toc-text">paltrace</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Print"><span class="toc-text">Print</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#pviews"><span class="toc-text">pviews</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#pvc"><span class="toc-text">pvc</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#pclass"><span class="toc-text">pclass</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#presponder"><span class="toc-text">presponder</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ptv"><span class="toc-text">ptv</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#pcells"><span class="toc-text">pcells</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#pinternals"><span class="toc-text">pinternals</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#pdata"><span class="toc-text">pdata</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#pkp"><span class="toc-text">pkp</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#pivar"><span class="toc-text">pivar</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#pca"><span class="toc-text">pca</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#panim"><span class="toc-text">panim</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Find"><span class="toc-text">Find</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#fvc"><span class="toc-text">fvc</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#fv"><span class="toc-text">fv</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#taplog"><span class="toc-text">taplog</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#flicker"><span class="toc-text">flicker</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#vs"><span class="toc-text">vs</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Display"><span class="toc-text">Display</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#caflush"><span class="toc-text">caflush</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#border"><span class="toc-text">border</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#unborder"><span class="toc-text">unborder</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#mask"><span class="toc-text">mask</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#unmask"><span class="toc-text">unmask</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#show"><span class="toc-text">show</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#hide"><span class="toc-text">hide</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#slowanim"><span class="toc-text">slowanim</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#unslowanim"><span class="toc-text">unslowanim</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Preview"><span class="toc-text">Preview</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#visualize"><span class="toc-text">visualize</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Debug"><span class="toc-text">Debug</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#wivar"><span class="toc-text">wivar</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#bmessage"><span class="toc-text">bmessage</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#binside"><span class="toc-text">binside</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#pinvocation"><span class="toc-text">pinvocation</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Accessibility"><span class="toc-text">Accessibility</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#fa11y"><span class="toc-text">fa11y</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#pa11y"><span class="toc-text">pa11y</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#End"><span class="toc-text">End</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Reference"><span class="toc-text">Reference</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#About-Me"><span class="toc-text">About Me</span></a></li></ol>
+  </div>
+
+
+
+<div class="content content-post CENTER">
+   <article id="post-小笨狼的LLDB技巧：chisel" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">小笨狼的LLDB技巧:chisel</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2015.12.19</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>John Doe</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/调试技巧/">调试技巧</a>
+  </span>
+
+
+
+      
+        <span>
+          <i class="icon-comment"></i>
+          <a href="http://www.forsigner.com/2015/12/19/小笨狼的LLDB技巧：chisel/#disqus_thread"></a>
+        </span>
+      
+
+      
+      <i class="fa fa-eye"></i> 
+        <span id="busuanzi_container_page_pv">
+           &nbsp热度 <span id="busuanzi_value_page_pv">
+           <i class="fa fa-spinner fa-spin"></i></span>℃
+        </span>
+      
+      
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <p>不玩LLDB，不知道chisel有多强大。chisel之于LLDB，就像iPhone之于手机，前者几乎给后者重新下了一次定义。如果你还不知道什么是LLDB，请看我上一篇文章<a href="http://www.jianshu.com/p/e89af3e9a8d7" target="_blank" rel="noopener">小笨狼与LLDB的故事</a></p>
+<h1 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h1><h3 id="安装Homebrew"><a href="#安装Homebrew" class="headerlink" title="安装Homebrew"></a>安装Homebrew</h3><p>chisel的安装需要使用Homebrew，如果还没有安装Homebrew，可以使用下面的命令安装，如果你已经安装了，可以跳过这一步</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ruby -e &quot;$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)&quot;</span><br></pre></td></tr></table></figure>
+<h3 id="用Homebrew安装chisel"><a href="#用Homebrew安装chisel" class="headerlink" title="用Homebrew安装chisel"></a>用Homebrew安装chisel</h3><p>搞定Homebrew之后，你就可以用他来安装chisel了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">brew update</span><br><span class="line">brew install chisel</span><br></pre></td></tr></table></figure>
+<p>官网的命令里有一个<code>brew update</code>，是用来更新Homebrew版本的，如果你是新安装的Homebrew，可以省略掉这条命令</p>
+<h3 id="在-lldbinit中添加命令"><a href="#在-lldbinit中添加命令" class="headerlink" title="在~/.lldbinit中添加命令"></a>在<code>~/.lldbinit</code>中添加命令</h3><p>安装好之后，terminal中会出现这个东西</p>
+<pre><code>==&gt; Caveats
+Add the following line to ~/.lldbinit to load chisel when Xcode launches:
+  command script import /usr/local/opt/chisel/libexec/fblldb.py
+</code></pre><p>意思是需要把这个命令<code>command script import /usr/local/opt/chisel/libexec/fblldb.py</code>加到<code>~/.lldbinit</code>文件中</p>
+<p>我们将命令其添加进去即可。如果你已经添加过一次了，不需要再次添加</p>
+<pre><code>touch ~/.lldbinit
+echo &quot;command script import /usr/local/opt/chisel/libexec/fblldb.py&quot; &gt;&gt; ~/.lldbinit
+</code></pre><p>重启一下Xcode，安装完成</p>
+<h3 id="更新"><a href="#更新" class="headerlink" title="更新"></a>更新</h3><p>如果你想更新chisel，只需要输入更新的命令即可</p>
+<pre><code>brew upgrade chisel
+</code></pre><h1 id="命令"><a href="#命令" class="headerlink" title="命令"></a>命令</h1><h2 id="Autolayout"><a href="#Autolayout" class="headerlink" title="Autolayout"></a>Autolayout</h2><p>autolayout中有一种bug叫<a href="https://developer.apple.com/library/tvos/documentation/UserExperience/Conceptual/AutolayoutPG/AmbiguousLayouts.html#//apple_ref/doc/uid/TP40010853-CH18-SW1" target="_blank" rel="noopener">Ambiguous Layouts</a>，意思是你设置的约束不足以确定view的位置或大小。比如你只设置了X轴的位置，没有设置Y轴的位置</p>
+<p>autolayout提供了专门判断和查找这类问题的方法：</p>
+<pre><code>hasAmbiguousLayout. Available for both iOS and OS X. Call this method on a misplaced view. It returns YES if the view’s frame is ambiguous. Otherwise, it returns NO.
+_autolayoutTrace. Available as a private method in iOS. Call this method on a view. It returns a string with diagnostic information about the entire view hierarchy containing that view. Ambiguous views are labeled, and so are views that have translatesAutoresizingMaskIntoConstraints set to YES.
+</code></pre><ul>
+<li><code>hasAmbiguousLayout</code>用于判断是否存在<code>Ambiguous Layouts</code></li>
+<li><code>_autolayoutTrace</code>用于查找存在的<code>Ambiguous Layouts</code></li>
+</ul>
+<p>但是即使有查找的方法，真正去做这个事儿也比较费时费力的，这时候chisel给我们提供了更为方便的命令</p>
+<h3 id="alamborder"><a href="#alamborder" class="headerlink" title="alamborder"></a>alamborder</h3><p>给存在<code>Ambiguous Layouts</code>的view加上border，方便查找哪些View存在问题</p>
+<p>语法：</p>
+<pre><code>Syntax: alamborder [--color=color] [--width=width]
+</code></pre><ul>
+<li><code>--color</code>/<code>-c</code>: border的颜色，参数为string类型，比如’red’, ‘green’, ‘magenta’等，不设置默认为红色。</li>
+<li><code>--width</code>/<code>-w</code>: border的宽度，参数为CGFloat类型，不设置默认宽度为2。</li>
+</ul>
+<p>e.g: 假设我们写了这么一段代码，可以明显看出，我们没有设置X轴的位置。</p>
+<pre><code>UIView *subview = [UIView new];
+[self.view addSubview:subview];
+[subview mas_makeConstraints:^(MASConstraintMaker *make) {
+    make.top.offset(100);
+    make.size.equalTo(@100);
+}];
+</code></pre><p>运行代码之后，在LLDB控制台输入<code>alamborder</code></p>
+<pre><code>(lldb) alamborder 
+</code></pre><p>所有带有<code>Ambiguous Layouts</code>的view立即会被渲染上红色border</p>
+<p><img src="http://jiangliancheng.gitcafe.io/images/chisel/alamborder.png" alt=""></p>
+<p>可以看到，subview的边框已经变为红色，另外只要有一个View存在<code>Ambiguous Layouts</code>，UIWindow的边框也会变为红色，这就有效的避免了宽度或者高度为0的<code>Ambiguous Layouts</code>不宜察觉的缺陷。</p>
+<h3 id="alamunborder"><a href="#alamunborder" class="headerlink" title="alamunborder"></a>alamunborder</h3><p>将<code>alamborder</code>设置的border去掉.</p>
+<p>语法：</p>
+<pre><code>Syntax: alamunborder
+</code></pre><p>e.g: 刚刚设置的border，在lldb控制台输入<code>alamunborder</code>即可去掉边框</p>
+<pre><code>(lldb) alamborder 
+</code></pre><h3 id="paltrace"><a href="#paltrace" class="headerlink" title="paltrace"></a>paltrace</h3><p>打印某个View的autolayout详细信息，相当于调用<code>_autolayoutTrace</code></p>
+<p>语法：</p>
+<pre><code>Syntax: paltrace &lt;view&gt;
+</code></pre><ul>
+<li><code>&lt;view&gt;</code>: 需要打印详细信息的view，不传参数默认为keyWindow</li>
+</ul>
+<p>e.g: 查看一下keyWindow上有哪个view存在<code>Ambiguous Layouts</code></p>
+<pre><code>(lldb) paltrace 
+•UIWindow:0x7ff450d2fb50 - AMBIGUOUS LAYOUT
+|   •UIView:0x7ff450e14430
+|   |   *_UILayoutGuide:0x7ff450d30e90
+|   |   *_UILayoutGuide:0x7ff450d31230
+|   |   *UIView:0x7ff450d32870- AMBIGUOUS LAYOUT for UIView:0x7ff450d32870.minX{id: 46}
+
+Legend:
+    * - is laid out with auto layout
+    + - is laid out manually, but is represented in the layout engine because translatesAutoresizingMaskIntoConstraints = YES
+    • - layout engine host
+</code></pre><p>我们可以看到，<code>UIView:0x7ff450d32870</code>存在<code>Ambiguous Layouts</code>，原因是缺少<code>minX</code>。也就是没有设置X轴的位置</p>
+<h2 id="Print"><a href="#Print" class="headerlink" title="Print"></a>Print</h2><p>在LLDB中，我们执行的最多的可能就是打印操作了，chisel专门为这类操作封装了一些打印命令</p>
+<h3 id="pviews"><a href="#pviews" class="headerlink" title="pviews"></a>pviews</h3><p>循环打印view层级，正常情况下等效于调用<code>recursiveDescription</code>命令</p>
+<pre><code>// 下面2条命令等效
+(lldb) po [self.view recursiveDescription]
+(lldb) pviews self.view
+</code></pre><p>语法：</p>
+<pre><code>pviews [--up] [--depth=depth] &lt;aView&gt;
+</code></pre><ul>
+<li><code>--up</code>/<code>-u</code>: 以view为起始位置，向上打印，直到打印到window层</li>
+<li><code>--depth</code>/<code>-d</code>: 传入int类型，表示打印的层数，0表示没有限制</li>
+</ul>
+<p>e.g: 打印一下self.view层级</p>
+<pre><code>(lldb) pviews self.view
+&lt;UIView: 0x7fee7ae1fa60; frame = (0 0; 375 667); autoresize = W+H; layer = &lt;CALayer: 0x7fee7ae1d3c0&gt;&gt;
+   | &lt;UIButton: 0x7fee7ae1dd90; frame = (54 244; 46 30); opaque = NO; autoresize = RM+BM; layer = &lt;CALayer: 0x7fee7ae1e300&gt;&gt;
+   | &lt;UIView: 0x7fee7ae1f2e0; frame = (35 312; 240 128); autoresize = RM+BM; layer = &lt;CALayer: 0x7fee7ae1f660&gt;&gt;
+   | &lt;_UILayoutGuide: 0x7fee7ae1fc20; frame = (0 0; 0 0); hidden = YES; layer = &lt;CALayer: 0x7fee7ae20030&gt;&gt;
+   | &lt;_UILayoutGuide: 0x7fee7ae20b30; frame = (0 0; 0 0); hidden = YES; layer = &lt;CALayer: 0x7fee7ae1d100&gt;&gt;
+   | &lt;UILabel: 0x7fee7ae1d3f0; frame = (0.4 150; 58.25 20.5); text = &apos;aaa&apos;; userInteractionEnabled = NO; layer = &lt;_UILabelLayer: 0x7fee7ae1bb30&gt;&gt;
+</code></pre><h3 id="pvc"><a href="#pvc" class="headerlink" title="pvc"></a>pvc</h3><p>循环打印viewController的层级</p>
+<p>语法：</p>
+<pre><code>Syntax: pvc &lt;aViewController&gt;
+</code></pre><p><code>&lt;aViewController&gt;</code>: 表示要打印的viewController，不传参数默认viewController为当前的VC</p>
+<p>e.g: 打印一下当前VC</p>
+<pre><code>(lldb) pvc
+&lt;UINavigationController 0x7fce1a03d800&gt;, state: appeared, view: &lt;UILayoutContainerView 0x7fce19500c00&gt;
+   | &lt;ViewController 0x7fce1c03a1d0&gt;, state: disappeared, view: &lt;UIView 0x7fce19517b40&gt; not in the window
+   | &lt;TableViewController 0x7fce1951f7b0&gt;, state: appeared, view: &lt;UIView 0x7fce1c053e60&gt;
+</code></pre><h3 id="pclass"><a href="#pclass" class="headerlink" title="pclass"></a>pclass</h3><p>循环打印class的继承关系</p>
+<p>语法：</p>
+<pre><code>Syntax: pclass &lt;object&gt;
+</code></pre><p><code>&lt;object&gt;</code>: 要打印继承关系的对象</p>
+<p>e.g: 打印一个View对象的继承关系</p>
+<pre><code>(lldb) pclass [UIView new]
+UIView
+   | UIResponder
+   |    | NSObject
+</code></pre><h3 id="presponder"><a href="#presponder" class="headerlink" title="presponder"></a>presponder</h3><p>打印响应链</p>
+<p>语法：</p>
+<pre><code>Syntax: presponder &lt;startResponder&gt;
+</code></pre><p><code>&lt;startResponder&gt;</code>: UIResponder对象，响应链开始位置</p>
+<p>e.g: 打印一个tableView的响应链</p>
+<pre><code>(lldb) presponder tableView
+&lt;UITableView: 0x7fde54810e00; frame = (0 0; 0 0); clipsToBounds = YES; gestureRecognizers = &lt;NSArray: 0x7fde52519ac0&gt;; layer = &lt;CALayer: 0x7fde5253b4c0&gt;; contentOffset: {0, 0}; contentSize: {0, 220}&gt;
+   | &lt;UIView: 0x7fde5255c710; frame = (0 0; 600 600); autoresize = W+H; layer = &lt;CALayer: 0x7fde5253b300&gt;&gt;
+   |    | &lt;TableViewController: 0x7fde52491310&gt;
+</code></pre><h3 id="ptv"><a href="#ptv" class="headerlink" title="ptv"></a>ptv</h3><p>打印屏幕中显示的tableView，主要是与<code>pcells</code>联合使用。如果有多个tableView，打印View层级中最上面的一个</p>
+<p>语法：</p>
+<pre><code>Syntax: ptv
+</code></pre><p>e.g: 看看当前最上面是哪个tableView</p>
+<pre><code>(lldb) ptv
+&lt;UITableView: 0x7fde52811800; frame = (0 0; 414 736); clipsToBounds = YES; autoresize = RM+BM; gestureRecognizers = &lt;NSArray: 0x7fde526418d0&gt;; layer = &lt;CALayer: 0x7fde5260adc0&gt;; contentOffset: {0, -64}; contentSize: {414, 176}&gt;
+</code></pre><h3 id="pcells"><a href="#pcells" class="headerlink" title="pcells"></a>pcells</h3><p>打印tableView中当前可见的cell，如果有多个tableView，打印View层级中最上面的tableView的可见cell</p>
+<p>语法：</p>
+<pre><code>Syntax: pcells
+</code></pre><p>e.g: 看看当前可见的cell有哪些</p>
+<pre><code>(lldb) pcells
+&lt;__NSArrayI 0x7fde52565a00&gt;(
+&lt;UITableViewCell: 0x7fde52551180; frame = (0 0; 414 44); text = &apos;BasicViewController&apos;; autoresize = W; layer = &lt;CALayer: 0x7fde52537140&gt;&gt;,
+&lt;UITableViewCell: 0x7fde5255bea0; frame = (0 44; 414 44); text = &apos;DateViewController&apos;; autoresize = W; layer = &lt;CALayer: 0x7fde5255b1a0&gt;&gt;,
+&lt;UITableViewCell: 0x7fde5255e2d0; frame = (0 88; 414 44); text = &apos;PPTViewController&apos;; autoresize = W; layer = &lt;CALayer: 0x7fde5255e270&gt;&gt;,
+&lt;UITableViewCell: 0x7fde5255fce0; frame = (0 132; 414 44); text = &apos;TableViewController&apos;; autoresize = W; layer = &lt;CALayer: 0x7fde5255fa90&gt;&gt;
+)
+</code></pre><h3 id="pinternals"><a href="#pinternals" class="headerlink" title="pinternals"></a>pinternals</h3><p>打印一个对象内部的成员变量，这个方法我一般用来看model属性</p>
+<p>语法：</p>
+<pre><code>Syntax: pinternals &lt;object&gt;
+</code></pre><ul>
+<li><code>&lt;object&gt;</code>: 需要打印内部成员变量的对象</li>
+</ul>
+<p>e.g: 我们来看看一个<code>model</code>内部属性的值</p>
+<pre><code>(lldb) pinternals model
+(Model) $5 = {
+  _name = 0x000000010dd1c0a0 @&quot;老鼠爱大米&quot;
+  _URL = nil
+  _array = nil
+  _dictionary = nil
+  _string = nil
+  _model = nil
+}
+</code></pre><h3 id="pdata"><a href="#pdata" class="headerlink" title="pdata"></a>pdata</h3><p>对编码过的NSData进行解码打印，等效于调用<code>-[NSString initWithData:encoding:]</code></p>
+<p>语法：</p>
+<pre><code>Syntax: pdata [--encoding=encoding] &lt;data&gt;
+</code></pre><ul>
+<li><code>&lt;data&gt;</code>: 需要打印的data，NSData类型</li>
+<li><code>--encoding</code>/<code>-e</code>: 编码类型，如果缺省默认为utf8，主要支持的类型有：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">- ascii,</span><br><span class="line">- utf8,</span><br><span class="line">- utf16, unicode,</span><br><span class="line">- utf16l (Little endian),</span><br><span class="line">- utf16b (Big endian),</span><br><span class="line">- utf32,</span><br><span class="line">- utf32l (Little endian),</span><br><span class="line">- utf32b (Big endian),</span><br><span class="line">- latin1, iso88591 (88591),</span><br><span class="line">- latin2, iso88592 (88592),</span><br><span class="line">- cp1251 (1251),</span><br><span class="line">- cp1252 (1252),</span><br><span class="line">- cp1253 (1253),</span><br><span class="line">- cp1254 (1254),</span><br><span class="line">- cp1250 (1250),</span><br></pre></td></tr></table></figure>
+<p>e.g: 将一个utf8的NSData打印</p>
+<pre><code>(lldb) pdata -e=utf8 data
+老鼠爱大米
+</code></pre><h3 id="pkp"><a href="#pkp" class="headerlink" title="pkp"></a>pkp</h3><p>通过<code>-valueForKeyPath:</code>打印<code>key path</code>对应的值。</p>
+<p>语法：</p>
+<pre><code>Syntax: pkp &lt;keypath&gt;
+</code></pre><ul>
+<li><code>&lt;keypath&gt;</code>: 需要打印的路径，如<code>self.view</code></li>
+</ul>
+<p>说明：以前打印属性一般都用<code>po obj.xxx</code>，现在我想用<code>pkp obj.xxx</code>是一个更好的选择了，因为<code>po obj.xxx</code>是调用getter方法，如果没有getter方法就无法打印了。<code>pkp obj.xxx</code>不仅会调用getter方法，没有getter方法还会去查找成员变量</p>
+<p>e.g: 打印一下self.view</p>
+<pre><code>(lldb) pkp self.view
+&lt;UIView: 0x7fd1da52d5d0; frame = (0 0; 375 667); autoresize = W+H; layer = &lt;CALayer: 0x7fd1da52d740&gt;&gt;
+</code></pre><h3 id="pivar"><a href="#pivar" class="headerlink" title="pivar"></a>pivar</h3><p>打印对象成员变量</p>
+<p>语法：</p>
+<pre><code>Syntax: pivar &lt;object&gt; &lt;ivarName&gt;
+</code></pre><ul>
+<li><code>&lt;object&gt;</code>: id类型，要打印成员变量的对象</li>
+<li><code>&lt;ivarName&gt;</code>: 成员变量的名称，注意：如果是属性，对应成员变量的名字默认有<code>_</code>前缀.</li>
+</ul>
+<p>说明：个人觉得这个方法有点鸡肋，<code>pinternals</code>一下子可以打印出所有的成员变量，用起来更方便，如果你只想打印某一个成员变量，用<code>pkp</code>应该更爽</p>
+<p>e.g: 继续打印self.view</p>
+<pre><code>(lldb) pivar self _view
+&lt;UIView: 0x7fd1da52d5d0; frame = (0 0; 375 667); autoresize = W+H; layer = &lt;CALayer: 0x7fd1da52d740&gt;&gt;
+</code></pre><h3 id="pca"><a href="#pca" class="headerlink" title="pca"></a>pca</h3><p>从渲染服务器的角度来打印<code>layer tree</code>，命令的完整名字是<code>PrintCoreAnimationTree</code>，相当于调用<code>po [NSString stringWithCString:(char *)CARenderServerGetInfo(0, 2, 0)]</code></p>
+<p>语法：</p>
+<pre><code>Syntax: pca
+</code></pre><p>说明：这个命令我也没用过，可能在某些情况下会有用处</p>
+<p>e.g: 试一下pca</p>
+<pre><code>(lldb) pca
+== context 956ecbbf; level 0; pid 28092 [/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk/System/Library/CoreServices/SpringBoard.app/SpringBoard] (secure) at time 34552.989286 ==
+
+(layer [375 667 0] [0 0 375 667] [0.5 0.5 0]
+  (transform [2 -0 0 0; 0 2 0 0; 0 0 1 0; 0 0 0 1])
+  (rasterizationScale 2)
+  (sublayers (array
+    (layer [187.5 333.5 0] [0 0 375 667] [0.5 0.5 0]
+      (masksToBounds true)
+      (sublayers (array
+        (layer [187.5 333.5 0] [0 0 375 667] [0.5 0.5 0]
+          (backgroundColor #000000ff)
+          (sublayers (array
+            (layer [187.5 333.5 0] [0 0 375 667] [0.5 0.5 0]
+              (sublayers (array
+                (layer [187.5 333.5 0] [0 0 375 667] [0.5 0.5 0]
+                  (sublayers (array
+                    (layer [187.5 333.5 0] [0 0 375 667] [0.5 0.5 0]
+                      (sublayers (array
+                        (layer [187.5 333.5 0] [0 0 375 667] [0.5 0.5 0]
+                          (masksToBounds true)
+                          (edgeAntialiasingMask 0)
+                          (subclass (layer-host adc504e5
+                            ....东西太多，省略部分内容.........
+</code></pre><h3 id="panim"><a href="#panim" class="headerlink" title="panim"></a>panim</h3><p>显示是否正在执行动画，相当于调用<code>p (BOOL)[UIView _isInAnimationBlock]</code></p>
+<p>语法：</p>
+<pre><code>Syntax: panim
+</code></pre><p>说明：这个命令也并不常用</p>
+<p>e.g: 在动画中，我们打印一下：</p>
+<pre><code>(lldb) panim
+(BOOL) $0 = YES
+</code></pre><h2 id="Find"><a href="#Find" class="headerlink" title="Find"></a>Find</h2><p>debug的时候，我们经常需要查找一些东西，比如View，viewController等。</p>
+<h3 id="fvc"><a href="#fvc" class="headerlink" title="fvc"></a>fvc</h3><p>根据viewController的Class名字查找VC</p>
+<p>语法：</p>
+<pre><code>Syntax: fvc [--name=classNameRegex] [--view=view]
+</code></pre><ul>
+<li><code>--name</code>/<code>-n</code>: string类型参数，根据viewController的Class名字查找viewController</li>
+<li><code>--view</code>/<code>-v</code>: UIView类型参数，根据viewController拥有的view查找viewController</li>
+</ul>
+<p>说明：上面2个option不能同时使用，只能使用某一个</p>
+<p>e.g: 我们先根据名字查找一下VC</p>
+<pre><code>(lldb) fvc --name=viewcontroller
+0x7fd01a90f310 ViewController
+</code></pre><p>e.g: 如果我们知道VC的view地址，也可以根据view来查找VC</p>
+<pre><code>(lldb) fvc --view=0x7fd0194194d0
+Found the owning view controller.
+&lt;ViewController: 0x7fd01a90f310&gt;
+</code></pre><h3 id="fv"><a href="#fv" class="headerlink" title="fv"></a>fv</h3><p>根据view的class名字查找view</p>
+<p>语法：</p>
+<pre><code>Syntax: fv &lt;classNameRegex&gt;
+</code></pre><ul>
+<li><code>&lt;classNameRegex&gt;</code>: view的class名称</li>
+</ul>
+<p>e.g: 查找一下屏幕上的UILabel</p>
+<pre><code>(lldb) fv uilabel
+0x7fd01a91dc10 UILabel
+</code></pre><h3 id="taplog"><a href="#taplog" class="headerlink" title="taplog"></a>taplog</h3><p>将点击的view打印出来，这个命令对于查找哪个view非常有帮助</p>
+<p>语法：</p>
+<pre><code>Syntax: taplog
+</code></pre><p>说明：要查看的view必须能接收点击事件，也就是他的<code>userInteractionEnabled</code>必须为YES才能被找到，UILabel和UIImageView默认<code>userInteractionEnabled</code>为NO。</p>
+<p>用法：我们需要先将程序暂停，输入<code>taplog</code>，程序会自己运行，这时候点击你需要查看的view，控制台上就会显示出你刚刚点击的view相关信息</p>
+<p>e.g: 我们先将程序暂停，输入<code>taplog</code></p>
+<pre><code>(lldb) taplog
+Process 28421 resuming
+</code></pre><p>程序会自己运行，我们再点击一个UIButton：</p>
+<pre><code>&lt;UIButton: 0x7fe6785284e0; frame = (54 244; 46 30); opaque = NO; autoresize = RM+BM; layer = &lt;CALayer: 0x7fe678528a50&gt;&gt;
+</code></pre><h3 id="flicker"><a href="#flicker" class="headerlink" title="flicker"></a>flicker</h3><p>将view闪烁一下，以便于查找view的位置</p>
+<p>语法：</p>
+<pre><code>Syntax: flicker &lt;viewOrLayer&gt;
+</code></pre><ul>
+<li><code>&lt;viewOrLayer&gt;</code>需要闪烁的view或者layer</li>
+</ul>
+<p>e.g: 我们来看看self.subView的位置</p>
+<pre><code>(lldb) flicker self.subView
+</code></pre><p><img src="http://jiangliancheng.gitcafe.io/images/chisel/flicker.gif" alt=""></p>
+<h3 id="vs"><a href="#vs" class="headerlink" title="vs"></a>vs</h3><p>在view层级中搜索view，并显示出来</p>
+<p>语法：</p>
+<pre><code>Syntax: vs &lt;view&gt;
+</code></pre><ul>
+<li><code>&lt;view&gt;</code>:要查找的view</li>
+</ul>
+<p>说明：相比<code>fv</code>，<code>vs</code>主要用于显示view在屏幕上的位置，2个命令可以配合使用</p>
+<p>e.g:  假设我们要找屏幕上的一个view</p>
+<p>首先用<code>fv</code>查找<code>UIView</code>类型的view</p>
+<pre><code>(lldb) fv uiview
+0x7fbcf37228d0 UIView
+0x7fbcf3725e90 UIView
+</code></pre><p>然后看看这2个view到底哪个是我们想要找的view</p>
+<pre><code>(lldb) vs 0x7fbcf3725e90
+
+Use the following and (q) to quit.
+(w) move to superview
+(s) move to first subview
+(a) move to previous sibling
+(d) move to next sibling
+(p) print the hierarchy
+
+&lt;UIView: 0x7fbcf3725e90; frame = (0 100; 100 100); layer = &lt;CALayer: 0x7fbcf3712a40&gt;&gt;
+</code></pre><p>输入命令后他会帮我们在屏幕上用粉红色标志出来<code>vs</code>的view</p>
+<p><img src="http://jiangliancheng.gitcafe.io/images/chisel/vs.png" alt=""></p>
+<p>控制台中<code>vs</code>的view也有相应log。并且还提示有6种子命令：</p>
+<ul>
+<li><code>w</code>: 移动到superview</li>
+<li><code>s</code>: 移动到第一个subview</li>
+<li><code>a</code>: 移动到前面的同级view</li>
+<li><code>d</code>: 移动到后面的同级view</li>
+<li><code>p</code>: 打印出层级</li>
+<li><code>q</code>: 退出</li>
+</ul>
+<p>如果这个不是我们要找的view，可以使用<code>w</code>,<code>s</code>,<code>a</code>,<code>d</code>,<code>p</code>命令继续查找</p>
+<h2 id="Display"><a href="#Display" class="headerlink" title="Display"></a>Display</h2><p>debug的时候，可能有一小半的工作是跟UI打交道，关于UI显示上的东西，也有几个命令</p>
+<h3 id="caflush"><a href="#caflush" class="headerlink" title="caflush"></a>caflush</h3><p>刷新UI界面。一般我们用LLDB命令改变UI，UI并不会立即更新，我们需要使用<code>caflush</code>刷新界面</p>
+<p>语法：</p>
+<pre><code>Syntax: caflush
+</code></pre><p>e.g: 我们用命令将label的背景色改为红色</p>
+<pre><code>(lldb) fv uilabel
+0x7fb3919189d0 UILabel
+(lldb) e [((UILabel*)0x7fb3919189d0) setBackgroundColor:[UIColor redColor]]
+(lldb) caflush
+</code></pre><p><img src="http://jiangliancheng.gitcafe.io/images/chisel/caflush.png" alt=""></p>
+<h3 id="border"><a href="#border" class="headerlink" title="border"></a>border</h3><p>给View或者layer加上border</p>
+<p>语法：</p>
+<pre><code>Syntax: border [--color=color] [--width=width] &lt;viewOrLayer&gt;
+</code></pre><ul>
+<li><code>--color</code>/<code>-c</code>: 边框颜色，string类型，比如:’red’, ‘green’<br>‘magenta’等，不设置默认为红色</li>
+<li><code>--width</code>/<code>-w</code>: 边框宽度，不设置默认为2</li>
+<li><code>&lt;viewOrLayer&gt;</code>: 需要设置边框的view或者layer</li>
+</ul>
+<p>e.g: 给刚刚的label加上边框</p>
+<pre><code>(lldb) fv uilabel
+0x7fe713901f10 UILabel
+(lldb) border 0x7fe713901f10
+</code></pre><p><img src="http://jiangliancheng.gitcafe.io/images/chisel/border.png" alt=""></p>
+<h3 id="unborder"><a href="#unborder" class="headerlink" title="unborder"></a>unborder</h3><p>去掉view或者layer的border</p>
+<p>语法：</p>
+<pre><code>Syntax: unborder &lt;viewOrLayer&gt;
+</code></pre><p>e.g: 将刚刚加上的border去掉</p>
+<pre><code>(lldb) unborder 0x7fe713901f10
+</code></pre><p><img src="http://jiangliancheng.gitcafe.io/images/chisel/unborder.png" alt=""></p>
+<h3 id="mask"><a href="#mask" class="headerlink" title="mask"></a>mask</h3><p>给view添加一个半透明的矩形mask，用来查看view的位置</p>
+<p>语法：</p>
+<pre><code>Syntax: mask [--color=color] [--alpha=alpha] &lt;viewOrLayer&gt;
+</code></pre><ul>
+<li><code>--color</code>/<code>-c</code>: mask的颜色，string类型，比如:’red’, ‘green’,’magenta’等，不设置默认为红色</li>
+<li><code>--alpha</code>/<code>-a</code>: mask的透明度，不设置默认为0.5</li>
+<li><code>&lt;viewOrLayer&gt;</code>: 需要添加mask的view或者layer</li>
+</ul>
+<p>e.g: 假如label是隐藏的，我们给他添加一个mask，看看他的位置在哪儿</p>
+<pre><code>(lldb) fv uilabel
+0x7fe713901f10 UILabel
+(lldb) mask 0x7fe713901f10
+</code></pre><p><img src="http://jiangliancheng.gitcafe.io/images/chisel/mask.png" alt=""></p>
+<h3 id="unmask"><a href="#unmask" class="headerlink" title="unmask"></a>unmask</h3><p>将添加的mask去掉</p>
+<p>语法：</p>
+<pre><code>Syntax: unmask &lt;viewOrLayer&gt;
+</code></pre><ul>
+<li><code>&lt;viewOrLayer&gt;</code>: 需要去掉mask的view或者layer</li>
+</ul>
+<p>e.g: 我们将刚刚添加的mask去掉</p>
+<pre><code>(lldb) unmask 0x7fe713901f10
+</code></pre><p>使用命令之后，我们可以看到什么都没有了，因为label是hidden的</p>
+<h3 id="show"><a href="#show" class="headerlink" title="show"></a>show</h3><p>显示一个view或者layer，相当于执行<code>view.hidden = NO</code></p>
+<p>语法：</p>
+<pre><code>Syntax: show &lt;viewOrLayer&gt;
+</code></pre><ul>
+<li><code>&lt;viewOrLayer&gt;</code>: 需要显示的view或者layer</li>
+</ul>
+<p>e.g: 将刚刚的label显示出来</p>
+<pre><code>(lldb) show 0x7fe713901f10
+</code></pre><p><img src="http://jiangliancheng.gitcafe.io/images/chisel/show.png" alt=""></p>
+<h3 id="hide"><a href="#hide" class="headerlink" title="hide"></a>hide</h3><p>隐藏一个view或者layer，相当于执行<code>view.hidden = YES</code></p>
+<p>语法：</p>
+<pre><code>Syntax: hide &lt;viewOrLayer&gt;
+</code></pre><ul>
+<li><code>&lt;viewOrLayer&gt;</code>: 需要隐藏的view或者layer</li>
+</ul>
+<p>e.g: 又把label隐藏</p>
+<pre><code>(lldb) hide 0x7fe713901f10
+</code></pre><p>可以看到label位置什么都没有了</p>
+<h3 id="slowanim"><a href="#slowanim" class="headerlink" title="slowanim"></a>slowanim</h3><p>减慢动画的速度</p>
+<p>语法：</p>
+<pre><code>Syntax: slowanim &lt;speed&gt;
+</code></pre><ul>
+<li><code>&lt;speed&gt;</code>: 动画的速度，速度越大，动画越快。1表示原始速度。不传参数默认为0.1</li>
+</ul>
+<p>e.g: 原始动画我们设置为1s</p>
+<pre><code>[UIView animateWithDuration:1 animations:^{
+    self.subView.frame = frame;
+}];
+</code></pre><p>暂停程序，将动画放慢5倍</p>
+<pre><code>(lldb) slowanim 0.2
+</code></pre><p>我们可以看到动画变慢了:</p>
+<p><img src="http://jiangliancheng.gitcafe.io/images/chisel/slowanim.gif" alt=""></p>
+<h3 id="unslowanim"><a href="#unslowanim" class="headerlink" title="unslowanim"></a>unslowanim</h3><p>取消<code>slowanim</code>效果，将动画速度变为正常</p>
+<p>语法：</p>
+<pre><code>Syntax: unslowanim
+</code></pre><p>e.g: 我们将刚刚的<code>slowanim</code>效果取消</p>
+<pre><code>(lldb) unslowanim
+</code></pre><p><img src="http://jiangliancheng.gitcafe.io/images/chisel/unslowanim.gif" alt=""></p>
+<h2 id="Preview"><a href="#Preview" class="headerlink" title="Preview"></a>Preview</h2><p>预览功能，帮助我们用命令查看一个view或者图片的真正样子</p>
+<h3 id="visualize"><a href="#visualize" class="headerlink" title="visualize"></a>visualize</h3><p>用预览App打开UIImage, CGImageRef, UIView, CALayer等对象</p>
+<p>语法：</p>
+<pre><code>Syntax: visualize &lt;target&gt;
+</code></pre><ul>
+<li><code>&lt;target&gt;</code>: 需要预览的对象，id类型</li>
+</ul>
+<p>e.g: 我们来看看某个image的样子</p>
+<pre><code>(lldb) visualize image
+</code></pre><p><img src="http://jiangliancheng.gitcafe.io/images/chisel/visualize.png" alt=""></p>
+<h2 id="Debug"><a href="#Debug" class="headerlink" title="Debug"></a>Debug</h2><p>LLDB主要用于Debug，chisel怎么可能缺少debug相关命令呢？</p>
+<h3 id="wivar"><a href="#wivar" class="headerlink" title="wivar"></a>wivar</h3><p>为对象的成员变量设置<code>watchpoint</code>，更多<code>watchpoint</code>相关知识请阅读<a href="http://www.jianshu.com/p/e89af3e9a8d7" target="_blank" rel="noopener">&lt;小笨狼与LLDB的故事&gt;</a></p>
+<p>语法：</p>
+<pre><code>Syntax: wivar &lt;object&gt; &lt;ivarName&gt;
+</code></pre><ul>
+<li><code>&lt;object&gt;</code>: 需要为成员变量设置<code>watchpoint</code>的对象。id类型</li>
+<li><code>&lt;ivarName&gt;</code>: 成员变量的名字，注意一般属性对应的成员变量带有<code>_</code>前缀</li>
+</ul>
+<p>e.g: 为self.subView设置watchpoint</p>
+<pre><code>(lldb) wivar self _subView
+Remember to delete the watchpoint using: watchpoint delete 1
+</code></pre><p>这时候，_subView值改变就会中断程序<br><img src="http://jiangliancheng.gitcafe.io/images/chisel/wivar.png" alt=""></p>
+<h3 id="bmessage"><a href="#bmessage" class="headerlink" title="bmessage"></a>bmessage</h3><p>根据方法名设置断点</p>
+<p>语法：</p>
+<pre><code>Syntax: bmessage &lt;expression&gt;
+</code></pre><ul>
+<li><code>&lt;expression&gt;</code>: 设置断点的方法名，如： <code>-[MyView
+setFrame:]</code>, <code>+[MyView awesomeClassMethod]</code>, <code>-[0xabcd1234 setFrame:]</code>等</li>
+</ul>
+<p>说明：一般设置断点，如果这个方法本类没有实现，是父类实现的，断点是无效的。<code>bmessage</code>有效避免了这种缺陷，即使本类没有实现，也能设置上断点</p>
+<p>e.g: 给self中的<code>btnAction:</code>方法设置一个断点</p>
+<pre><code>(lldb) bmessage -[self btnAction:]
+Setting a breakpoint at -[ViewController btnAction:] with condition (void*)(id)$rdi == 0x00007ff2485311e0
+Breakpoint 4: where = TLLDB`-[ViewController btnAction:] at ViewController.m:42, address = 0x000000010c4bb620
+</code></pre><h3 id="binside"><a href="#binside" class="headerlink" title="binside"></a>binside</h3><p>通过一个相对地址，给framework(library)设置断点</p>
+<p>语法：</p>
+<pre><code>Syntax: binside &lt;address&gt;
+</code></pre><ul>
+<li><code>&lt;address&gt;</code>: framework的相对地址</li>
+</ul>
+<h3 id="pinvocation"><a href="#pinvocation" class="headerlink" title="pinvocation"></a>pinvocation</h3><p>打印方法调用堆栈，仅支持x86</p>
+<p>语法：</p>
+<pre><code>Syntax: pinvocation [--all]
+</code></pre><ul>
+<li><code>--all</code>/<code>-a</code>: 表示打印所有堆栈，不设置默认只打印当前堆栈</li>
+</ul>
+<p>说明：与<code>bt</code>命令类似，不过信息比<code>bt</code>打印得更详细，遗憾的是只能支持x86</p>
+<p>e.g: 打印一下当前堆栈</p>
+<pre><code>(lldb) pinvocation
+frame #0: 0x000962aa TMasonry`-[ViewController viewDidLoad](self=0x7bf2d9c0, _cmd=&quot;viewDidLoad&quot;) + 234 at ViewController.m:28
+NSInvocation: 0x7bf433e0
+self: 0x7bf2d9c0
+</code></pre><p>打印所有堆栈：</p>
+<pre><code>(lldb) pinvocation -a
+frame #0: 0x000962aa TMasonry`-[ViewController viewDidLoad](self=0x7bf2d9c0, _cmd=&quot;viewDidLoad&quot;) + 234 at ViewController.m:28
+NSInvocation: 0x7d2bb050
+self: 0x7bf2d9c0
+---------------------------------
+frame #1: 0x008062ae UIKit`-[UIViewController _sendViewDidLoadWithAppearanceProxyObjectTaggingEnabled] + 44
+NSInvocation: 0x7be18a50
+self: 0x7bf2d9c0
+---------------------------------
+frame #2: 0x0080adce UIKit`-[UIViewController loadViewIfRequired] + 1384
+NSInvocation: 0x7bf0cc40
+self: 0x7bf2d9c0
+---------------------------------
+frame #3: 0x008569f9 UIKit`-[UINavigationController _layoutViewController:] + 52
+NSInvocation: 0x7d340c90
+self: 0x7c89ee00
+
+Argument:
+0xbff69108, address of @} 0x7bf2d9c0
+---------------------------------
+frame #4: 0x008572b1 UIKit`-[UINavigationController _updateScrollViewFromViewController:toViewController:] + 421
+NSInvocation: 0x7d340cc0
+self: 0x7c89ee00
+
+2 Arguments:
+0xbff69158, address of @} 0x0
+0xbff6915c, address of @} 0x7bf2d9c0
+---------------------------------
+frame #5: 0x00857458 UIKit`-[UINavigationController _startTransition:fromViewController:toViewController:] + 145
+NSInvocation: 0x7bf24870
+self: 0x7c89ee00
+
+3 Arguments:
+0xbff69298, address of i} 0
+0xbff6929c, address of @} 0x0
+0xbff692a0, address of @} 0x7bf2d9c0
+---------------------------------
+frame #6: 0x00858854 UIKit`-[UINavigationController _startDeferredTransitionIfNeeded:] + 1038
+NSInvocation: 0x7bf16b50
+self: 0x7c89ee00
+
+Argument:
+0xbff692f8, address of @} 0x0
+---------------------------------
+frame #7: 0x00859ada UIKit`-[UINavigationController __viewWillLayoutSubviews] + 68
+NSInvocation: 0x7be18930
+self: 0x7c89ee00
+---------------------------------
+frame #8: 0x00a35c4a UIKit`-[UILayoutContainerView layoutSubviews] + 252
+NSInvocation: 0x7bf26ab0
+self: 0x7bf40d40
+---------------------------------
+frame #9: 0x0070b008 UIKit`-[UIView(CALayerDelegate) layoutSublayersOfLayer:] + 810
+NSInvocation: 0x7bf25da0
+self: 0x7bf40d40
+
+Argument:
+0xbff693b8, address of @} 0x7bf40f80
+---------------------------------
+frame #10: 0x01b23059 libobjc.A.dylib`-[NSObject performSelector:withObject:] + 70
+NSInvocation: 0x7d2bb6c0
+self: 0x7bf40d40
+
+2 Arguments:
+0xbff693d8, address of :} layoutSublayersOfLayer:
+0xbff693dc, address of @} 0x7bf40f80
+---------------------------------
+frame #11: 0x0496b80a QuartzCore`-[CALayer layoutSublayers] + 144
+NSInvocation: 0x7bf134c0
+self: 0x7bf40f80
+---------------------------------
+frame #12: 0x0495f4ee QuartzCore`CA::Layer::layout_if_needed(CA::Transaction*) + 388
+---------------------------------
+frame #13: 0x0495f352 QuartzCore`CA::Layer::layout_and_display_if_needed(CA::Transaction*) + 26
+---------------------------------
+frame #14: 0x04951e8b QuartzCore`CA::Context::commit_transaction(CA::Transaction*) + 317
+---------------------------------
+frame #15: 0x04985e03 QuartzCore`CA::Transaction::commit() + 561
+---------------------------------
+frame #16: 0x049866c4 QuartzCore`CA::Transaction::observer_callback(__CFRunLoopObserver*, unsigned long, void*) + 92
+---------------------------------
+frame #17: 0x01f66ffe CoreFoundation`__CFRUNLOOP_IS_CALLING_OUT_TO_AN_OBSERVER_CALLBACK_FUNCTION__ + 30
+---------------------------------
+frame #18: 0x01f66f5e CoreFoundation`__CFRunLoopDoObservers + 398
+---------------------------------
+frame #19: 0x01f5c108 CoreFoundation`CFRunLoopRunSpecific + 504
+---------------------------------
+frame #20: 0x01f5befb CoreFoundation`CFRunLoopRunInMode + 123
+---------------------------------
+frame #21: 0x00639206 UIKit`-[UIApplication _run] + 540
+NSInvocation: 0x7d21fc00
+self: 0x7d30bfe0
+---------------------------------
+frame #22: 0x0063ebfa UIKit`UIApplicationMain + 160
+---------------------------------
+frame #23: 0x00096a0a TMasonry`main(argc=1, argv=0xbff6a898) + 138 at main.m:14
+---------------------------------
+frame #24: 0x031caa21 libdyld.dylib`start + 1
+---------------------------------
+</code></pre><h2 id="Accessibility"><a href="#Accessibility" class="headerlink" title="Accessibility"></a>Accessibility</h2><p>这个模块的命令主要利用了<code>UIAccessibility</code>相关特性，需要开启Accessibility功能才能使用，<code>UIAccessibility</code>详细资料可以阅读<a href="http://nshipster.cn/uiaccessibility/" target="_blank" rel="noopener">UIAccessibility</a></p>
+<h3 id="fa11y"><a href="#fa11y" class="headerlink" title="fa11y"></a>fa11y</h3><p>根据view的<a href="https://developer.apple.com/library/ios/documentation/UIKit/Reference/UIAccessibility_Protocol/#//apple_ref/occ/instp/NSObject/accessibilityLabel" target="_blank" rel="noopener">accessibilityLabel</a>查找view</p>
+<p>语法：</p>
+<pre><code>Syntax: fa11y &lt;labelRegex&gt;
+</code></pre><ul>
+<li><code>&lt;labelRegex&gt;</code>: 需要匹配的text</li>
+</ul>
+<p>说明：UILabel，UIButton的<code>accessibilityLabel</code>等于title</p>
+<p>e.g: 我们根据显示的文案，查找相应的控件</p>
+<pre><code>(lldb) fa11y 妈妈
+(UILabel 0x176b5bd0) 妈妈叫你回家吃饭了
+</code></pre><h3 id="pa11y"><a href="#pa11y" class="headerlink" title="pa11y"></a>pa11y</h3><p>打印view层级中所有的<code>accessibilityLabel</code></p>
+<p>语法：</p>
+<pre><code>Syntax: pa11y &lt;aView&gt;
+</code></pre><ul>
+<li><code>&lt;aView&gt;</code>: 需要打印层级的View，UIView类型</li>
+</ul>
+<p>e.g: 我们打印一下self.view层级中所有的<code>accessibilityLabel</code></p>
+<pre><code>(lldb) pa11y self.view
+UIView self.view
+   | (UIButton 0x176b4600) Button
+   | (UILabel 0x176b5bd0) 妈妈叫你回家吃饭了
+</code></pre><h1 id="End"><a href="#End" class="headerlink" title="End"></a>End</h1><p>chisel的命令就介绍到这里，东西挺多的，没必要全部都记住，我把这个写出来就打算当做一个文档，以后记不起哪个命令就查一下自己的博客。</p>
+<p>不过chisel确实是个好东西，工欲善其事，必先利其器。要想要方便的调bug，chisel绝对值得你拥有</p>
+<h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><ul>
+<li><a href="https://github.com/gkassabli/chisel" target="_blank" rel="noopener">chisel</a></li>
+<li><a href="http://www.jianshu.com/p/e89af3e9a8d7" target="_blank" rel="noopener">小笨狼与LLDB的故事</a></li>
+<li><a href="https://developer.apple.com/library/tvos/documentation/UserExperience/Conceptual/AutolayoutPG/AmbiguousLayouts.html#//apple_ref/doc/uid/TP40010853-CH18-SW1" target="_blank" rel="noopener">Ambiguous Layouts</a></li>
+<li><a href="http://nshipster.cn/uiaccessibility/" target="_blank" rel="noopener">UIAccessibility</a></li>
+<li><a href="https://developer.apple.com/library/ios/documentation/UIKit/Reference/UIAccessibility_Protocol/#//apple_ref/occ/instp/NSObject/accessibilityLabel" target="_blank" rel="noopener">accessibilityLabel</a></li>
+</ul>
+<h1 id="About-Me"><a href="#About-Me" class="headerlink" title="About Me"></a>About Me</h1><p><a href="http://jiangliancheng.gitcafe.io/" target="_blank" rel="noopener">个人博客</a> <a href="http://www.jianshu.com/users/1f93e3b1f3da" target="_blank" rel="noopener">简书</a> <a href="http://weibo.com/u/5592239559" target="_blank" rel="noopener">微博</a> QQ群：159974494</p>
+<p>欢迎大家关注我，共同学习iOS~</p>
+
+    
+  </div>
+
+</article>
+
+
+   
+  <div class="text-center donation">
+    <div class="inner-donation">
+      <span class="btn-donation">支持一下</span>
+      <div class="donation-body">
+        <div class="tip text-center">扫一扫，支持forsigner</div>
+        <ul>
+        
+          <li class="item">
+            
+              <span>微信扫一扫</span>
+            
+            <img src="/images/qr-wechat.png" alt="">
+          </li>
+        
+          <li class="item">
+            
+              <span>支付宝扫一扫</span>
+            
+            <img src="/images/qr-alipay.png" alt="">
+          </li>
+        
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+   
+  <div class="box-prev-next clearfix">
+    <a class="show pull-left" href="/2015/12/13/小笨狼与LLDB的故事/">
+        <i class="icon icon-angle-left"></i>
+    </a>
+    <a class="show pull-right" href="/2016/01/16/小笨狼漫谈多线程-NSThread/">
+        <i class="icon icon-angle-right"></i>
+    </a>
+  </div>
+
+
+
+
+
+   
+      <div class="git"></div>
+   
+</div>
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/link/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              友链
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/atom.xml"
+              rel="noopener noreferrer"
+              target="_blank"
+              >
+              RSS
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+  <section class="disqus-comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+  </section>
+
+  <script>
+    var disqus_shortname = 'forsigner';
+    
+    var disqus_url = 'http://yoursite.com/2015/12/19/小笨狼的LLDB技巧：chisel/';
+    
+    (function(){
+      var dsq = document.createElement('script');
+      dsq.type = 'text/javascript';
+      dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+
+  <script id="dsq-count-scr" src="//forsigner.disqus.com/count.js" async></script>
+
+
+
+    
+    
+
+    
+    
+
+    
+
+    
+    
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>

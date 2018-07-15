@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>iOS开发RunTime之函数调用 | Hexo</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="forsigner,前端,设计,Hexo主题,前端开发,用户体验,设计,frontend,design,nodejs,JavaScript" />
+  
+
+  <meta name="description" content="经过两个多月的面试，工作终于尘埃落定了。这两个多月的面试过程中，我发现很多底层基础的东西大公司非常看重。比如：RunLoop，RunTime，Block等。这篇文章主要是介绍RunTime中函数调用的机制，知识点有一定深度，也是面试过程中能力的体现。     1.Objective-C中的函数调用对于C语言，函数调用是由编译器直接转化完成的，在编译时程序就开始查找要执行的函数(C语言函数调用原理)">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iOS开发RunTime之函数调用">
+<meta property="og:url" content="http://yoursite.com/2014/11/01/iOS开发RunTime之函数调用/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="经过两个多月的面试，工作终于尘埃落定了。这两个多月的面试过程中，我发现很多底层基础的东西大公司非常看重。比如：RunLoop，RunTime，Block等。这篇文章主要是介绍RunTime中函数调用的机制，知识点有一定深度，也是面试过程中能力的体现。     1.Objective-C中的函数调用对于C语言，函数调用是由编译器直接转化完成的，在编译时程序就开始查找要执行的函数(C语言函数调用原理)">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2015-10-31T16:08:20.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="iOS开发RunTime之函数调用">
+<meta name="twitter:description" content="经过两个多月的面试，工作终于尘埃落定了。这两个多月的面试过程中，我发现很多底层基础的东西大公司非常看重。比如：RunLoop，RunTime，Block等。这篇文章主要是介绍RunTime中函数调用的机制，知识点有一定深度，也是面试过程中能力的体现。     1.Objective-C中的函数调用对于C语言，函数调用是由编译器直接转化完成的，在编译时程序就开始查找要执行的函数(C语言函数调用原理)">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=c114cben" rel="stylesheet">
+
+
+  
+    <link rel="stylesheet" href="/css/personal-style.css">
+  
+
+  
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+  
+  <script type="text/javascript">
+	(function(){
+	    var bp = document.createElement('script');
+	    var curProtocol = window.location.protocol.split(':')[0];
+	    if (curProtocol === 'https') {
+	        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+	    }
+	    else {
+	        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+	    }
+	    var s = document.getElementsByTagName("script")[0];
+	    s.parentNode.insertBefore(bp, s);
+	})();
+  </script>
+
+
+
+  
+    <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+
+  
+    <link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  
+</head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">盒子</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/link/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            友链
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/atom.xml"
+            rel="noopener noreferrer"
+            target="_blank"
+            >
+            RSS
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-Objective-C中的函数调用"><span class="toc-text">1.Objective-C中的函数调用</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-Objective-C函数调用的底层实现"><span class="toc-text">2.Objective-C函数调用的底层实现</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-objc-msgSend的实现细节"><span class="toc-text">3.objc_msgSend的实现细节</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4-函数调用的性能优化"><span class="toc-text">4.函数调用的性能优化</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-SEL的使用"><span class="toc-text">4.1 SEL的使用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-cache的使用"><span class="toc-text">4.2 cache的使用</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#总结"><span class="toc-text">总结</span></a></li></ol>
+  </div>
+
+
+
+<div class="content content-post CENTER">
+   <article id="post-iOS开发RunTime之函数调用" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">iOS开发RunTime之函数调用</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2014.11.01</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>John Doe</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/刨根究底iOS/">刨根究底iOS</a>
+  </span>
+
+
+
+      
+        <span>
+          <i class="icon-comment"></i>
+          <a href="http://www.forsigner.com/2014/11/01/iOS开发RunTime之函数调用/#disqus_thread"></a>
+        </span>
+      
+
+      
+      <i class="fa fa-eye"></i> 
+        <span id="busuanzi_container_page_pv">
+           &nbsp热度 <span id="busuanzi_value_page_pv">
+           <i class="fa fa-spinner fa-spin"></i></span>℃
+        </span>
+      
+      
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <p>经过两个多月的面试，工作终于尘埃落定了。这两个多月的面试过程中，我发现很多底层基础的东西大公司非常看重。比如：RunLoop，RunTime，Block等。这篇文章主要是介绍RunTime中函数调用的机制，知识点有一定深度，也是面试过程中能力的体现。    </p>
+<h1 id="1-Objective-C中的函数调用"><a href="#1-Objective-C中的函数调用" class="headerlink" title="1.Objective-C中的函数调用"></a>1.Objective-C中的函数调用</h1><p>对于C语言，函数调用是由编译器直接转化完成的，在编译时程序就开始查找要执行的函数(<a href="http://www.cnblogs.com/haolujun/archive/2011/03/26/1996525.html" target="_blank" rel="noopener">C语言函数调用原理</a>)。<br>然而在OC中，情况确是完全不一样的。在编译时OC程序并不直接查找要执行的函数，必须等到真正运行时，程序才查找要执行的函数。这就是OC的运行时特性。</p>
+<blockquote>
+<p>例子：在C语言中，仅申明一个函数，不去实现。其他地方调用此函数。编译时就会报错(C语言编译时查找要执行的函数，找不到所以报错)。而同样的情况在OC中并不会报错，只有在运行时候才会报错。(OC运行时才查找要执行的函数)</p>
+</blockquote>
+<h1 id="2-Objective-C函数调用的底层实现"><a href="#2-Objective-C函数调用的底层实现" class="headerlink" title="2.Objective-C函数调用的底层实现"></a>2.Objective-C函数调用的底层实现</h1><p><code>Objective-C</code>为什么能在运行时才查找函数，它到底是怎么做到的呢？下面我们就来看看吧。<br>在runTime的SDK下有一个<code>objc_msgSend()</code>的方法</p>
+<pre><code>OBJC_EXPORT id objc_msgSend(id self, SEL op, ...)
+</code></pre><p>当我们写下一行代码<code>[obj doSth];</code>，在编译时，编译器并不直接去查找<code>doSth</code>的方法，而是将代码转化为</p>
+<pre><code>objc_msgSend(obj,@selector(doSth));
+</code></pre><p>将调用函数的对象<code>obj</code>和函数的方法名对应的SEL<code>@selector(doSth)</code>作为参数传入<code>objc_msgSend()</code>方法中。由<code>objc_msgSend()</code>方法实现了函数查找和匹配。</p>
+<p>在<code>objc_msgSend()</code>方法中，主要通过以下步骤来查找和调用函数：</p>
+<ol>
+<li>根据对象<code>obj</code>找到对象类中存储的函数列表<code>methodLists</code>。</li>
+<li>再根据SEL<code>@selector(doSth)</code>在<code>methodLists</code>中查找对应的函数指针<code>method_imp</code>。</li>
+<li>根据函数指针<code>method_imp</code>调用响应的函数。</li>
+</ol>
+<h1 id="3-objc-msgSend的实现细节"><a href="#3-objc-msgSend的实现细节" class="headerlink" title="3.objc_msgSend的实现细节"></a>3.objc_msgSend的实现细节</h1><p>前面我们只是简单的介绍了<code>objc_msgSend()</code>的原理，下面我们来详细看看<code>objc_msgSend</code>是怎么实现的。</p>
+<p>首先我们来看看<code>NSObject</code>的结构，对于任意一个<code>NSObject</code>对象，下面都有一个<code>isa</code>的属性，指向对象对应的<code>Class</code>类</p>
+<pre><code>@interface NSObject &lt;NSObject&gt; {
+    Class isa  OBJC_ISA_AVAILABILITY;
+}
+</code></pre><p>所以通过<code>isa</code>属性即可拿到对象对应的<code>Class</code>。然后我们来看看<span id="jump"><code>Class</code>的结构</span></p>
+<pre><code>typedef struct objc_class *Class;
+
+struct objc_class {
+    Class isa; // 指向metaclass  
+
+    Class superclass;  // 指向父类Class
+    const char *name;  // 类名 
+    uint32_t version;  // 类的版本信息
+    uint32_t info;        // 一些标识信息，标明是普通的Class还是metaclass
+    uint32_t instance_size;        // 该类的实例变量大小(包括从父类继承下来的实例变量);
+    struct old_ivar_list *ivars;    //类中成员变量的信息
+    struct old_method_list **methodLists;    类中方法列表
+    Cache cache;    查找方法的缓存，用于提升效率
+    struct old_protocol_list *protocols;  // 存储该类遵守的协议  
+}
+</code></pre><p>由上面的代码我们能看到<code>Class</code>是一个结构体指针，指向<code>objc_class</code>结构体。</p>
+<p>在<code>objc_class</code>中有一个<code>methodLists</code>属性，这是一个<code>old_method_list</code>结构体。</p>
+<pre><code>struct old_method_list {
+    void *obsolete;        //废弃的属性
+    int method_count;    //方法的个数
+    /* variable length structure */
+    struct old_method method_list[1];    //方法的首地址
+};
+</code></pre><p><code>old_method_list</code>结构体是一个储存<code>old_method</code>的列表，他有2个成员，分别是<code>old_method</code>的个数和存储首地址。我们可以把他当做一个可变长度的<code>old_method</code>数组。</p>
+<blockquote>
+<p>开始我也不明白为什么是<code>method_list[1]</code>，数组的大小怎么会是1呢？后来才想通由于数组的大小是不定的，不同的类对应的不同的方法个数。所以定义时只存储首地址，在实际使用过程中再扩展长度</p>
+</blockquote>
+<p>我们再来看看<code>old_method</code>结构体</p>
+<pre><code>struct old_method {
+    SEL method_name;    //函数的SEL
+    char *method_types;        //函数的类型
+    IMP method_imp;        //函数指针
+};
+</code></pre><p><code>old_method</code>结构体由<code>method_name</code>，<code>method_types</code>，<code>method_imp</code>三个成员组成，分别对应着函数的SEL，函数类型，和指向具体要执行函数的函数指针。</p>
+<p>所以只要找到<code>old_method</code>即可通过其成员属性<code>method_imp</code>来调用具体要执行的函数。</p>
+<p>我们再来理一下思路：</p>
+<ol>
+<li>obj-&gt;isa(Class类型) obj对象通过isa属性拿到对应的Class</li>
+<li>Class-&gt;methodLists(old_method_list类型)  Class通过methodLists属性拿到存放所有方法的列表</li>
+<li>old_method_list-&gt;old_method  在old_method_list中通过SEL查找到对应的old_method</li>
+<li>old_method-&gt;method_imp(IMP类型)  old_method通过method_imp属性拿到函数指针</li>
+<li>method_imp-&gt;调用函数  通过函数指针调用函数</li>
+</ol>
+<p>通过上面的思路我们知道只有第三步稍微复杂一些，我们来看看第三步的具体代码吧。</p>
+<pre><code>static inline old_method *_findMethodInList(old_method_list * mlist, SEL sel) {
+    int i;
+    if (!mlist) return nil;
+    for (i = 0; i &lt; mlist-&gt;method_count; i++) {
+        old_method *m = &amp;mlist-&gt;method_list[i];
+        if (m-&gt;method_name == sel) {
+            return m;
+        }
+    }
+    return nil;
+}
+</code></pre><ol>
+<li>查找函数是个内联函数，传入<code>old_method_list</code>和<code>SEL</code>，返回<code>old_method</code></li>
+<li>首先对<code>old_method_list</code>数组判空，如果为空，返回nil</li>
+<li>遍历<code>old_method_list</code>数组，根据<code>SEL</code>匹配，找到<code>old_method</code></li>
+</ol>
+<h1 id="4-函数调用的性能优化"><a href="#4-函数调用的性能优化" class="headerlink" title="4.函数调用的性能优化"></a>4.函数调用的性能优化</h1><p>上面部分我们已经讲完了函数调用的基本过程。在看完上面部分之后大家可能会有疑惑：<code>Objective-C</code>的函数调用是如此的复杂，会不会导致运行起来非常慢呢？毕竟每调用一个函数都要走这么多过程。<br>别急，其实在调用的过程中苹果对其做了一些性能优化，使得其调用并不比C语言很多。下面我们来具体看看做了哪些性能优化：</p>
+<h3 id="4-1-SEL的使用"><a href="#4-1-SEL的使用" class="headerlink" title="4.1 SEL的使用"></a>4.1 SEL的使用</h3><p>大家可能早就有疑惑了，前面一直在说<code>SEL</code>，<code>SEL</code>到底是个什么东西？</p>
+<pre><code>/// An opaque type that represents a method selector.
+typedef struct objc_selector *SEL;
+</code></pre><p>苹果对SEL的官方解释是：一种不透明的类型，它代表着一个方法选择器。<br>SEL本质其实是一个int类型的地址，指向存储的方法名。对于每一个类，都会分配一块特殊空空间，专门存储类中的方法名，SEL就是指向对应方法名的地址。由于方法名字符串是唯一的，所以SEL也是唯一的。<br>为什么不直接使用方法名而使用SEL呢？这个问题没有找到比较官方的资料，个人认为由于方法名是字符串，SEL是int类型，使用时int类型更方便，效率更高（特别是比较相等时，字符串的比较比int的比较效率低很多）</p>
+<h3 id="4-2-cache的使用"><a href="#4-2-cache的使用" class="headerlink" title="4.2 cache的使用"></a>4.2 cache的使用</h3><p>我们来仔细分析一下函数的调用过程：</p>
+<pre><code>obj-&gt;isa-&gt;methodLists
+old_method-&gt;method_imp
+</code></pre><ol>
+<li>由于<code>isa</code>是<code>obj</code>的成员变量，<code>methodLists</code>是<code>isa</code>的成员变量，所以用<code>obj</code>可以直接拿到<code>methodLists</code></li>
+<li>由于<code>method_imp</code>是<code>old_method</code>的成员变量，所以用<code>old_method</code>可以直接拿到<code>method_imp</code></li>
+</ol>
+<p>所以函数调用过程的主要时间消耗在<code>methodLists</code>中查找<code>old_method</code>。<br><code>cache</code>就是用来优化这个查找过程的。<code>cache</code>也是<code>objc_class</code>的一个结构体成员，见<a href="#jump">Class的结构</a>。<br>我们可以把<code>cache</code>简单当成一个哈希表，<code>key</code>是<code>SEL</code>，<code>Value</code>是<code>old_method</code>。由此可知，从<code>cache</code>中查找<code>old_method</code>相当简单高效。<br>从<code>methodLists</code>中查找<code>old_method</code>的真正过程分为如下两步：</p>
+<ol>
+<li>通过<code>SEL</code>在<code>cache</code>中查找<code>old_method</code>，若找到了直接返回，若未找到执行2</li>
+<li>在<code>methodLists</code>中查找<code>old_method</code>，找到之后先将<code>old_method</code>插入<code>cache</code>中以方便下次查找，再返回<code>old_method</code></li>
+</ol>
+<p>由此可知，在第一次调用某个函数时，会比较慢，因为<code>cache</code>中没有这个函数，第二次调用时就会非常快了</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>这篇文章主要是讲<code>Objective-C</code>中函数调用的过程，其他不太相关的东西就被忽略了，例如<code>objc_class</code>结构体中其他成员变量作用，本类中查找不到函数怎么去父类中查找，如果没有找到函数怎么办？这些问题我可能后续还会有文章介绍，现在暂时先写到这吧。如果有人想要了解可以在评论区提问或者加QQ群讨论。大家有什么异议的地方也可以和我说</p>
+
+    
+  </div>
+
+</article>
+
+
+   
+  <div class="text-center donation">
+    <div class="inner-donation">
+      <span class="btn-donation">支持一下</span>
+      <div class="donation-body">
+        <div class="tip text-center">扫一扫，支持forsigner</div>
+        <ul>
+        
+          <li class="item">
+            
+              <span>微信扫一扫</span>
+            
+            <img src="/images/qr-wechat.png" alt="">
+          </li>
+        
+          <li class="item">
+            
+              <span>支付宝扫一扫</span>
+            
+            <img src="/images/qr-alipay.png" alt="">
+          </li>
+        
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+   
+  <div class="box-prev-next clearfix">
+    <a class="show pull-left" href="/2014/10/30/iOS开发之单例/">
+        <i class="icon icon-angle-left"></i>
+    </a>
+    <a class="show pull-right" href="/2014/12/08/iOS开发Tips/">
+        <i class="icon icon-angle-right"></i>
+    </a>
+  </div>
+
+
+
+
+
+   
+      <div class="git"></div>
+   
+</div>
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/link/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              友链
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/atom.xml"
+              rel="noopener noreferrer"
+              target="_blank"
+              >
+              RSS
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+  <section class="disqus-comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+  </section>
+
+  <script>
+    var disqus_shortname = 'forsigner';
+    
+    var disqus_url = 'http://yoursite.com/2014/11/01/iOS开发RunTime之函数调用/';
+    
+    (function(){
+      var dsq = document.createElement('script');
+      dsq.type = 'text/javascript';
+      dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+
+  <script id="dsq-count-scr" src="//forsigner.disqus.com/count.js" async></script>
+
+
+
+    
+    
+
+    
+    
+
+    
+
+    
+    
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>

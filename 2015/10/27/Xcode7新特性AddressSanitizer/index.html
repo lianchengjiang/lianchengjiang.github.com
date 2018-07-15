@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>Xcode7新特性AddressSanitizer | Hexo</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="forsigner,前端,设计,Hexo主题,前端开发,用户体验,设计,frontend,design,nodejs,JavaScript" />
+  
+
+  <meta name="description" content="昨天发现微博的圈子里iOS学习氛围比较好，所以特意注册了一个新浪微博。无意中在微博里看到了@没故事的卓同学的文章Xcode7中你一定要知道的炸裂调试神技，介绍Xcode7中新增了AddressSanitizer工具可以捕获EXC_BAD_ACCESS。然而Xcode中不是已经有了Zombie了么？怎么又出来了一个Address Sanitizer，他们有什么区别呢？ AddressSanitize">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Xcode7新特性AddressSanitizer">
+<meta property="og:url" content="http://yoursite.com/2015/10/27/Xcode7新特性AddressSanitizer/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="昨天发现微博的圈子里iOS学习氛围比较好，所以特意注册了一个新浪微博。无意中在微博里看到了@没故事的卓同学的文章Xcode7中你一定要知道的炸裂调试神技，介绍Xcode7中新增了AddressSanitizer工具可以捕获EXC_BAD_ACCESS。然而Xcode中不是已经有了Zombie了么？怎么又出来了一个Address Sanitizer，他们有什么区别呢？ AddressSanitize">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://yoursite.com/images/DebugTips/poisonedMemory.png">
+<meta property="og:image" content="http://yoursite.com/images/DebugTips/sanitizerVSzombie.png">
+<meta property="og:image" content="http://yoursite.com/images/DebugTips/editScheme.png">
+<meta property="og:image" content="http://yoursite.com/images/DebugTips/enableSanitizer.png">
+<meta property="og:image" content="http://yoursite.com/images/DebugTips/undefinedTrap.png">
+<meta property="og:image" content="http://yoursite.com/images/DebugTips/undefinedTrapEx.png">
+<meta property="og:updated_time" content="2015-10-31T16:11:18.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Xcode7新特性AddressSanitizer">
+<meta name="twitter:description" content="昨天发现微博的圈子里iOS学习氛围比较好，所以特意注册了一个新浪微博。无意中在微博里看到了@没故事的卓同学的文章Xcode7中你一定要知道的炸裂调试神技，介绍Xcode7中新增了AddressSanitizer工具可以捕获EXC_BAD_ACCESS。然而Xcode中不是已经有了Zombie了么？怎么又出来了一个Address Sanitizer，他们有什么区别呢？ AddressSanitize">
+<meta name="twitter:image" content="http://yoursite.com/images/DebugTips/poisonedMemory.png">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=c114cben" rel="stylesheet">
+
+
+  
+    <link rel="stylesheet" href="/css/personal-style.css">
+  
+
+  
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+  
+  <script type="text/javascript">
+	(function(){
+	    var bp = document.createElement('script');
+	    var curProtocol = window.location.protocol.split(':')[0];
+	    if (curProtocol === 'https') {
+	        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+	    }
+	    else {
+	        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+	    }
+	    var s = document.getElementsByTagName("script")[0];
+	    s.parentNode.insertBefore(bp, s);
+	})();
+  </script>
+
+
+
+  
+    <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+
+  
+    <link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  
+</head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">盒子</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/link/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            友链
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/atom.xml"
+            rel="noopener noreferrer"
+            target="_blank"
+            >
+            RSS
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#AddressSanitizer-VS-Zombie"><span class="toc-text">AddressSanitizer VS Zombie</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#原理"><span class="toc-text">原理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#适用性"><span class="toc-text">适用性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#缺陷"><span class="toc-text">缺陷</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#AddressSanitizer使用"><span class="toc-text">AddressSanitizer使用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#其他compiler-flags"><span class="toc-text">其他compiler flags</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#End"><span class="toc-text">End</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Reference"><span class="toc-text">Reference</span></a></li></ol>
+  </div>
+
+
+
+<div class="content content-post CENTER">
+   <article id="post-Xcode7新特性AddressSanitizer" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">Xcode7新特性AddressSanitizer</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2015.10.27</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>John Doe</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/调试技巧/">调试技巧</a>
+  </span>
+
+
+
+      
+        <span>
+          <i class="icon-comment"></i>
+          <a href="http://www.forsigner.com/2015/10/27/Xcode7新特性AddressSanitizer/#disqus_thread"></a>
+        </span>
+      
+
+      
+      <i class="fa fa-eye"></i> 
+        <span id="busuanzi_container_page_pv">
+           &nbsp热度 <span id="busuanzi_value_page_pv">
+           <i class="fa fa-spinner fa-spin"></i></span>℃
+        </span>
+      
+      
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <p>昨天发现微博的圈子里iOS学习氛围比较好，所以特意注册了一个<a href="http://weibo.com/5592239559/profile?topnav=1&amp;wvr=6" target="_blank" rel="noopener">新浪微博</a>。无意中在微博里看到了<code>@没故事的卓同学</code>的文章<a href="http://www.jianshu.com/p/70ed36cf8a98?utm_campaign=maleskine&amp;utm_content=note&amp;utm_medium=writer_share&amp;utm_source=weibo&amp;url_type=39&amp;object_type=webpage&amp;pos=1" target="_blank" rel="noopener">Xcode7中你一定要知道的炸裂调试神技</a>，介绍Xcode7中新增了AddressSanitizer工具可以捕获EXC_BAD_ACCESS。然而Xcode中不是已经有了Zombie了么？怎么又出来了一个Address Sanitizer，他们有什么区别呢？</p>
+<h2 id="AddressSanitizer-VS-Zombie"><a href="#AddressSanitizer-VS-Zombie" class="headerlink" title="AddressSanitizer VS Zombie"></a>AddressSanitizer VS Zombie</h2><h3 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h3><ol>
+<li><code>zombie</code>：<br> zombie的原理是用生成僵尸对象来替换dealloc的实现，当对象引用计数为0的时候，将需要dealloc的对象转化为僵尸对象。如果之后再给这个僵尸对象发消息，则抛出异常，并打印出相应的信息，调试者可以很轻松的找到异常发生位置。</li>
+<li><code>AddressSanitizer</code>：<br> AddressSanitizer的原理是当程序创建变量分配一段内存时，将此内存后面的一段内存也冻结住，标识为中毒内存。如图所示，黄色是变量所占内存，紫色是冻结的中毒内存。<br> <img src="/images/DebugTips/poisonedMemory.png" alt=""><br> 当程序访问到中毒内存时（越界访问），就会抛出异常，并打印出相应log信息。调试者可以根据中断位置和的log信息，识别bug。如果变量释放了，变量所占的内存也会标识为中毒内存，这时候访问这段内存同样会抛出异常（访问已经释放的对象）。</li>
+</ol>
+<h3 id="适用性"><a href="#适用性" class="headerlink" title="适用性"></a>适用性</h3><p>了解原理之后我们可以大概猜到Zombie和AddressSanitizer的适用性，不过一切还得以实验结果为准：<br><img src="/images/DebugTips/sanitizerVSzombie.png" alt=""><br>实验后发现AddressSanitizer比Zombie拥有更强大的捕获能力，特别是在malloc对象和内存越界方面，zombie几乎无能为力。如果在debug的时候无法捕获异常，上线之后crash log中概率性的EXC_BAD_ACCESS简直是一种灾难。</p>
+<h3 id="缺陷"><a href="#缺陷" class="headerlink" title="缺陷"></a>缺陷</h3><p>上面研究发现AddressSanitizer比zombie更有优势，那么AddressSanitizer有什么缺陷呢？</p>
+<ol>
+<li>AddressSanitizer可能会没有log，不过会在访问中毒内存的代码处断住，这倒是对debug影响不大</li>
+<li>使用AddressSanitizer除了分配对象的内存之外，还需要额外的内存，这会导致App内存大量增加，用起来有可能会比较卡</li>
+</ol>
+<p>虽然AddressSanitizer有一些缺陷，但是总的来说AddressSanitizer还是一个非常好用的debug工具。</p>
+<h2 id="AddressSanitizer使用"><a href="#AddressSanitizer使用" class="headerlink" title="AddressSanitizer使用"></a>AddressSanitizer使用</h2><p>在了解AddressSanitizer的功能之后，我们来看看AddressSanitizer用。<br>AddressSanitizer的使用其实非常简单，在Xcode上方选择设备的地方，点击工程名字，选择Edit Scheme.<br><img src="/images/DebugTips/editScheme.png" alt=""><br>在Diagnostics中选中enable address sanitizer即可。<br><img src="/images/DebugTips/enableSanitizer.png" alt=""><br>AddressSanitizer开启之后，在debug过程中，如果遇到EXC_BAD_ACCESS的问题，Xcode会自动中断，抛出异常</p>
+<h2 id="其他compiler-flags"><a href="#其他compiler-flags" class="headerlink" title="其他compiler flags"></a>其他compiler flags</h2><p>实际AddressSanitizer很早以前就有了，只是没在Xcode中集成而已。除了AddressSanitizer还有很多其他的<a href="http://clang.llvm.org/docs/index.html" target="_blank" rel="noopener">compiler flags</a>，undefined-trap就是其中的一种。undefined-trap的功能也非常强大，它可以检测出程序中的不明确行为，如数据溢出等。</p>
+<p>下面我们以undefined-trap举例，看看怎么用其他的compiler flags：</p>
+<p>在Build Settings中的Custom Compiler Flags下为other C Flags添加<code>-fsanitize=undefined-trap -fsanitize-undefined-trap-on-error</code><br><img src="/images/DebugTips/undefinedTrap.png" alt=""><br>完成undefined-trap的设置之后，当程序的数据发生溢出行为时，系统就会抛出异常。<br><img src="/images/DebugTips/undefinedTrapEx.png" alt=""></p>
+<h2 id="End"><a href="#End" class="headerlink" title="End"></a>End</h2><p>经过ARC的洗礼之后，普通的访问释放对象产生的EXC_BAD_ACCESS已经大量减少了，现在出现的EXC_BAD_ACCESS有很大一部分来自malloc的对象或者越界访问。简单的敌人已经被干掉，剩下的都是难缠的对手了。还好Apple给我们升级了装备，以后遇到EXC_BAD_ACCESS应该不用那么心惊胆战了吧？</p>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><p><a href="http://www.jianshu.com/p/70ed36cf8a98?utm_campaign=maleskine&amp;utm_content=note&amp;utm_medium=writer_share&amp;utm_source=weibo&amp;url_type=39&amp;object_type=webpage&amp;pos=1" target="_blank" rel="noopener">Xcode7中你一定要知道的炸裂调试神技</a><br><a href="http://www.cocoachina.com/ios/20150729/12830.html" target="_blank" rel="noopener">在Xcode 7上直接使用Address Sanitizer</a><br><a href="http://clang.llvm.org/docs/index.html" target="_blank" rel="noopener">Clang 3.8 documentation</a></p>
+
+    
+  </div>
+
+</article>
+
+
+   
+  <div class="text-center donation">
+    <div class="inner-donation">
+      <span class="btn-donation">支持一下</span>
+      <div class="donation-body">
+        <div class="tip text-center">扫一扫，支持forsigner</div>
+        <ul>
+        
+          <li class="item">
+            
+              <span>微信扫一扫</span>
+            
+            <img src="/images/qr-wechat.png" alt="">
+          </li>
+        
+          <li class="item">
+            
+              <span>支付宝扫一扫</span>
+            
+            <img src="/images/qr-alipay.png" alt="">
+          </li>
+        
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+   
+  <div class="box-prev-next clearfix">
+    <a class="show pull-left" href="/2015/10/17/AVFoundation(一)：基础知识/">
+        <i class="icon icon-angle-left"></i>
+    </a>
+    <a class="show pull-right" href="/2015/10/30/AVFoundation(二)：AVFoundation的核心AVAsset/">
+        <i class="icon icon-angle-right"></i>
+    </a>
+  </div>
+
+
+
+
+
+   
+      <div class="git"></div>
+   
+</div>
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/link/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              友链
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/atom.xml"
+              rel="noopener noreferrer"
+              target="_blank"
+              >
+              RSS
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+  <section class="disqus-comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+  </section>
+
+  <script>
+    var disqus_shortname = 'forsigner';
+    
+    var disqus_url = 'http://yoursite.com/2015/10/27/Xcode7新特性AddressSanitizer/';
+    
+    (function(){
+      var dsq = document.createElement('script');
+      dsq.type = 'text/javascript';
+      dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+
+  <script id="dsq-count-scr" src="//forsigner.disqus.com/count.js" async></script>
+
+
+
+    
+    
+
+    
+    
+
+    
+
+    
+    
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>

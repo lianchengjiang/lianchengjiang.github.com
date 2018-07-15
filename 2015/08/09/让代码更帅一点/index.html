@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>让代码更帅一点 | Hexo</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="forsigner,前端,设计,Hexo主题,前端开发,用户体验,设计,frontend,design,nodejs,JavaScript" />
+  
+
+  <meta name="description" content="写代码最重要的是实现功能，但是除了实现功能之外，我们还应该想办法，让代码变得更规范，更漂亮最近在读《禅与Objective-C编程艺术》和《Effective Objective C 2.0:编写高质量iOS与OS X代码的52个有效方法》，这两本都讲解了代码规范方面的东西，结合自己平时的代码习惯，发现有很多地方自己做的还是不够好，代码写得不够帅，所以总结一下，让以后的代码更帅一点 条件语句条件语">
+<meta property="og:type" content="article">
+<meta property="og:title" content="让代码更帅一点">
+<meta property="og:url" content="http://yoursite.com/2015/08/09/让代码更帅一点/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="写代码最重要的是实现功能，但是除了实现功能之外，我们还应该想办法，让代码变得更规范，更漂亮最近在读《禅与Objective-C编程艺术》和《Effective Objective C 2.0:编写高质量iOS与OS X代码的52个有效方法》，这两本都讲解了代码规范方面的东西，结合自己平时的代码习惯，发现有很多地方自己做的还是不够好，代码写得不够帅，所以总结一下，让以后的代码更帅一点 条件语句条件语">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2015-10-31T16:06:18.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="让代码更帅一点">
+<meta name="twitter:description" content="写代码最重要的是实现功能，但是除了实现功能之外，我们还应该想办法，让代码变得更规范，更漂亮最近在读《禅与Objective-C编程艺术》和《Effective Objective C 2.0:编写高质量iOS与OS X代码的52个有效方法》，这两本都讲解了代码规范方面的东西，结合自己平时的代码习惯，发现有很多地方自己做的还是不够好，代码写得不够帅，所以总结一下，让以后的代码更帅一点 条件语句条件语">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=c114cben" rel="stylesheet">
+
+
+  
+    <link rel="stylesheet" href="/css/personal-style.css">
+  
+
+  
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+  
+  <script type="text/javascript">
+	(function(){
+	    var bp = document.createElement('script');
+	    var curProtocol = window.location.protocol.split(':')[0];
+	    if (curProtocol === 'https') {
+	        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+	    }
+	    else {
+	        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+	    }
+	    var s = document.getElementsByTagName("script")[0];
+	    s.parentNode.insertBefore(bp, s);
+	})();
+  </script>
+
+
+
+  
+    <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+
+  
+    <link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  
+</head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">盒子</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/link/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            友链
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/atom.xml"
+            rel="noopener noreferrer"
+            target="_blank"
+            >
+            RSS
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#条件语句"><span class="toc-text">条件语句</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#括号"><span class="toc-text">括号</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#nil和BOOL判断"><span class="toc-text">nil和BOOL判断</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#避免嵌套if"><span class="toc-text">避免嵌套if</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#多用字面量语法"><span class="toc-text">多用字面量语法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#复杂的表达式"><span class="toc-text">复杂的表达式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#用常量代替宏"><span class="toc-text">用常量代替宏</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#static"><span class="toc-text">static</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#类"><span class="toc-text">类</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#命名冲突"><span class="toc-text">命名冲突</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Designated-Initializer"><span class="toc-text">Designated Initializer</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#类的封装"><span class="toc-text">类的封装</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#protocol"><span class="toc-text">protocol</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#属性"><span class="toc-text">属性</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#规范"><span class="toc-text">规范</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#setter-amp-getter"><span class="toc-text">setter&amp;getter</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#可变对象赋值"><span class="toc-text">可变对象赋值</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#点符号"><span class="toc-text">点符号</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Block"><span class="toc-text">Block</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#后记"><span class="toc-text">后记</span></a></li></ol>
+  </div>
+
+
+
+<div class="content content-post CENTER">
+   <article id="post-让代码更帅一点" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">让代码更帅一点</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2015.08.09</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>John Doe</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/代码规范和技巧/">代码规范和技巧</a>
+  </span>
+
+
+
+      
+        <span>
+          <i class="icon-comment"></i>
+          <a href="http://www.forsigner.com/2015/08/09/让代码更帅一点/#disqus_thread"></a>
+        </span>
+      
+
+      
+      <i class="fa fa-eye"></i> 
+        <span id="busuanzi_container_page_pv">
+           &nbsp热度 <span id="busuanzi_value_page_pv">
+           <i class="fa fa-spinner fa-spin"></i></span>℃
+        </span>
+      
+      
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <p>写代码最重要的是实现功能，但是除了实现功能之外，我们还应该想办法，让代码变得更规范，更漂亮<br>最近在读<a href="https://github.com/oa414/objc-zen-book-cn/#init-%E5%92%8C-dealloc" target="_blank" rel="noopener">《禅与Objective-C编程艺术》</a>和<a href="http://www.amazon.cn/dp/B00IDSGY06/ref=cm_sw_r_qz_2_dp_A2OPub0CH96YH" target="_blank" rel="noopener">《Effective Objective C 2.0:编写高质量iOS与OS X代码的52个有效方法》</a>，这两本都讲解了代码规范方面的东西，结合自己平时的代码习惯，发现有很多地方自己做的还是不够好，代码写得不够帅，所以总结一下，让以后的代码更帅一点</p>
+<h3 id="条件语句"><a href="#条件语句" class="headerlink" title="条件语句"></a>条件语句</h3><p>条件语句一定要使用括号，如果不使用括号，if后面的那行代码删除，之后的代码会成为if语句里面的代码<br>推荐：</p>
+<pre><code>if (!error) {
+    return success;
+}
+</code></pre><h3 id="括号"><a href="#括号" class="headerlink" title="括号"></a>括号</h3><p>大括号的使用最好跟Apple保持一致，大括号在同一行开始，在新的一行结束，<br>如：</p>
+<pre><code>if (user.isHappy) {
+    //Do something
+}
+else {
+    //Do something else
+}
+</code></pre><h3 id="nil和BOOL判断"><a href="#nil和BOOL判断" class="headerlink" title="nil和BOOL判断"></a>nil和BOOL判断</h3><p>最好直接使用<code>!</code>判断<code>nil</code>，或者BOOL值<br>推荐：</p>
+<pre><code>if (![someObject boolValue]) { ...
+if (!someObject) { ...
+</code></pre><h3 id="避免嵌套if"><a href="#避免嵌套if" class="headerlink" title="避免嵌套if"></a>避免嵌套if</h3><p>不要嵌套 if 语句。使用多个 return 可以避免增加循环的复杂度，并提高代码的可读性。<br>推荐：</p>
+<pre><code>- (void)someMethod {
+  if (![someOther boolValue]) {
+      return;
+  }
+
+  //Do something important
+}
+</code></pre><p>不推荐：</p>
+<pre><code>- (void)someMethod {
+  if ([someOther boolValue]) {
+    //Do something important
+  }
+}
+</code></pre><h3 id="多用字面量语法"><a href="#多用字面量语法" class="headerlink" title="多用字面量语法"></a>多用字面量语法</h3><p>何为字面量语法</p>
+<pre><code>NSString *string = @&quot;string&quot;;
+
+NSNumber *intNumber = @88;
+NSNumber *boolNumber = @YES;
+NSNumber *floatNumber = @3.14;
+int var = 3;
+NSNumber *varNumber = @(var);
+
+NSArray *list = @[@&quot;itme1&quot;,@&quot;item2&quot;,@&quot;item3&quot;];
+NSLog(@&quot;%@,%@,%@&quot;,list[0],list[1],list[2]);
+NSDictionary *map = @{@&quot;key1&quot;:@&quot;value1&quot;,@&quot;key2&quot;:@&quot;value2&quot;};
+NSLog(@&quot;%@,%@&quot;,map[@&quot;key1&quot;],map[@&quot;key2&quot;]);
+</code></pre><p>这就是字面量语法，用非常简单直观的方法创建或者获取常用的对象(NSString,NSNumber,NSArray,NSDictionary)，使用字面量语法简单方便直观</p>
+<h3 id="复杂的表达式"><a href="#复杂的表达式" class="headerlink" title="复杂的表达式"></a>复杂的表达式</h3><p>当有一个复杂的if语句时，可以把判断条件提取出来作为BOOL变量</p>
+<pre><code>BOOL nameContainsSwift  = [sessionName containsString:@&quot;Swift&quot;];
+BOOL isCurrentYear      = [sessionDateCompontents year] == 2014;
+BOOL isSwiftSession     = nameContainsSwift &amp;&amp; isCurrentYear;
+
+if (isSwiftSession) {
+    // Do something very cool
+}
+</code></pre><h3 id="用常量代替宏"><a href="#用常量代替宏" class="headerlink" title="用常量代替宏"></a>用常量代替宏</h3><p>推荐：</p>
+<pre><code>static NSString * const ZOCCacheControllerDidClearCacheNotification = @&quot;ZOCCacheControllerDidClearCacheNotification&quot;;
+static const NSTimeInterval animationDuration = 3.0;
+</code></pre><p>不推荐：</p>
+<pre><code>#define ZOCCacheControllerDidClearCacheNotification @&quot;ZOCCacheControllerDidClearCacheNotification&quot;
+#define animationDuration 3.0
+</code></pre><p>原因：</p>
+<ol>
+<li>使用宏的过程中无法直接知道常量类型(是int呢？还是Stiring呢？)，除非查看宏定义的地方</li>
+<li>宏可以更改，，如果2个地方使用同样的名字定义了2个不一样的宏，你使用的时候可能会使用错误，造成难以发现的bug。使用const定义的常量如果更改编译器就会报错</li>
+</ol>
+<h4 id="static"><a href="#static" class="headerlink" title="static"></a>static</h4><p>在常量的使用过程中分两种情况<br>1.常量需要对外暴露。不使用<code>static</code>，并在.h中用<code>extern</code>暴露出去</p>
+<pre><code>// .h
+extern NSString *const ZOCCacheControllerDidClearCacheNotification;
+// .m
+NSString * const ZOCCacheControllerDidClearCacheNotification = @&quot;ZOCCacheControllerDidClearCacheNotification&quot;;
+</code></pre><p>2.常量只在本类中使用，不需要对外暴露，使用<code>static</code>.</p>
+<pre><code>static NSString * const ZOCCacheControllerDidClearCacheNotification = @&quot;ZOCCacheControllerDidClearCacheNotification&quot;;
+</code></pre><p><code>static</code>定义的变量仅在当前的.m文件中可见，如果常量只在本类中使用，用<code>static</code>会避免影响到其他类，如果需要全局可见，就不能使用<code>static</code></p>
+<h3 id="类"><a href="#类" class="headerlink" title="类"></a>类</h3><h4 id="命名冲突"><a href="#命名冲突" class="headerlink" title="命名冲突"></a>命名冲突</h4><p>1）类名，全局变量和C函数(C函数类似于全局变量)命名时，使用三个字母作为前缀，避免命名跟第三方API或者苹果API名称冲突<br>项目里经常看到不使用前缀或者使用两个字母作为前缀的命名方式。<br>不使用前缀可能发生冲突不言而喻，那为什么不使用两个字母作为前缀呢？<br>因为Apple宣称其保留使用所有”两字母前缀”的权利，使用两字母作为前缀有跟未来的苹果API冲突的风险，所以保险起见，尽量使用三个字母作为iOS的命名前缀</p>
+<p>2）类内部使用的私有方法，可以加个前缀，但不要使用单个下划线<code>_</code>作为前缀，因为这也是Apple预留的。可以使用双下划线<code>__</code>或者<code>p_</code>作为前缀</p>
+<p>3）如果需要为无源码的类（包括第三方类和系统类）添加category，方法名称前最好带前缀，避免冲突</p>
+<h4 id="Designated-Initializer"><a href="#Designated-Initializer" class="headerlink" title="Designated Initializer"></a>Designated Initializer</h4><p>子类重新定义designated initializer时应遵循以下步骤：</p>
+<ol>
+<li>定义designated initializer，并调用父类的designated initializer</li>
+<li>重载父类的designated initializer，并调用新定义的designated initializer</li>
+<li>为新的designated initializer写文档</li>
+</ol>
+<p>在.h中，使用<code>__attribute__((objc_designated_initializer))</code>标明哪个是designated initializer。<br>如果因为某些原因，父类的designated initializer被弃用，比如designated initializer必须要有某个参数，父类的designated initializer无法传这个参数。用<code>__attribute__((unavailable(&quot;Invoke the designated initializer&quot;)))</code>表示弃用</p>
+<pre><code>- (instancetype)initWithName:(NSString *)name __attribute__((objc_designated_initializer));
+- (instancetype)init __attribute__((unavailable(&quot;Invoke -initWithName:&quot;)));
+</code></pre><h4 id="类的封装"><a href="#类的封装" class="headerlink" title="类的封装"></a>类的封装</h4><p>在封装一个类的时候，下面几点需要注意：</p>
+<ol>
+<li>外部不需要了解的属性和方法，尽量定义在.m中 </li>
+<li>不要轻易暴露属性的setter方法，多使用readonly</li>
+<li>尽量使用不可变对象</li>
+<li>不要暴露可变的collection，应该提供相应的方法替代</li>
+</ol>
+<h4 id="protocol"><a href="#protocol" class="headerlink" title="protocol"></a>protocol</h4><p>1）一般情况下protocol分为2类，delegate和dataSource</p>
+<ol>
+<li>delegate:委托别的类去干活的，需要放在delegate里面，一般没有返回值</li>
+<li>dataSource:去别的类获取数据的，放在dataSource里面，主要用于获取数据</li>
+</ol>
+<p>2）delegate属性在ARC下，一定要用weak取代assign，避免隐患<br>3）对于option的protocol。在调用之前一定要用<code>-respondsToSelector:</code>判断这个方法是否实现了</p>
+<h3 id="属性"><a href="#属性" class="headerlink" title="属性"></a>属性</h3><h5 id="规范"><a href="#规范" class="headerlink" title="规范"></a>规范</h5><p>从代码规范和漂亮的角度来说，属性最好这样写，这是apple的写法<br>推荐：</p>
+<pre><code>@property(nonatomic, readonly, copy) NSString *nibName; 
+</code></pre><p>不推荐：</p>
+<pre><code>@property(nonatomic, readonly, copy) NSString* nibName; 
+@property(nonatomic, readonly, copy)NSString *nibName; 
+@property (nonatomic, readonly, copy) NSString *nibName; 
+...
+</code></pre><h5 id="setter-amp-getter"><a href="#setter-amp-getter" class="headerlink" title="setter&amp;getter"></a>setter&amp;getter</h5><p>属性除了init和dealloc外，建议使用setter和getter方法。在init和dealloc中，建议直接使用ivar<br>使用setter和getter方法的好处：</p>
+<ol>
+<li>遵守内存管理语义(strong,copy…)</li>
+<li>kvo通知会自动被执行</li>
+<li>方便debug，打断点</li>
+<li>方便重写getter或者setter</li>
+</ol>
+<p>为什么不要在init和dealloc中使用setter和getter?<br>如果init中使用了setter，在子类的属性初始化之前，调用[super init]的时候就会调用setter方法。这时候如果重写了setter，并在setter中做了特殊的操作，这时候就可能会引起一些非常难发现的bug。所以为了避免隐患，在init或者dealloc中直接使用ivar</p>
+<h5 id="可变对象赋值"><a href="#可变对象赋值" class="headerlink" title="可变对象赋值"></a>可变对象赋值</h5><p>对可以用可变对象赋值的属性(如：NSString,NSArray,NSDictionary),属性的内存管理类型必须为<code>copy</code>。这是为了防止可变对象(NSMultableArray)给不可变对象(NSArray)赋值。导致不可变对象(NSArray)指针指向可变对象(NSMultableArray)，在使用过程中可能会改变它的值，出现bug</p>
+<h5 id="点符号"><a href="#点符号" class="headerlink" title="点符号"></a>点符号</h5><p>当使用属性的时候尽量使用<code>.</code>符号，方法调用使用<code>[]</code><br> 例：</p>
+<pre><code> view.backgroundColor = [UIColor orangeColor];
+[UIApplication sharedApplication].delegate;
+</code></pre><h3 id="Block"><a href="#Block" class="headerlink" title="Block"></a>Block</h3><p>推荐这种block使用方法</p>
+<pre><code>__weak __typeof(self)weakSelf = self;
+[self executeBlock:^(NSData *data, NSError *error) {
+    __strong __typeof(weakSelf) strongSelf = weakSelf;
+    if (strongSelf) {
+        [strongSelf doSomethingWithData:data];
+        [strongSelf doSomethingWithData:data];
+    }
+}];
+</code></pre><p>在block外面用weak持有self，避免循环引用<br>在block里面用strong持有self，避免多线程中block执行到一半，self被释放为nil，而出现的隐患<br>其他的block问题，可以看以前写的<a href="http://jiangliancheng.gitcafe.io/2015/03/02/blcok%E7%9A%84%E9%82%A3%E4%BA%9B%E4%BA%8B/" target="_blank" rel="noopener">这篇文章</a></p>
+<h3 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h3><p>主要的东西来自<a href="https://github.com/oa414/objc-zen-book-cn/#init-%E5%92%8C-dealloc" target="_blank" rel="noopener">《禅与Objective-C编程艺术》</a>和<a href="http://www.amazon.cn/dp/B00IDSGY06/ref=cm_sw_r_qz_2_dp_A2OPub0CH96YH" target="_blank" rel="noopener">Effective Objective C 2.0:编写高质量iOS与OS X代码的52个有效方法</a>，有兴趣的同学可以读一下原书，后续发现其他规范方面的东西，我会继续更新，如果大家有这方面的东西，也欢迎提出来~~~</p>
+
+    
+  </div>
+
+</article>
+
+
+   
+  <div class="text-center donation">
+    <div class="inner-donation">
+      <span class="btn-donation">支持一下</span>
+      <div class="donation-body">
+        <div class="tip text-center">扫一扫，支持forsigner</div>
+        <ul>
+        
+          <li class="item">
+            
+              <span>微信扫一扫</span>
+            
+            <img src="/images/qr-wechat.png" alt="">
+          </li>
+        
+          <li class="item">
+            
+              <span>支付宝扫一扫</span>
+            
+            <img src="/images/qr-alipay.png" alt="">
+          </li>
+        
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+   
+  <div class="box-prev-next clearfix">
+    <a class="show pull-left" href="/2015/07/25/iOS中framework的联调/">
+        <i class="icon icon-angle-left"></i>
+    </a>
+    <a class="show pull-right" href="/2015/08/14/让代码更帅一点（二）/">
+        <i class="icon icon-angle-right"></i>
+    </a>
+  </div>
+
+
+
+
+
+   
+      <div class="git"></div>
+   
+</div>
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/link/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              友链
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/atom.xml"
+              rel="noopener noreferrer"
+              target="_blank"
+              >
+              RSS
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+  <section class="disqus-comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+  </section>
+
+  <script>
+    var disqus_shortname = 'forsigner';
+    
+    var disqus_url = 'http://yoursite.com/2015/08/09/让代码更帅一点/';
+    
+    (function(){
+      var dsq = document.createElement('script');
+      dsq.type = 'text/javascript';
+      dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+
+  <script id="dsq-count-scr" src="//forsigner.disqus.com/count.js" async></script>
+
+
+
+    
+    
+
+    
+    
+
+    
+
+    
+    
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>

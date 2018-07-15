@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>刨根究底iOS—调戏Categoty | Hexo</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="forsigner,前端,设计,Hexo主题,前端开发,用户体验,设计,frontend,design,nodejs,JavaScript" />
+  
+
+  <meta name="description" content="##起因我们项目中很多公用的类都封装在framework中，以便iPhone、iPad共同调用。某些逻辑不一样的东西我们会在主工程用category实现，然而category默认是不能定义属性的。 ##AssociatedObjectiOS有些基础的朋友应该会知道，runtime里有objc_setAssociatedObject和objc_getAssociatedObject两个方法，可以将属">
+<meta property="og:type" content="article">
+<meta property="og:title" content="刨根究底iOS—调戏Categoty">
+<meta property="og:url" content="http://yoursite.com/2015/11/21/刨根究底iOS—调戏Categoty/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="##起因我们项目中很多公用的类都封装在framework中，以便iPhone、iPad共同调用。某些逻辑不一样的东西我们会在主工程用category实现，然而category默认是不能定义属性的。 ##AssociatedObjectiOS有些基础的朋友应该会知道，runtime里有objc_setAssociatedObject和objc_getAssociatedObject两个方法，可以将属">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://yoursite.com/images/category_property/class_addMethod.png">
+<meta property="og:image" content="http://yoursite.com/images/category_property/IMP.png">
+<meta property="og:image" content="http://yoursite.com/images/category_property/imp_block.png">
+<meta property="og:image" content="http://yoursite.com/images/category_property/S_imp_block.png">
+<meta property="og:updated_time" content="2015-11-22T05:04:46.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="刨根究底iOS—调戏Categoty">
+<meta name="twitter:description" content="##起因我们项目中很多公用的类都封装在framework中，以便iPhone、iPad共同调用。某些逻辑不一样的东西我们会在主工程用category实现，然而category默认是不能定义属性的。 ##AssociatedObjectiOS有些基础的朋友应该会知道，runtime里有objc_setAssociatedObject和objc_getAssociatedObject两个方法，可以将属">
+<meta name="twitter:image" content="http://yoursite.com/images/category_property/class_addMethod.png">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=c114cben" rel="stylesheet">
+
+
+  
+    <link rel="stylesheet" href="/css/personal-style.css">
+  
+
+  
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+  
+  <script type="text/javascript">
+	(function(){
+	    var bp = document.createElement('script');
+	    var curProtocol = window.location.protocol.split(':')[0];
+	    if (curProtocol === 'https') {
+	        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+	    }
+	    else {
+	        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+	    }
+	    var s = document.getElementsByTagName("script")[0];
+	    s.parentNode.insertBefore(bp, s);
+	})();
+  </script>
+
+
+
+  
+    <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+
+  
+    <link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  
+</head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">盒子</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/link/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            友链
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/atom.xml"
+            rel="noopener noreferrer"
+            target="_blank"
+            >
+            RSS
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#消除Category同名方法覆盖"><span class="toc-text">消除Category同名方法覆盖</span></a></li></ol>
+  </div>
+
+
+
+<div class="content content-post CENTER">
+   <article id="post-刨根究底iOS—调戏Categoty" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">刨根究底iOS—调戏Categoty</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2015.11.21</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>John Doe</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/刨根究底iOS/">刨根究底iOS</a>
+  </span>
+
+
+
+      
+        <span>
+          <i class="icon-comment"></i>
+          <a href="http://www.forsigner.com/2015/11/21/刨根究底iOS—调戏Categoty/#disqus_thread"></a>
+        </span>
+      
+
+      
+      <i class="fa fa-eye"></i> 
+        <span id="busuanzi_container_page_pv">
+           &nbsp热度 <span id="busuanzi_value_page_pv">
+           <i class="fa fa-spinner fa-spin"></i></span>℃
+        </span>
+      
+      
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <p>##起因<br>我们项目中很多公用的类都封装在framework中，以便iPhone、iPad共同调用。某些逻辑不一样的东西我们会在主工程用category实现，然而category默认是不能定义属性的。</p>
+<p>##AssociatedObject<br>iOS有些基础的朋友应该会知道，runtime里有objc_setAssociatedObject和objc_getAssociatedObject两个方法，可以将属性挂到Object上：</p>
+<pre><code>@interface Model (Property)
+@property (nonatomic, strong)NSString *name;
+@end
+
+@implementation Model (Property)
+
+static void *kName = &amp;kName;
+- (void)setName:(NSString *)name
+{
+    objc_setAssociatedObject(self, kName, name, OBJC_ASSOCIATION_COPY_NONATOMIC);
+}
+- (NSString *)name
+{
+    return objc_getAssociatedObject(self, kName);
+}
+@end
+</code></pre><p>重写property的setter和getter方法，在setter的时候调用objc_setAssociatedObject将属性挂到self上，在getter的时候，从self身上将属性取出来。</p>
+<p>这样的实现已经是可以用了，事实上大多数为category添加属性的代码都是这样写的。不过我还是太懒，每添加一个属性，就要写这么大一堆代码。想想要是加上十个八个属性，顿时整个人都觉得不好了…</p>
+<p>##class_addMethod<br>既然能用runtime动态将属性挂在class上，我们也可以用runtime动态将setter和getter方法插入到class中。<br>runtime提供了class_addMethod方法动态插入method<br><img src="/images/category_property/class_addMethod.png" alt=""><br>class_addMethod需要4个参数。class可以通过[self class]获取，SEL可以通过property的name拼接出对应的SEL，types由于参数的类型固定，所以也是可以直接确定。但是IMP怎么办？</p>
+<p>##imp_implementationWithBlock<br>说到IMP，我们先来了解一下IMP是个什么东西<br><img src="/images/category_property/IMP.png" alt=""><br>IMP是一个函数指针，指向相应的函数实现，函数一般会有2个默认参数：id类型的self和SEL类型的_cmd。平时我们之所以能在OC函数中调用self，也是因为函数中有隐藏起来了的self参数</p>
+<p>翻阅runtime的文档，我们找到了通过block转换成IMP的API：<br><img src="/images/category_property/imp_block.png" alt=""><br>不过通过block转换为IMP时，需要注意，block不需要SEL，所以在block中只有一个默认参数self。在我们写block时，第一个参数必须为self，当函数调用的时候才能正确接收参数。<br><img src="/images/category_property/S_imp_block.png" alt=""></p>
+<p>##封装<br>一切都准备就绪了，那我们就来封装一个动态添加属性的方法吧，为了简化流程，我们暂时先只考虑id类型的属性。</p>
+<pre><code>+ (void)addObjectProperty:(NSString *)name
+{
+    //1. 通过class的指针和property的name，创建一个唯一的key
+    NSString *key = [NSString stringWithFormat:@&quot;%p_%@&quot;,self,name];
+
+    //2. 用block实现setter方法
+    id setblock = ^(id self,id value){
+        objc_setAssociatedObject(self, (__bridge void *)key, value, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    };
+
+    //3. 将block的实现转化为IMP
+    IMP imp = imp_implementationWithBlock(setblock);
+
+    //4. 用name拼接出setter方法
+    NSString *selString = [self setMethodNameWithProperty:name];
+
+    //5. 将setter方法加入到class中
+    BOOL result = class_addMethod([self class], NSSelectorFromString(selString), imp, &quot;v@:@&quot;);
+
+
+    //6. getter
+    id getBlock = ^id(id self){
+        return objc_getAssociatedObject(self, (__bridge void*)key);
+    };
+    IMP getImp = imp_implementationWithBlock(getBlock);
+    result = class_addMethod([self class], NSSelectorFromString(name), getImp, &quot;@@:&quot;);
+}
+</code></pre><ol>
+<li>通过class的指针和property的name，创建一个唯一的key。用来在AssociatedObject的时候存取属性。</li>
+<li>在block中实现setter方法</li>
+<li>通过block创建IMP</li>
+<li>通过name将setter的方法名拼接出来，-setMethodNameWithProperty是自己写的方法，这里没有贴出来</li>
+<li>将setter方法加入到class中。其中@”v@:@”：<code>v</code>表示空，setter的返回值为空。<code>@</code>表示id类型，第一个参数，也就是self为id类型。<code>:</code>表示SEL类型，第二个参数为method的selector。<code>@</code>表示id类型，第三个参数也就是setter方法真正要传入的参数为id类型。</li>
+<li>后面是相应的getter方法，与setter方法类似</li>
+</ol>
+<p>##使用<br>这时候，再也不用担心有很多property，写一堆重复的代码。我们只需要调一个函数就可以将在category插入属性</p>
+<pre><code>@interface Model (Property)
+@property (nonatomic, strong)NSString *name;
+@property (nonatomic, strong)NSURL *URL;
+@property (nonatomic, strong)NSDate *date;
+@end
+
+@implementation Model (Property)
+
++ (void)load
+{
+    [self addObjectProperty:@&quot;name&quot;];
+    [self addObjectProperty:@&quot;URL&quot;];
+    [self addObjectProperty:@&quot;date&quot;];
+}
+@end    
+</code></pre><p>+load方法在程序运行之前会调用，不用担心在用的时候，property还未插入进去。所有的category的+load方法系统都会自动调用。也不用担心+load方法在category中被覆盖。<br><del>开始考虑过在+initialize中使用，不过由于+initialize一个class只会调用一次，多个category的时候会有覆盖。所以+load中使用是最好的选择</del></p>
+<p>你以为这样就ok了么？过几天有用户反馈说App启动的时候有点卡啊，因为+load方法是在app启动的时候调用的，里面执行的代码越多，App启动越慢，(说得有点夸张，实际这点代码影响不了什么)。<br>我们知道除了+load之外，还有一个+initialize方法，+initialize会在第一次使用这个类的时候调用，我们完全可以在+initialize中添加属性。<br>然而+initialize有个最大的问题就是，他跟普通方法一样，当有多个category实现的时候，会发生覆盖，系统只会调用一个Category中的+initialize，那该怎么办呢？</p>
+<h2 id="消除Category同名方法覆盖"><a href="#消除Category同名方法覆盖" class="headerlink" title="消除Category同名方法覆盖"></a>消除Category同名方法覆盖</h2><p>sunnyxx大神在<a href="http://blog.sunnyxx.com/2014/03/05/objc_category_secret/" target="_blank" rel="noopener">objc category的秘密</a>里介绍过，category的同名方法覆盖并不是真的其他同名方法就消失了，而是因为系统调用方法的时候根据方法名在method_list中查找方法，找到第一个名字匹配的方法之后就不继续往下找了。所以每次调用的都是method_list中最前面的同名方法。实际其他同名方法还在method_list中<br>so…我们可以根据selector查找到所有的同名method，然后调用：</p>
+<pre><code>static inline void __invoke_all_method(id self, SEL selecotr)
+{
+    //1. 根据self，获取class
+    Class class = object_getClass(self);
+
+    //2. 获取方法列表
+    uint count;
+    Method *methodList = class_copyMethodList(class, &amp;count);
+
+    //3. 遍历方法列表
+    for (int i = 0; i &lt; count; i++) {
+        Method method = methodList[i];
+        //4. 根据SEL查找方法
+        if (!sel_isEqual(selecotr, method_getName(method))) {
+            continue;
+        }
+
+        //5. 获取方法的实现
+        IMP implement = method_getImplementation(method);
+
+        //6. 直接调用方法的实现
+        ((void(*)(id,SEL))implement)(self, selecotr);
+    }
+}
+
++ (void)invokeAllClassMethodWithSelector:(SEL)selector
+{
+    __invoke_all_method(self, selector);
+}
+</code></pre><p>根据刚刚介绍的原理，我们封装了一个通过selector调用所有同名method的方法。</p>
+<ol>
+<li>根据self，获取class，如果self是实例方法的self，这里获取的是普通的class，如果self是类方法的self，这里获取的是metaClass。实例方法存放在普通class中，类方法存放在metaClass中。了解更多请看<a href="http://jiangliancheng.gitcafe.io/2014/11/01/iOS%E5%BC%80%E5%8F%91RunTime%E4%B9%8B%E5%87%BD%E6%95%B0%E8%B0%83%E7%94%A8/" target="_blank" rel="noopener">iOS开发RunTime之函数调用</a></li>
+<li>通过class_copyMethodList获取class的方法列表。如果class传的是metaClass，获取的是类方法的方法列表，如果class是普通class，获取的是实例方法的方法列表。</li>
+<li>遍历methodList</li>
+<li>根据SEL查找method</li>
+<li>获取IMP</li>
+<li>直接调用IMP</li>
+</ol>
+<p>在系统的+initialize中，我们用invokeAllClassMethodWithSelector调用自定义的+categoryInitialize。这时候，在category的+categoryInitialize中添加属性，就不怕Category覆盖了</p>
+<pre><code>@implementation Model
+
++ (void)initialize
+{
+    [self invokeAllClassMethodWithSelector:@selector(categoryInitialize)];
+}
+
+@end
+
+@implementation Model (Property1)
++ (void)categoryInitialize
+{
+    [self addBasicProperty:@&quot;point&quot; encodingType:@encode(CGPoint)];
+    [self addBasicProperty:@&quot;myRect&quot; encodingType:@encode(CGRect)];
+}
+@end
+
+@implementation Model (Property2)
++ (void)categoryInitialize
+{
+    [self addBasicProperty:@&quot;f&quot; encodingType:@encode(float)];
+    [self addBasicProperty:@&quot;a&quot; encodingType:@encode(int)];
+}
+@end
+</code></pre><p>##Extension<br>文章主要为了说明思路，很多代码没贴出来。也没考虑接口设计和不是id类型的问题。大家可以去我的github上下载完整的代码。<a href="https://github.com/lianchengjiang/LcCategoryProperty" target="_blank" rel="noopener">LcCategoryProperty</a></p>
+
+    
+  </div>
+
+</article>
+
+
+   
+  <div class="text-center donation">
+    <div class="inner-donation">
+      <span class="btn-donation">支持一下</span>
+      <div class="donation-body">
+        <div class="tip text-center">扫一扫，支持forsigner</div>
+        <ul>
+        
+          <li class="item">
+            
+              <span>微信扫一扫</span>
+            
+            <img src="/images/qr-wechat.png" alt="">
+          </li>
+        
+          <li class="item">
+            
+              <span>支付宝扫一扫</span>
+            
+            <img src="/images/qr-alipay.png" alt="">
+          </li>
+        
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+   
+  <div class="box-prev-next clearfix">
+    <a class="show pull-left" href="/2015/10/30/AVFoundation(二)：AVFoundation的核心AVAsset/">
+        <i class="icon icon-angle-left"></i>
+    </a>
+    <a class="show pull-right" href="/2015/11/29/Autolayout的第一次亲密接触/">
+        <i class="icon icon-angle-right"></i>
+    </a>
+  </div>
+
+
+
+
+
+   
+      <div class="git"></div>
+   
+</div>
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/link/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              友链
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/atom.xml"
+              rel="noopener noreferrer"
+              target="_blank"
+              >
+              RSS
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+  <section class="disqus-comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+  </section>
+
+  <script>
+    var disqus_shortname = 'forsigner';
+    
+    var disqus_url = 'http://yoursite.com/2015/11/21/刨根究底iOS—调戏Categoty/';
+    
+    (function(){
+      var dsq = document.createElement('script');
+      dsq.type = 'text/javascript';
+      dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+
+  <script id="dsq-count-scr" src="//forsigner.disqus.com/count.js" async></script>
+
+
+
+    
+    
+
+    
+    
+
+    
+
+    
+    
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>

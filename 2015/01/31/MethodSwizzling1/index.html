@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>Method Swizzling(一) | Hexo</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="forsigner,前端,设计,Hexo主题,前端开发,用户体验,设计,frontend,design,nodejs,JavaScript" />
+  
+
+  <meta name="description" content="Time Flies，好久没写博客了，最近一直在玩设计模式，而设计模式这个东西比较大，自认为还没到将他们写出来的时候，等再过一阵吧。正好这几天看了一个好玩的小东西，觉得不错，所以分享一下。 缘起相信大家都用过NSMutableDictionary的-setObject:forKey:方法，使用这个方法当object为nil时，将会崩溃。我们写代码时，每次都需要对nil进行判断，非常麻烦。而且有时候">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Method Swizzling(一)">
+<meta property="og:url" content="http://yoursite.com/2015/01/31/MethodSwizzling1/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="Time Flies，好久没写博客了，最近一直在玩设计模式，而设计模式这个东西比较大，自认为还没到将他们写出来的时候，等再过一阵吧。正好这几天看了一个好玩的小东西，觉得不错，所以分享一下。 缘起相信大家都用过NSMutableDictionary的-setObject:forKey:方法，使用这个方法当object为nil时，将会崩溃。我们写代码时，每次都需要对nil进行判断，非常麻烦。而且有时候">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://img.blog.csdn.net/20130718230259187">
+<meta property="og:image" content="http://img.blog.csdn.net/20130718230430859">
+<meta property="og:image" content="http://yoursite.com/images/swizzling_finally.jpeg">
+<meta property="og:image" content="https://developer.apple.com/library/ios/documentation/General/Conceptual/CocoaEncyclopedia/Art/cluster3.gif">
+<meta property="og:image" content="http://yoursite.com/images/Swizzling_NSDictionaryM">
+<meta property="og:updated_time" content="2015-10-31T16:10:20.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Method Swizzling(一)">
+<meta name="twitter:description" content="Time Flies，好久没写博客了，最近一直在玩设计模式，而设计模式这个东西比较大，自认为还没到将他们写出来的时候，等再过一阵吧。正好这几天看了一个好玩的小东西，觉得不错，所以分享一下。 缘起相信大家都用过NSMutableDictionary的-setObject:forKey:方法，使用这个方法当object为nil时，将会崩溃。我们写代码时，每次都需要对nil进行判断，非常麻烦。而且有时候">
+<meta name="twitter:image" content="http://img.blog.csdn.net/20130718230259187">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=c114cben" rel="stylesheet">
+
+
+  
+    <link rel="stylesheet" href="/css/personal-style.css">
+  
+
+  
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+  
+  <script type="text/javascript">
+	(function(){
+	    var bp = document.createElement('script');
+	    var curProtocol = window.location.protocol.split(':')[0];
+	    if (curProtocol === 'https') {
+	        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+	    }
+	    else {
+	        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+	    }
+	    var s = document.getElementsByTagName("script")[0];
+	    s.parentNode.insertBefore(bp, s);
+	})();
+  </script>
+
+
+
+  
+    <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+
+  
+    <link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  
+</head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">盒子</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/link/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            友链
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/atom.xml"
+            rel="noopener noreferrer"
+            target="_blank"
+            >
+            RSS
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#缘起"><span class="toc-text">缘起</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-Override"><span class="toc-text">1.Override</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-Category"><span class="toc-text">2.Category</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-Swizzling"><span class="toc-text">3.Swizzling</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#But……"><span class="toc-text">But……</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#So……"><span class="toc-text">So……</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Danger"><span class="toc-text">Danger</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#参考："><span class="toc-text">参考：</span></a></li></ol></li></ol></li></ol>
+  </div>
+
+
+
+<div class="content content-post CENTER">
+   <article id="post-MethodSwizzling1" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">Method Swizzling(一)</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2015.01.31</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>John Doe</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/刨根究底iOS/">刨根究底iOS</a>
+  </span>
+
+
+
+      
+        <span>
+          <i class="icon-comment"></i>
+          <a href="http://www.forsigner.com/2015/01/31/MethodSwizzling1/#disqus_thread"></a>
+        </span>
+      
+
+      
+      <i class="fa fa-eye"></i> 
+        <span id="busuanzi_container_page_pv">
+           &nbsp热度 <span id="busuanzi_value_page_pv">
+           <i class="fa fa-spinner fa-spin"></i></span>℃
+        </span>
+      
+      
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <p>Time Flies，好久没写博客了，最近一直在玩设计模式，而设计模式这个东西比较大，自认为还没到将他们写出来的时候，等再过一阵吧。正好这几天看了一个好玩的小东西，觉得不错，所以分享一下。</p>
+<h2 id="缘起"><a href="#缘起" class="headerlink" title="缘起"></a>缘起</h2><p>相信大家都用过NSMutableDictionary的-setObject:forKey:方法，使用这个方法当object为nil时，将会崩溃。我们写代码时，每次都需要对nil进行判断，非常麻烦。而且有时候忘了对nil进行判断，很可能就bug留到上线。上线App中经常会遇到这种崩溃</p>
+<p>这时候就想用一个方法，替代-setObject:forKey:，当obj为非nil时正常使用-setObject:forKey:，为nil时不执行任何操作。</p>
+<p>对于改变一个方法的实现，有三种方案：override，caregory，swizzling</p>
+<h2 id="1-Override"><a href="#1-Override" class="headerlink" title="1.Override"></a>1.Override</h2><p>重写是改变一个方法实现的最普遍的用法，首先创建一个CustomDictionary继承于NSMutableDictionary，然后重写-setObject:forKey:，在使用的时候我们使用CustomDictionary.    </p>
+<p>这样虽然能达到目的，但也非常麻烦，首先我们必须创建一个新的类继承于NSMutableDictionary，并对所有使用NSMutableDictionary的老代码，都得进行修改。如果团队来了新人，必须得叮嘱他不能使用NSMutableDictionary，而要用CustomDictionary……</p>
+<p>my god,这也太麻烦了，pass~</p>
+<h2 id="2-Category"><a href="#2-Category" class="headerlink" title="2.Category"></a>2.Category</h2><p>category是OC中非常棒的东西，传说其他语言都没有，那么让我们看看使用category怎么样？<br>首先category中的这个方法不能跟-setObject:forKey:重名，不然我们就没法调用系统的这个-setObject:forKey:了，所以我们命名为-safeSetObject:forKey:，在这个方法中对-setObject:forKey进行重写。</p>
+<p>这个方案比重写好一些，至少我们不需要创建新的类，并且也完全能达到目的，不过对于老代码的修改，和对新人的嘱咐还是必不可少……</p>
+<p>其实我们还有更完美的方案</p>
+<h2 id="3-Swizzling"><a href="#3-Swizzling" class="headerlink" title="3.Swizzling"></a>3.Swizzling</h2><p>iOS中Method Swizzling不太常见，让我们来详细看看什么是Method Swizzling。</p>
+<p>一个方法分为2部分：方法名和方法实现，也即是SEL和IMP。一般情况每个方法都会有固定的SEL和IMP，不可分割。</p>
+<p>每个类里面都有一个方法列表，存放着SEL和IMP的映射关系（<a href="http://blog.csdn.net/yiyaaixuexi/article/details/9374411" target="_blank" rel="noopener">图片来源</a>）：</p>
+<p><img src="http://img.blog.csdn.net/20130718230259187" alt="图片"></p>
+<p>Method Swizzling就是将其中2个方法的SEL和IMP对换一下(<a href="http://blog.csdn.net/yiyaaixuexi/article/details/9374411" target="_blank" rel="noopener">图片来源</a>):<br><img src="http://img.blog.csdn.net/20130718230430859" alt="图片"><br>让本来调用selectorC的方法，去执行selectorN的实现。</p>
+<p>下面我们来看一下要实现Method Swizzling，到底要做些什么？<br>首先需要创建一个NSMutableDictionary的category，将用来替换-setObject:forKey:的方法写进去：</p>
+<pre><code>@implementation NSMutableDictionary(Override)
+
+- (void)overrideSetObject:(id)anObject forKey:(id &lt;NSCopying&gt;)aKey;
+{
+    if (anObject) {
+        /** 注意：必须调用自己的方法名 */
+        [self overrideSetObject:anObject forKey:aKey]; 
+    }
+}
+
+@end
+</code></pre><p>大家看到这肯定会非常惊讶，在-overrideSetObject:forKey:方法中竟然调用了自己的方法名，这不是死循环了么？</p>
+<p>不要忘了，这个方法是会Swizzling的，也就是说方法内部调用的这个方法名，会指向系统的实现。这里没看明白的朋友，可以跳过，后面我会详细给大家说清楚</p>
+<p>方法有了，现在我们该Swizzling了。</p>
+<p>首先要注意的是，Swizzling必须要在执行方法之前，不然方法都执行完了，再Swizzling就没意义了，其次需要看看要不要考虑多线程的问题。</p>
+<p>一般情况下，Swizzling的代码我们都放在+load方法中，因为+load方法是在启动时执行的（-application:didFinishLaunchingWithOptions:之前），肯定会在使用之前。并且也不用考虑多线程。</p>
+<pre><code>void methodSwizzling(Class class,SEL originSel,SEL overrideSel)
+{
+    Method originMethod = class_getInstanceMethod(class, originSel);
+    Method overrideMethod = class_getInstanceMethod(class, overrideSel);
+
+    if (class_addMethod(class,
+                        originSel,
+                        method_getImplementation(overrideMethod),
+                        method_getTypeEncoding(originMethod)))
+    {
+        /** case1:NSMutableDictionary中没有-setObject:forKey:的实现 */
+        class_replaceMethod(class,
+                            overrideSel,
+                            method_getImplementation(originMethod),
+                            method_getTypeEncoding(originMethod));
+    }else{
+        /** case2:NSMutableDictionary中有-setObject:forKey:的实现   */
+        method_exchangeImplementations(originMethod, overrideMethod);
+    }
+
+}
+
++ (void)load
+{
+    /** 获取SEL和Method */
+    SEL originSel = @selector(setObject:forKey:);
+    SEL overrideSel = @selector(overrideSetObject:forKey:);
+
+    methodSwizzling([self class], originSel, overrideSel);
+}
+</code></pre><p>对于Swizzling的实现，我们需要分2种case来处理：</p>
+<p>case1:NSMutableDictionary中没有-setObject:forKey:的实现，也许-setObject:forKey:是NSMutableDictionary的父类实现的，我们没有源代码，任何情况都可能发生。这种case下。我们需要在NSMutableDictionary中插入-setObject:forKey:方法，再替换他们的IMP部分</p>
+<p>case2:NSMutableDictionary中已经存在-setObject:forKey:的实现了，这时候我们就只需要直接替换他们的IMP就ok了</p>
+<p>那么怎么知道NSMutableDictionary中是否已经存在-setObject:forKey:了呢？很简单。使用class_addMethod()方法将-setObject:forKey:插入其中，若原来Class未实现，则会插入成功，返回YES，否则返回NO。具体的替换操作的方法我就不详细解释了，大家看名字也应该能看明白。</p>
+<p>有人可能会问，为什么要考虑case1这种情况呢？直接全部使用case2不行么？答案是不行！因为class_getInstanceMethod()会查找父类，若原Class未实现，则会替换掉了父类的方法。这并不是我们想要的。</p>
+<blockquote>
+<p>这里替换掉父类的方法也许影响不大，不过为了保险起见，我们最好还是只替换掉所需Class的方法</p>
+</blockquote>
+<p><img src="/images/swizzling_finally.jpeg" alt=""><br>这是Swizzling之后的流程图：</p>
+<ol>
+<li>外部调用-setObject:forKey:的SEL，会跳转到-overrideSetObject:forKey:的IMP</li>
+<li>在-overrideSetObject:forKey:的IMP中我们会调用-overrideSetObject:forKey:的SEL</li>
+<li>-overrideSetObject:forKey:的SEL对应着-setObject:forKey:的IMP</li>
+</ol>
+<p>这时候大家应该明白了前面提到的问题：为什么-overrideSetObject:forKey:的实现中会调用自己了吧？</p>
+<h2 id="But……"><a href="#But……" class="headerlink" title="But……"></a>But……</h2><p>事情还没完，当我用上面的代码准备Swizzling的时候，结果发现Swizzling无效……<br>原来对于NSDictionary来说，使用的是Class Cluster(类族)。</p>
+<blockquote>
+<p>Class clusters are a design pattern that the Foundation framework makes extensive use of. Class clusters group a number of private concrete subclasses under a public abstract superclass. The grouping of classes in this way simplifies the publicly visible architecture of an object-oriented framework without reducing its functional richness. Class clusters are based on the Abstract Factory design pattern.                ———Apple document</p>
+</blockquote>
+<p>简单的说，类族是一种类似抽象工厂的设计模式。对外暴露是一个抽象的类，实际使用是这个抽象类的子类，如图所示，对于Number，在alloc的时候我们生成的其实是Number的子类，例如char，子类中实现了Number抽象类的方法。我们调用Number的方法，实际真正runtime的时候，其实调用的是char的方法</p>
+<p><img src="https://developer.apple.com/library/ios/documentation/General/Conceptual/CocoaEncyclopedia/Art/cluster3.gif" alt=""></p>
+<p>NSDictionary也是使用类族的模式，NSDictionary实际是一个抽象类，实际生成之后是NSDictionary的子类__NSDictionaryM</p>
+<p><img src="/images/Swizzling_NSDictionaryM" alt=""></p>
+<p>所以我们对NSDictionary做Swizzling是无效的，我们真正需要的是对__NSDictionaryM做Swizzling，所以需要对Class进行修改，使用new先生成一个对象，再获取他的Class</p>
+<pre><code>methodSwizzling([[self new] class], originSel, overrideSel);
+</code></pre><h2 id="So……"><a href="#So……" class="headerlink" title="So……"></a>So……</h2><p>完整代码如下所示：</p>
+<pre><code>@implementation NSMutableDictionary(Swizzling)
+
+void methodSwizzling(Class class,SEL originSel,SEL overrideSel)
+{
+    Method originMethod = class_getInstanceMethod(class, originSel);
+    Method overrideMethod = class_getInstanceMethod(class, overrideSel);
+
+    if (class_addMethod(class,
+                        originSel,
+                        method_getImplementation(overrideMethod),
+                        method_getTypeEncoding(originMethod)))
+    {
+        /** case1:NSMutableDictionary中没有-setObject:forKey:的实现 */
+        class_replaceMethod(class,
+                            overrideSel,
+                            method_getImplementation(originMethod),
+                            method_getTypeEncoding(originMethod));
+    }else{
+        /** case2:NSMutableDictionary中有-setObject:forKey:的实现   */
+        method_exchangeImplementations(originMethod, overrideMethod);
+    }
+
+}
+
++ (void)load
+{
+    /** 获取SEL和Method */
+    SEL originSel = @selector(setObject:forKey:);
+    SEL overrideSel = @selector(overrideSetObject:forKey:);
+
+    methodSwizzling([[self new] class], originSel, overrideSel);
+}
+
+- (void)overrideSetObject:(id)anObject forKey:(id &lt;NSCopying&gt;)aKey;
+{
+    if (anObject) {
+        /** 注意：必须调用自己的方法名 */
+        [self overrideSetObject:anObject forKey:aKey];
+    }
+}
+
+@end
+</code></pre><h2 id="Danger"><a href="#Danger" class="headerlink" title="Danger"></a>Danger</h2><p>虽然Swizzling完成了，但是由于NSDictionary是类族，我们不能确保所有生成的NSDictionary都是<strong>NSDictionaryM，也许还有其他的类，或者在某一次升级系统之后苹果为了优化某个东西添加了另一个NSDictionary的子类，在用某种方法生成NSDictionary的时候，用的就是这个子类，而不是</strong>NSDictionaryM。虽然这种概率不大，但是这样的风险还是有的，所以最终项目中没有使用Swizzling对-setObject:forKey:进行替换，而是使用-setValue:forKey:</p>
+<blockquote>
+<p>Send -setObject:forKey: to the receiver, unless the value is nil, in which case send -removeObject:forKey:.<br>    ———Apple Document</p>
+</blockquote>
+<p>虽然这里没有使用method Swizzling，但是不可否认，method Swizzling是一个非常强大的工具</p>
+<h4 id="参考："><a href="#参考：" class="headerlink" title="参考："></a>参考：</h4><p><a href="https://www.mikeash.com/pyblog/friday-qa-2010-01-29-method-replacement-for-fun-and-profit.html" target="_blank" rel="noopener">Method Replacement for Fun and Profit</a></p>
+<p><a href="http://blog.csdn.net/yiyaaixuexi/article/details/9374411" target="_blank" rel="noopener">Objective-C的hook方案（一）:  Method Swizzling</a></p>
+
+    
+  </div>
+
+</article>
+
+
+   
+  <div class="text-center donation">
+    <div class="inner-donation">
+      <span class="btn-donation">支持一下</span>
+      <div class="donation-body">
+        <div class="tip text-center">扫一扫，支持forsigner</div>
+        <ul>
+        
+          <li class="item">
+            
+              <span>微信扫一扫</span>
+            
+            <img src="/images/qr-wechat.png" alt="">
+          </li>
+        
+          <li class="item">
+            
+              <span>支付宝扫一扫</span>
+            
+            <img src="/images/qr-alipay.png" alt="">
+          </li>
+        
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+   
+  <div class="box-prev-next clearfix">
+    <a class="show pull-left" href="/2015/01/01/JSONModel的使用/">
+        <i class="icon icon-angle-left"></i>
+    </a>
+    <a class="show pull-right" href="/2015/02/25/MethodSwizzling2/">
+        <i class="icon icon-angle-right"></i>
+    </a>
+  </div>
+
+
+
+
+
+   
+      <div class="git"></div>
+   
+</div>
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/link/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              友链
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/atom.xml"
+              rel="noopener noreferrer"
+              target="_blank"
+              >
+              RSS
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+  <section class="disqus-comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+  </section>
+
+  <script>
+    var disqus_shortname = 'forsigner';
+    
+    var disqus_url = 'http://yoursite.com/2015/01/31/MethodSwizzling1/';
+    
+    (function(){
+      var dsq = document.createElement('script');
+      dsq.type = 'text/javascript';
+      dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+
+  <script id="dsq-count-scr" src="//forsigner.disqus.com/count.js" async></script>
+
+
+
+    
+    
+
+    
+    
+
+    
+
+    
+    
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>

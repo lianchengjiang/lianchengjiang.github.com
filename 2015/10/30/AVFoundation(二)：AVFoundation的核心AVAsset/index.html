@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>AVFoundation(二)：核心AVAsset | Hexo</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="forsigner,前端,设计,Hexo主题,前端开发,用户体验,设计,frontend,design,nodejs,JavaScript" />
+  
+
+  <meta name="description" content="AVFoundation是一个对多媒体操作的库。多媒体一般以文件或者流的形式存在，显而易见，直接对多媒体进行操作并不是一件愉快的事，这需要我们了解很多底层多媒体方面的知识。AVFoundation为我们提供了一个多媒体的载体类：AVAsset，在AVAsset中有着统一并且友好的接口，我们不需要了解太多多媒体的知识（当然还是需要了解一些的），就能对其进行操作。 基本属性我们将描述视频基本信息的属性">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AVFoundation(二)：核心AVAsset">
+<meta property="og:url" content="http://yoursite.com/2015/10/30/AVFoundation(二)：AVFoundation的核心AVAsset/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="AVFoundation是一个对多媒体操作的库。多媒体一般以文件或者流的形式存在，显而易见，直接对多媒体进行操作并不是一件愉快的事，这需要我们了解很多底层多媒体方面的知识。AVFoundation为我们提供了一个多媒体的载体类：AVAsset，在AVAsset中有着统一并且友好的接口，我们不需要了解太多多媒体的知识（当然还是需要了解一些的），就能对其进行操作。 基本属性我们将描述视频基本信息的属性">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://jiangliancheng.gitcafe.io/images/AVFoundation/atom_mvhd.png">
+<meta property="og:image" content="http://jiangliancheng.gitcafe.io/images/AVFoundation/atom_track.png">
+<meta property="og:image" content="http://jiangliancheng.gitcafe.io/images/AVFoundation/atom2.png">
+<meta property="og:updated_time" content="2015-12-09T05:18:50.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="AVFoundation(二)：核心AVAsset">
+<meta name="twitter:description" content="AVFoundation是一个对多媒体操作的库。多媒体一般以文件或者流的形式存在，显而易见，直接对多媒体进行操作并不是一件愉快的事，这需要我们了解很多底层多媒体方面的知识。AVFoundation为我们提供了一个多媒体的载体类：AVAsset，在AVAsset中有着统一并且友好的接口，我们不需要了解太多多媒体的知识（当然还是需要了解一些的），就能对其进行操作。 基本属性我们将描述视频基本信息的属性">
+<meta name="twitter:image" content="http://jiangliancheng.gitcafe.io/images/AVFoundation/atom_mvhd.png">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=c114cben" rel="stylesheet">
+
+
+  
+    <link rel="stylesheet" href="/css/personal-style.css">
+  
+
+  
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+  
+  <script type="text/javascript">
+	(function(){
+	    var bp = document.createElement('script');
+	    var curProtocol = window.location.protocol.split(':')[0];
+	    if (curProtocol === 'https') {
+	        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+	    }
+	    else {
+	        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+	    }
+	    var s = document.getElementsByTagName("script")[0];
+	    s.parentNode.insertBefore(bp, s);
+	})();
+  </script>
+
+
+
+  
+    <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+
+  
+    <link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  
+</head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">盒子</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/link/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            友链
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/atom.xml"
+            rel="noopener noreferrer"
+            target="_blank"
+            >
+            RSS
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#基本属性"><span class="toc-text">基本属性</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#AVAssetTrack"><span class="toc-text">AVAssetTrack</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#元数据"><span class="toc-text">元数据</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#章节元数据"><span class="toc-text">章节元数据</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#媒体选择"><span class="toc-text">媒体选择</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#懒惰加载"><span class="toc-text">懒惰加载</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#End"><span class="toc-text">End</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Reference"><span class="toc-text">Reference</span></a></li></ol>
+  </div>
+
+
+
+<div class="content content-post CENTER">
+   <article id="post-AVFoundation(二)：AVFoundation的核心AVAsset" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">AVFoundation(二)：核心AVAsset</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2015.10.30</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>John Doe</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/AVFoundation/">AVFoundation</a>
+  </span>
+
+
+
+      
+        <span>
+          <i class="icon-comment"></i>
+          <a href="http://www.forsigner.com/2015/10/30/AVFoundation(二)：AVFoundation的核心AVAsset/#disqus_thread"></a>
+        </span>
+      
+
+      
+      <i class="fa fa-eye"></i> 
+        <span id="busuanzi_container_page_pv">
+           &nbsp热度 <span id="busuanzi_value_page_pv">
+           <i class="fa fa-spinner fa-spin"></i></span>℃
+        </span>
+      
+      
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <p>AVFoundation是一个对多媒体操作的库。多媒体一般以文件或者流的形式存在，显而易见，直接对多媒体进行操作并不是一件愉快的事，这需要我们了解很多底层多媒体方面的知识。AVFoundation为我们提供了一个多媒体的载体类：AVAsset，在AVAsset中有着统一并且友好的接口，我们不需要了解太多多媒体的知识（当然还是需要了解一些的），就能对其进行操作。</p>
+<h2 id="基本属性"><a href="#基本属性" class="headerlink" title="基本属性"></a>基本属性</h2><p>我们将描述视频基本信息的属性称为基本属性。AVAsset的属性从根本上来说是多媒体文件(如视频文件)的属性，我们先来看看多媒体文件中有哪些属性。用十六进制编辑器打开一个视频文件是最完整的查看视频中信息的方法，不过这样并不利于我们的阅读，因为数据太多了。apple提供了一个很好的查看视频信息的工具<a href="http://adcdownload.apple.com/QuickTime/atom_inspector/atom_inspector.dmg" target="_blank" rel="noopener">Atom Inspector</a>，它会将十六进制的数据归类，并提取出其中有用的信息，即有利于查阅信息，也可以很方便的查看视频完整的16进制，了解视频的结构。<br>用Atom Inspector打开一个<a href="http://movies.apple.com/media/us/iphone/2010/tours/apple-iphone4-design_video-us-20100607_848x480.mov" target="_blank" rel="noopener">视频文件</a>。<br><img src="http://jiangliancheng.gitcafe.io/images/AVFoundation/atom_mvhd.png" alt=""><br>我们可以看到在moov的目录下有一个mvhd，mvhd也称为movie header，它是整个视频的描述部分，里面包含着视频的基本信息，如时长，创建时间等。这些信息就是视频文件的基本属性，他们对应到AVAsset中有：</p>
+<pre><code>//    Indicates the duration of the asset. If @&quot;providesPreciseDurationAndTiming&quot; is NO, a best-available estimate of the duration is returned. The degree of precision preferred for timing-related properties can be set at initialization time for assets initialized with URLs. See AVURLAssetPreferPreciseDurationAndTimingKey for AVURLAsset below.
+@property (nonatomic, readonly) CMTime duration;
+
+//    indicates the natural rate at which the asset is to be played; often but not always 1.0
+@property (nonatomic, readonly) float preferredRate;
+
+//    indicates the preferred volume at which the audible media of an asset is to be played; often but not always 1.0
+@property (nonatomic, readonly) float preferredVolume;
+
+// Indicates the creation date of the asset as an AVMetadataItem. May be nil. If a creation date has been stored by the asset in a form that can be converted to an NSDate, the dateValue property of the AVMetadataItem will provide an instance of NSDate. Otherwise the creation date is available only as a string value, via -[AVMetadataItem stringValue].
+@property (nonatomic, readonly, nullable) AVMetadataItem *creationDate NS_AVAILABLE(10_8, 5_0);
+</code></pre><p>首先<code>duration</code>属性是CMTime类型，CMTime是一个结构体</p>
+<pre><code>typedef struct
+{
+    CMTimeValue    value;        // @field value The value of the CMTime. value/timescale = seconds.
+    CMTimeScale    timescale;    // @field timescale The timescale of the CMTime. value/timescale = seconds. 
+    CMTimeFlags    flags;        // @field flags The flags, eg. kCMTimeFlags_Valid, kCMTimeFlags_PositiveInfinity, etc. 
+    CMTimeEpoch    epoch;        // @field epoch Differentiates between equal timestamps that are actually different because of looping, multi-item sequencing, etc. Will be used during comparison: greater epochs happen after lesser ones. Additions/subtraction is only possible within a single epoch, however, since epoch length may be unknown/variable.
+} CMTime;
+</code></pre><p>它既包含了value，又包含了timescale，所以<code>duration</code>属性由视频中的duration和timescale共同组成。</p>
+<blockquote>
+<p>一般QuickTime和MPEG-4格式的mvhd中都有duration和timescale字段。不过其他格式可能不存在这2个字段，这时duration的值就需要通过计算才能得出。<br>如果创建AVURLAsset时传入的<code>AVURLAssetPreferPreciseDurationAndTimingKey</code>值为NO(不传默认为NO)，duration会取一个估计值，计算量比较小。反之如果为YES，duration需要返回一个精确值，计算量会比较大，耗时比较长。</p>
+</blockquote>
+<p><code>preferredRate</code>和<code>preferredVolume</code>属性分别表示视频默认的速度和音量，这两个属性直接从mvhd中取出来即可，一般情况下，他们的都是1。<br><code>creationDate</code>属性表示视频的创建时间，对应着mvhd中的created。如果mvhd中没有创建时间，creationDate会返回nil。</p>
+<h2 id="AVAssetTrack"><a href="#AVAssetTrack" class="headerlink" title="AVAssetTrack"></a>AVAssetTrack</h2><p>在mvhd下面，我们可以看到有3个轨道(track)，一般的视频至少有2个轨道，一个播放声音，一个播放画面。AVFoundation中有一个专门的类承载多媒体中的track：AVAssetTrack。<br>打开Atom Inspector中的track，我们可以看到，track中有一个tkhd(track header)，其中包含了track的基本信息:<br><img src="http://jiangliancheng.gitcafe.io/images/AVFoundation/atom_track.png" alt=""><br>跟mvhd类似，tkhd中包含了duration,rate,volume,created，除此之外，tkhd中还有一个很重要的字段：track id，这是视频中track的唯一标示符。在AVAsset中，可以通过trackId，获得特定的track</p>
+<pre><code>/*    Provides an instance of AVAssetTrack that represents the track of the specified trackID.    */
+- (nullable AVAssetTrack *)trackWithTrackID:(CMPersistentTrackID)trackID;
+</code></pre><p>除了通过trackID获得track之外，AVAsset中还提供了其他3中方式获得track</p>
+<pre><code>//    Provides the array of AVAssetTracks contained by the asset
+@property (nonatomic, readonly) NSArray&lt;AVAssetTrack *&gt; *tracks;
+
+//    Provides an array of AVAssetTracks of the asset that present media of the specified media type.
+- (NSArray&lt;AVAssetTrack *&gt; *)tracksWithMediaType:(NSString *)mediaType;
+
+//    Provides an array of AVAssetTracks of the asset that present media with the specified characteristic.
+- (NSArray&lt;AVAssetTrack *&gt; *)tracksWithMediaCharacteristic:(NSString *)mediaCharacteristic;
+</code></pre><p><code>tracks</code>中包含了当前Asset中的所有track，通过遍历我们可以获得想要的track.<br><code>-tracksWithMediaType:</code>方法会根据指定的媒体类型返回一个track数组，数组中包含着Asset中所有指定媒体类型的track。如果Asset中没有这个媒体类型的track，返回一个空数组。AVMediaFormat中一共定义了8种媒体类型:</p>
+<pre><code>AVF_EXPORT NSString *const AVMediaTypeVideo                 NS_AVAILABLE(10_7, 4_0);
+AVF_EXPORT NSString *const AVMediaTypeAudio                 NS_AVAILABLE(10_7, 4_0);
+AVF_EXPORT NSString *const AVMediaTypeText                  NS_AVAILABLE(10_7, 4_0);
+AVF_EXPORT NSString *const AVMediaTypeClosedCaption         NS_AVAILABLE(10_7, 4_0);
+AVF_EXPORT NSString *const AVMediaTypeSubtitle              NS_AVAILABLE(10_7, 4_0);
+AVF_EXPORT NSString *const AVMediaTypeTimecode              NS_AVAILABLE(10_7, 4_0);
+AVF_EXPORT NSString *const AVMediaTypeMetadata              NS_AVAILABLE(10_8, 6_0);
+AVF_EXPORT NSString *const AVMediaTypeMuxed                 NS_AVAILABLE(10_7, 4_0);
+</code></pre><p><code>-tracksWithMediaCharacteristic:</code>方法会根据指定的媒体特征返回track数组，数组的特性与-tracksWithMediaType:类似，如果Asset中没有这个媒体特征的track，返回一个空数组。AVMediaFormat中一共定义了15种媒体特征:</p>
+<pre><code>AVF_EXPORT NSString *const AVMediaTypeMetadataObject NS_AVAILABLE_IOS(9_0);
+AVF_EXPORT NSString *const AVMediaCharacteristicVisual      NS_AVAILABLE(10_7, 4_0);
+AVF_EXPORT NSString *const AVMediaCharacteristicAudible     NS_AVAILABLE(10_7, 4_0);
+AVF_EXPORT NSString *const AVMediaCharacteristicLegible     NS_AVAILABLE(10_7, 4_0);
+AVF_EXPORT NSString *const AVMediaCharacteristicFrameBased  NS_AVAILABLE(10_7, 4_0);
+AVF_EXPORT NSString *const AVMediaCharacteristicIsMainProgramContent NS_AVAILABLE(10_8, 5_0);
+AVF_EXPORT NSString *const AVMediaCharacteristicIsAuxiliaryContent NS_AVAILABLE(10_8, 5_0);
+AVF_EXPORT NSString *const AVMediaCharacteristicContainsOnlyForcedSubtitles NS_AVAILABLE(10_8, 5_0);
+AVF_EXPORT NSString *const AVMediaCharacteristicTranscribesSpokenDialogForAccessibility NS_AVAILABLE(10_8, 5_0);
+AVF_EXPORT NSString *const AVMediaCharacteristicDescribesMusicAndSoundForAccessibility NS_AVAILABLE(10_8, 5_0);
+AVF_EXPORT NSString *const AVMediaCharacteristicEasyToRead NS_AVAILABLE(10_8, 6_0);
+AVF_EXPORT NSString *const AVMediaCharacteristicDescribesVideoForAccessibility NS_AVAILABLE(10_8, 5_0);
+AVF_EXPORT NSString *const AVMediaCharacteristicLanguageTranslation NS_AVAILABLE(10_11, 9_0);
+AVF_EXPORT NSString *const AVMediaCharacteristicDubbedTranslation NS_AVAILABLE(10_11, 9_0);
+AVF_EXPORT NSString *const AVMediaCharacteristicVoiceOverTranslation NS_AVAILABLE(10_11, 9_0);    
+</code></pre><h2 id="元数据"><a href="#元数据" class="headerlink" title="元数据"></a>元数据</h2><p>再往下看有一个meta(meta data)和udta(user data)，里面都保存着视频的元数据，不过由于这个视频没有元数据，可能是因为国内正版视频不好找的原因，我找了几个其他的视频也没找到元数据。所以暂且使用<a href="http://item.jd.com/11742630.html" target="_blank" rel="noopener">AV Foundation开发秘籍</a>中的图片。<br>用Atom Inspector打开《超人总动员》mov格式的视频，可以看到视频的结构：<br><img src="http://jiangliancheng.gitcafe.io/images/AVFoundation/atom2.png" alt=""><br>在udta中我们可以看到版权(@cpy)持有者为Pixar公司，导演(@dir)是Brad Bird，另外在meta-&gt;ilst中电影的名字是the Incredibles，年份是2006年，类型是Kids &amp; Family。这些数据都会存放在AVAsset的metadata中</p>
+<pre><code>/*     Provides access to an array of AVMetadataItems for each common metadata key for which a value is available; items can be filtered according to language via +[AVMetadataItem metadataItemsFromArray:filteredAndSortedAccordingToPreferredLanguages:] and according to identifier via +[AVMetadataItem metadataItemsFromArray:filteredByIdentifier:].        */
+@property (nonatomic, readonly) NSArray&lt;AVMetadataItem *&gt; *commonMetadata;
+
+//     Provides access to an array of AVMetadataItems for all metadata identifiers for which a value is available; items can be filtered according to language via +[AVMetadataItem metadataItemsFromArray:filteredAndSortedAccordingToPreferredLanguages:] and according to identifier via +[AVMetadataItem metadataItemsFromArray:filteredByIdentifier:].
+@property (nonatomic, readonly) NSArray&lt;AVMetadataItem *&gt; *metadata NS_AVAILABLE(10_10, 8_0);
+
+//     Provides an NSArray of NSStrings, each representing a metadata format that&apos;s available to the asset (e.g. ID3, iTunes metadata, etc.). Metadata formats are defined in AVMetadataFormat.h.
+@property (nonatomic, readonly) NSArray&lt;NSString *&gt; *availableMetadataFormats;
+</code></pre><p><code>commonMetadata</code>属性中包含着当前视频常见格式类型的元数据<br><code>metadata</code>属性中包含当前视频所有格式类型的元数据<br><code>availableMetadataFormats</code>属性中包含当前视频所有可用元数据的格式类型<br>元数据的格式类型在AVMetadataFormat中定义了很多种，常见的有title、creator、subject、publisher等</p>
+<pre><code>// Metadata common keys
+AVF_EXPORT NSString *const AVMetadataCommonKeyTitle                                      NS_AVAILABLE(10_7, 4_0);
+AVF_EXPORT NSString *const AVMetadataCommonKeyCreator                                    NS_AVAILABLE(10_7, 4_0);
+AVF_EXPORT NSString *const AVMetadataCommonKeySubject                                    NS_AVAILABLE(10_7, 4_0);
+AVF_EXPORT NSString *const AVMetadataCommonKeyPublisher                                  NS_AVAILABLE(10_7, 4_0);
+</code></pre><blockquote>
+<p>以上只是部分format，要了解更多，可以在<a href="https://developer.apple.com/library/prerelease/mac/documentation/AVFoundation/Reference/AVFoundationMetadataKeyReference/#//apple_ref/doc/constant_group/Common_Metadata_Keys" target="_blank" rel="noopener">apple文档</a>中查阅</p>
+</blockquote>
+<p>有了metadataFormat，apple提供了通过fromat获取特定格式类型元数据的方法：</p>
+<pre><code>- (NSArray&lt;AVMetadataItem *&gt; *)metadataForFormat:(NSString *)format;
+</code></pre><h2 id="章节元数据"><a href="#章节元数据" class="headerlink" title="章节元数据"></a>章节元数据</h2><p>Asset中有一种特殊的元数据:章节。它是<code>AVTimedMetadataGroup</code>类型，这种类型表示一个只在特定时间段有效的元数据集合，也就是说章节中所包含的元数据只在当前章节的时间段有效。AVAsset中有3个章节相关的API：</p>
+<pre><code>//    The locales available for chapters in the asset.
+@property (readonly) NSArray&lt;NSLocale *&gt; *availableChapterLocales NS_AVAILABLE(10_7, 4_3);
+
+//    Returns an array of chapters with a given title locale and containing specified keys.
+- (NSArray&lt;AVTimedMetadataGroup *&gt; *)chapterMetadataGroupsWithTitleLocale:(NSLocale *)locale containingItemsWithCommonKeys:(nullable NSArray&lt;NSString *&gt; *)commonKeys NS_AVAILABLE(10_7, 4_3);
+
+//    Returns an array of chapters whose locale best matches the the list of preferred languages.
+- (NSArray&lt;AVTimedMetadataGroup *&gt; *)chapterMetadataGroupsBestMatchingPreferredLanguages:(NSArray&lt;NSString *&gt; *)preferredLanguages NS_AVAILABLE(10_8, 6_0);
+</code></pre><p><code>availableChapterLocales</code>属性表示当前Asset中可用的章节Locale(感觉翻译成地域或者区域在这里都很别扭,所以还是用英文)。数组类型，里面包含NSLocale对象<br><code>-chapterMetadataGroupsWithTitleLocale:containingItemsWithCommonKeys:</code>方法通过locale和元数据的commonkey筛选出特定的元数据，这些元数据只在当前章节的时间段有效。<br><code>-chapterMetadataGroupsBestMatchingPreferredLanguages:</code>方法通过指定一种语言，返回一个章节元数据数组。数组中越匹配指定语言的元数据，位置越靠前。</p>
+<h2 id="媒体选择"><a href="#媒体选择" class="headerlink" title="媒体选择"></a>媒体选择</h2><p>一个多媒体文件中相同的媒体特征的东西可能会有很多，比如一个视频中可能会有2种字幕。对于类似选择哪个字幕的问题，Asset提供了3个API：</p>
+<pre><code>//    Provides an NSArray of NSStrings, each NSString indicating a media characteristic for which a media selection option is available.
+@property (nonatomic, readonly) NSArray&lt;NSString *&gt; *availableMediaCharacteristicsWithMediaSelectionOptions NS_AVAILABLE(10_8, 5_0);
+
+//    Provides an instance of AVMediaSelectionGroup that contains one or more options with the specified media characteristic.
+- (nullable AVMediaSelectionGroup *)mediaSelectionGroupForMediaCharacteristic:(NSString *)mediaCharacteristic NS_AVAILABLE(10_8, 5_0);
+
+//    Provides an instance of AVMediaSelection with default selections for each of the receiver&apos;s media selection groups.
+@property (nonatomic, readonly) AVMediaSelection *preferredMediaSelection NS_AVAILABLE(10_11, 9_0);
+</code></pre><p><code>availableMediaCharacteristicsWithMediaSelectionOptions</code>属性表示当前asset中有效的媒体特征选项。数组类型，里面包含着代表相应媒体特征的string.<br><code>-mediaSelectionGroupForMediaCharacteristic:</code>方法通过传入一个媒体特征类型，返回可供选择的媒体选项集合。例如传入字幕的媒体特征类型，返回当前Asset的可供选择的字幕选项集合。<br><code>preferredMediaSelection</code>属性是AVMediaSelection类型，他的作用是主要是为各个媒体选项集合提供默认选项。<br>这里的属性都不是直接的基本属性，可能不是那么容易理解。下面举个简单的例子，以便于理解。打印出当前Asset中默认的媒体选项。</p>
+<pre><code>for (NSString *characteristic in asset.availableMediaCharacteristicsWithMediaSelectionOptions) {
+        AVMediaSelectionGroup *group = [asset mediaSelectionGroupForMediaCharacteristic:characteristic];
+        AVMediaSelectionOption *option = [asset.preferredMediaSelection selectedMediaOptionInMediaSelectionGroup:group];
+        NSLog(@&quot;对应媒体特征%@的默认媒体选项是%@&quot;,characteristic,option);
+    }
+</code></pre><h2 id="懒惰加载"><a href="#懒惰加载" class="headerlink" title="懒惰加载"></a>懒惰加载</h2><p>由于多媒体文件一般比较大，获取或计算出Asset中的属性非常耗时，apple对Asset的属性采用了懒惰加载模式。在创建AVAsset的时候，只生成一个实例，并不初始化属性。只有当第一次访问属性时，系统才会根据多媒体中的数据初始化这个属性。<br>由于不用同时加载所有属性，耗时问题得到了一定缓解。但是属性加载在计算量比较大的时候仍旧可能会阻塞线程。为了解决这个问题，AVFoundation提供了AVAsynchronousKeyValueLoading协议，可以异步加载属性：</p>
+<pre><code>@protocol AVAsynchronousKeyValueLoading
+@required    
+//    Directs the target to load the values of any of the specified keys that are not already loaded.
+- (void)loadValuesAsynchronouslyForKeys:(NSArray&lt;NSString *&gt; *)keys completionHandler:(nullable void (^)(void))handler;
+
+//    Reports whether the value for a key is immediately available without blocking.
+- (AVKeyValueStatus)statusOfValueForKey:(NSString *)key error:(NSError * __nullable * __nullable)outError;
+</code></pre><p>-loadValuesAsynchronouslyForKeys:completionHandler:方法用来异步加载属性，通过keys传入要加载的key数组，在handler中做加载完成的操作。<br>-statusOfValueForKey:error:方法可以获得属性的加载状态，如果是AVKeyValueStatusLoaded状态，表示已经加载完成。<br>除此之外，Asset也提供了取消加载的API:</p>
+<pre><code>//    Cancels the loading of all values for all observers.
+- (void)cancelLoading;
+</code></pre><p>当需要的时候我们可以通过这个API终止加载属性。另外在AVAsset释放的时候会暗中取消所有的加载请求。</p>
+<h2 id="End"><a href="#End" class="headerlink" title="End"></a>End</h2><p>除了已经介绍的API之外，还有一些BOOL值类型的标识属性，这些属性都比较简单，根据名字就能明白其中的意思。这里就不多介绍了。<br>最近刚开始研究AVFoundation，可能是玩这个的人不多，网上这方面的资料比较少，所以将最近研究的结果写成博客，以供大家参考，如果有什么不对的地方，希望能多多指教<br>如果你也正在学习AVFoundation，可以关注我的<a href="http://weibo.com/u/5592239559" target="_blank" rel="noopener">微博</a>，大家互相学习，共同进步</p>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><p><a href="http://blog.csdn.net/pirateleo/article/details/7590056#comments" target="_blank" rel="noopener">MP4文件格式详解——元数据moov</a><br><a href="http://item.jd.com/11742630.html" target="_blank" rel="noopener">AV Foundation开发秘籍</a><br><a href="https://developer.apple.com/library/prerelease/mac/documentation/AVFoundation/Reference/AVAsset_Class/index.html#//apple_ref/occ/cl/AVAsset" target="_blank" rel="noopener">AVAsset Class Reference</a></p>
+
+    
+  </div>
+
+</article>
+
+
+   
+  <div class="text-center donation">
+    <div class="inner-donation">
+      <span class="btn-donation">支持一下</span>
+      <div class="donation-body">
+        <div class="tip text-center">扫一扫，支持forsigner</div>
+        <ul>
+        
+          <li class="item">
+            
+              <span>微信扫一扫</span>
+            
+            <img src="/images/qr-wechat.png" alt="">
+          </li>
+        
+          <li class="item">
+            
+              <span>支付宝扫一扫</span>
+            
+            <img src="/images/qr-alipay.png" alt="">
+          </li>
+        
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+   
+  <div class="box-prev-next clearfix">
+    <a class="show pull-left" href="/2015/10/27/Xcode7新特性AddressSanitizer/">
+        <i class="icon icon-angle-left"></i>
+    </a>
+    <a class="show pull-right" href="/2015/11/21/刨根究底iOS—调戏Categoty/">
+        <i class="icon icon-angle-right"></i>
+    </a>
+  </div>
+
+
+
+
+
+   
+      <div class="git"></div>
+   
+</div>
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/link/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              友链
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/atom.xml"
+              rel="noopener noreferrer"
+              target="_blank"
+              >
+              RSS
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+  <section class="disqus-comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+  </section>
+
+  <script>
+    var disqus_shortname = 'forsigner';
+    
+    var disqus_url = 'http://yoursite.com/2015/10/30/AVFoundation(二)：AVFoundation的核心AVAsset/';
+    
+    (function(){
+      var dsq = document.createElement('script');
+      dsq.type = 'text/javascript';
+      dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+
+  <script id="dsq-count-scr" src="//forsigner.disqus.com/count.js" async></script>
+
+
+
+    
+    
+
+    
+    
+
+    
+
+    
+    
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>

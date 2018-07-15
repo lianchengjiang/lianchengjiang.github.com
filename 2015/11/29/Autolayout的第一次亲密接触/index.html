@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>Autolayout的第一次亲密接触 | Hexo</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="forsigner,前端,设计,Hexo主题,前端开发,用户体验,设计,frontend,design,nodejs,JavaScript" />
+  
+
+  <meta name="description" content="项目里的布局一直都是纯代码流，顺带着Autolayout也一直没有使用，直到遇到了masonry，让我看到了希望，我决定将Autolayout引入到项目中。masonry的基本用法网上已经很多了，我就先不具体介绍了。大家如果需要了解，可以去看看masonry的demo或者里脊串的Masonry介绍与使用实践(快速上手Autolayout)。 masonry只是给Autolayout披了一层华丽的外">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Autolayout的第一次亲密接触">
+<meta property="og:url" content="http://yoursite.com/2015/11/29/Autolayout的第一次亲密接触/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="项目里的布局一直都是纯代码流，顺带着Autolayout也一直没有使用，直到遇到了masonry，让我看到了希望，我决定将Autolayout引入到项目中。masonry的基本用法网上已经很多了，我就先不具体介绍了。大家如果需要了解，可以去看看masonry的demo或者里脊串的Masonry介绍与使用实践(快速上手Autolayout)。 masonry只是给Autolayout披了一层华丽的外">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://jiangliancheng.gitcafe.io/images/Autolayout/constraint.png">
+<meta property="og:image" content="http://jiangliancheng.gitcafe.io/images/Autolayout/intrinsicContentSize.png">
+<meta property="og:image" content="http://jiangliancheng.gitcafe.io/images/Autolayout/intrinsicContentSize2.png">
+<meta property="og:image" content="http://jiangliancheng.gitcafe.io/images/Autolayout/example1.png">
+<meta property="og:image" content="http://jiangliancheng.gitcafe.io/images/Autolayout/example2.png">
+<meta property="og:image" content="http://jiangliancheng.gitcafe.io/images/Autolayout/debug1.png">
+<meta property="og:image" content="http://jiangliancheng.gitcafe.io/images/Autolayout/debug2.png">
+<meta property="og:image" content="http://jiangliancheng.gitcafe.io/images/Autolayout/debug3.png">
+<meta property="og:image" content="http://jiangliancheng.gitcafe.io/images/Autolayout/debug4.png">
+<meta property="og:image" content="http://jiangliancheng.gitcafe.io/images/Autolayout/debug5.png">
+<meta property="og:image" content="http://jiangliancheng.gitcafe.io/images/Autolayout/debug6.png">
+<meta property="og:image" content="http://jiangliancheng.gitcafe.io/images/Autolayout/debug7.png">
+<meta property="og:image" content="http://jiangliancheng.gitcafe.io/images/Autolayout/deep1.png">
+<meta property="og:image" content="http://jiangliancheng.gitcafe.io/images/Autolayout/deep2.png">
+<meta property="og:image" content="http://jiangliancheng.gitcafe.io/images/Autolayout/deep3.png">
+<meta property="og:image" content="http://jiangliancheng.gitcafe.io/images/Autolayout/note1.png">
+<meta property="og:updated_time" content="2015-12-19T02:27:30.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Autolayout的第一次亲密接触">
+<meta name="twitter:description" content="项目里的布局一直都是纯代码流，顺带着Autolayout也一直没有使用，直到遇到了masonry，让我看到了希望，我决定将Autolayout引入到项目中。masonry的基本用法网上已经很多了，我就先不具体介绍了。大家如果需要了解，可以去看看masonry的demo或者里脊串的Masonry介绍与使用实践(快速上手Autolayout)。 masonry只是给Autolayout披了一层华丽的外">
+<meta name="twitter:image" content="http://jiangliancheng.gitcafe.io/images/Autolayout/constraint.png">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=c114cben" rel="stylesheet">
+
+
+  
+    <link rel="stylesheet" href="/css/personal-style.css">
+  
+
+  
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+  
+  <script type="text/javascript">
+	(function(){
+	    var bp = document.createElement('script');
+	    var curProtocol = window.location.protocol.split(':')[0];
+	    if (curProtocol === 'https') {
+	        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+	    }
+	    else {
+	        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+	    }
+	    var s = document.getElementsByTagName("script")[0];
+	    s.parentNode.insertBefore(bp, s);
+	})();
+  </script>
+
+
+
+  
+    <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+
+  
+    <link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  
+</head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">盒子</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/link/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            友链
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/atom.xml"
+            rel="noopener noreferrer"
+            target="_blank"
+            >
+            RSS
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#初识Autolayout"><span class="toc-text">初识Autolayout</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Constraint"><span class="toc-text">Constraint</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#IntrinsicContentSize"><span class="toc-text">IntrinsicContentSize</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Priorities"><span class="toc-text">Priorities</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#IntrinsicContentSize举例-12月6日新增"><span class="toc-text">IntrinsicContentSize举例(12月6日新增)</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#调教Autolayout"><span class="toc-text">调教Autolayout</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Log"><span class="toc-text">Log</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Visualizing-Views-and-Constraints"><span class="toc-text">Visualizing Views and Constraints</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Autolayout深层次的探索"><span class="toc-text">Autolayout深层次的探索</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Autolayout什么时候计算frame"><span class="toc-text">Autolayout什么时候计算frame</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Autolayout做动画（12月3日新增）"><span class="toc-text">Autolayout做动画（12月3日新增）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#当View约束发生变化时，是怎么调整布局的"><span class="toc-text">当View约束发生变化时，是怎么调整布局的</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#在Autolayout下使用Frame"><span class="toc-text">在Autolayout下使用Frame</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Autolayout的小情绪"><span class="toc-text">Autolayout的小情绪</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#UITableView的layoutSubviews没有调用-super-layoutSubviews"><span class="toc-text">UITableView的layoutSubviews没有调用[super layoutSubviews]</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ScrollView的相对布局"><span class="toc-text">ScrollView的相对布局</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#不同性质的Attribute不能参照"><span class="toc-text">不同性质的Attribute不能参照</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#View不在同一坐标系统下不能参照"><span class="toc-text">View不在同一坐标系统下不能参照</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#何时使用updateConstraints"><span class="toc-text">何时使用updateConstraints</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Reference"><span class="toc-text">Reference</span></a></li></ol>
+  </div>
+
+
+
+<div class="content content-post CENTER">
+   <article id="post-Autolayout的第一次亲密接触" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">Autolayout的第一次亲密接触</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2015.11.29</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>John Doe</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/Autolayout/">Autolayout</a>
+  </span>
+
+
+
+      
+        <span>
+          <i class="icon-comment"></i>
+          <a href="http://www.forsigner.com/2015/11/29/Autolayout的第一次亲密接触/#disqus_thread"></a>
+        </span>
+      
+
+      
+      <i class="fa fa-eye"></i> 
+        <span id="busuanzi_container_page_pv">
+           &nbsp热度 <span id="busuanzi_value_page_pv">
+           <i class="fa fa-spinner fa-spin"></i></span>℃
+        </span>
+      
+      
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <p>项目里的布局一直都是纯代码流，顺带着Autolayout也一直没有使用，直到遇到了<a href="https://github.com/SnapKit/Masonry" target="_blank" rel="noopener">masonry</a>，让我看到了希望，我决定将Autolayout引入到项目中。masonry的基本用法网上已经很多了，我就先不具体介绍了。大家如果需要了解，可以去看看masonry的<a href="https://github.com/SnapKit/Masonry" target="_blank" rel="noopener">demo</a>或者里脊串的<a href="http://adad184.com/2014/09/28/use-masonry-to-quick-solve-Autolayout/" target="_blank" rel="noopener">Masonry介绍与使用实践(快速上手Autolayout)</a>。</p>
+<p>masonry只是给Autolayout披了一层华丽的外衣，让他更好用了，但真正实现布局的还是Autolayout，文章主要介绍Autolayout，部分code用的是masonry，但应该不会影响理解</p>
+<h1 id="初识Autolayout"><a href="#初识Autolayout" class="headerlink" title="初识Autolayout"></a>初识Autolayout</h1><p>iOS中，会将View的布局定义为一系列的线性方程，存放在UIView的属性中。在View布局的时候，通过这些方程式，计算出每一个view的frame来完成布局。这就是Autolayout。</p>
+<h2 id="Constraint"><a href="#Constraint" class="headerlink" title="Constraint"></a>Constraint</h2><p>Autolayout将所有的方程式用constraint表示，存放在View的属性constraints下</p>
+<pre><code>@property(nonatomic,readonly) NSArray&lt;__kindof NSLayoutConstraint *&gt; *constraints NS_AVAILABLE_IOS(6_0);
+</code></pre><p>每一个constraint，表示一个相等或不等(大于小于)关系</p>
+<p><img src="http://jiangliancheng.gitcafe.io/images/Autolayout/constraint.png" alt=""></p>
+<p>上面的这个constraint表示红色view的头部距离蓝色view的尾部8个点。</p>
+<ul>
+<li>Item: 一般的item都是View</li>
+<li>Multiplier: 系数，一般对宽高的属性用得比较多</li>
+<li>Constant: 常量，一般为设置距离，大小什么的</li>
+<li>Relationship: 关系，上图中表示的是相等关系，除此之外也可以用不等关系表示，例如：&gt;=, &lt;=</li>
+<li>Attribute: 属性，iOS中主要的属性有上，下，左，右，前，后，宽，高，Y轴中心，X轴中心。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">NSLayoutAttributeLeft,		//左边</span><br><span class="line">NSLayoutAttributeRight,		//右边</span><br><span class="line">NSLayoutAttributeTop,		//上边    </span><br><span class="line">NSLayoutAttributeBottom,	//下面</span><br><span class="line">NSLayoutAttributeLeading,	//前面</span><br><span class="line">NSLayoutAttributeTrailing,	//后面</span><br><span class="line">NSLayoutAttributeWidth,		//宽度</span><br><span class="line">NSLayoutAttributeHeight,	//高度</span><br><span class="line">NSLayoutAttributeCenterX,	//X轴中心</span><br><span class="line">NSLayoutAttributeCenterY,	//Y轴中心</span><br></pre></td></tr></table></figure>
+<p>NSLayoutAttributeLeading和NSLayoutAttributeTrailing可能不太好理解。<br>一般正常情况下，我们的文字顺序是从左到由，所以Label的Leading=Left，Trailing=Right，但是如果有的语言，文字的顺序是从右往左(传说古代的文字顺序就是从右往左),那么就是Leading=Right，Trailing=Left。</p>
+<p>由于国际化的关系，Apple推荐使用Leading和Trailing代替Left和Right。但是个人感觉Left和Right比较好理解，而且项目支持的文字也都是从左到右的，所以Left和Right反而用的比较多</p>
+<h2 id="IntrinsicContentSize"><a href="#IntrinsicContentSize" class="headerlink" title="IntrinsicContentSize"></a>IntrinsicContentSize</h2><p>使用Autolayout之后，一个比较爽的地方就是UIlabel，UIButton, UIImageView有了IntrinsicContentSize的属性。他们可以自己根据内容调整大小，再也不用量宽和高了。设置好位置之后，就让他们自己浪吧，文字有多长就显示多长，图片有多大，就显示多大，真是Very Nice~~<br>对于哪些View有IntrinsicContentSize，Apple给了一张表:</p>
+<p><img src="http://jiangliancheng.gitcafe.io/images/Autolayout/intrinsicContentSize.png" alt=""></p>
+<ol>
+<li>UIView和NSView是没有IntrinsicContentSize的。</li>
+<li><del>Sliders只有with有这个属性。</del> Sliders只能定义width。Sliders的height拥有IntrinsicContentSize(感谢@凸小布，发现了这个问题)</li>
+<li>Labels, buttons, switches, text fields比较棒，width和height都有IntrinsicContentSize</li>
+<li>Text views和image views也挺好，在有内容的时候支持，没有内容的时候不支持。这也正是我们想要的</li>
+</ol>
+<p>从上面我们可以看到UIView是没有IntrinsicContentSize的，如果我们自定义一个View，想要他拥有默认宽高，只需要重写-IntrinsicContentSize方法，即可让其拥有默认的宽高。</p>
+<pre><code>- (CGSize)intrinsicContentSize
+{
+    return CGSizeMake(100, 150);
+}
+</code></pre><p>由于View只有被addSubview之后才能设置约束，所以一直在为怎么让自定义的View拥有默认Size而烦恼。重写intrinsicContentSize可能是最好的让其拥有默认Size的方法了，感谢@里脊串的指点</p>
+<p>对于IntrinsicContentSize，Autolayout又把他分成了2个部分：ContentHugging和CompressionResistance:</p>
+<p><img src="http://jiangliancheng.gitcafe.io/images/Autolayout/intrinsicContentSize2.png" alt=""></p>
+<ol>
+<li>ContentHugging我翻译过来是内容凝聚力，表示View的宽度和高度紧靠内容，不让其扩展的力量</li>
+<li>CompressionResistance是指压缩阻力，表示当有力量要对其进行压缩的时候，其阻力的大小</li>
+</ol>
+<p>对于同一个View，ContentHugging和CompressionResistance不会同时起作用。当一个Label有文字的时候，label会存在一个内容的Size。</p>
+<p>如果有外力让其size扩张，ContentHugging会起作用，外力大于ContentHugging的力量，label的size由外力决定，反之，label的Size由内容决定。</p>
+<p>如果有外力让其size压缩，CompressionResistance会起作用，外力大于CompressionResistance的力量，label的size由外力决定，反之，label的Size由内容决定。</p>
+<h2 id="Priorities"><a href="#Priorities" class="headerlink" title="Priorities"></a>Priorities</h2><p>各个约束力量的大小，由constraint的优先级(Priorities)决定，优先级越高，力量越大。系统的优先级由1~1000的数字表示，值越大，优先级越高。NSLayoutConstraint中一共定义了4种比较常用的优先级</p>
+<pre><code>typedef float UILayoutPriority;
+static const UILayoutPriority UILayoutPriorityRequired NS_AVAILABLE_IOS(6_0) = 1000; // A required constraint.  Do not exceed this.
+static const UILayoutPriority UILayoutPriorityDefaultHigh NS_AVAILABLE_IOS(6_0) = 750; // This is the priority level with which a button resists compressing its content.
+static const UILayoutPriority UILayoutPriorityDefaultLow NS_AVAILABLE_IOS(6_0) = 250; // This is the priority level at which a button hugs its contents horizontally.
+static const UILayoutPriority UILayoutPriorityFittingSizeLevel NS_AVAILABLE_IOS(6_0) = 50; // When you send -[UIView systemLayoutSizeFittingSize:], the size fitting most closely to the target size (the argument) is computed.  UILayoutPriorityFittingSizeLevel is the priority level with which the view wants to conform to the target size in that computation.  It&apos;s quite low.  It is generally not appropriate to make a constraint at exactly this priority.  You want to be higher or lower.
+</code></pre><ol>
+<li>UILayoutPriorityRequired: 必须级别优先级，值为最高值1000，一般平时定义约束，默认都是这个优先级。</li>
+<li>UILayoutPriorityDefaultHigh: 高优先级，值为750，CompressionResistance的默认优先级是这个。</li>
+<li>UILayoutPriorityDefaultLow: 低优先级，值为250，ContentHugging的默认优先级是这个</li>
+<li>UILayoutPriorityFittingSizeLevel: 极低的优先级，让系统估算Size的时候使用，不适合做约束</li>
+</ol>
+<p>知道了各个属性的默认优先级之后，就可以解释为什么一般情况我们给Lable设置Size约束之后，Label由我们设置的Size决定，而不是由其内容决定。因为我们没有特意设置优先级，用的都是默认优先级。Size约束的优先级比CompressionResistance和ContentHugging的优先级高。如果我们想让Label由内容决定，我们可以不设置Size约束或者调低自己Size约束的优先级。</p>
+<p>有了优先级之后，我们就可以处理很多复杂情况了。比如2个Label排列在一起，宽度都由内容决定，父view宽度不够的时候，我们需要优先显示某个Label的内容。这时候我们就可以设置2个Label的CompressionResistance优先级，<br>优先级高的Label，会优先显示~~~</p>
+<p>更多例子可以看土土哥的<a href="http://tutuge.me/2015/05/23/autolayout-example-with-masonry/" target="_blank" rel="noopener">有趣的Autolayout示例-Masonry实现</a></p>
+<h2 id="IntrinsicContentSize举例-12月6日新增"><a href="#IntrinsicContentSize举例-12月6日新增" class="headerlink" title="IntrinsicContentSize举例(12月6日新增)"></a>IntrinsicContentSize举例(12月6日新增)</h2><p>由于IntrinsicContentSize的ContentHugging和CompressionResistance比较抽象，很多人没怎么看明白。所以举几个例子，帮助大家理解。（感谢@里脊串的提醒）</p>
+<p>假设有2个Label，并列放着，他们都是使用IntrinsicContentSize自动根据文字适应宽度。效果如图所示：</p>
+<p><img src="http://jiangliancheng.gitcafe.io/images/Autolayout/example1.png" alt=""></p>
+<p>一、那么我们设置一个优先级为500宽度为100的约束(100小于Label2的宽度，大于Label1的宽度)</p>
+<pre><code>[@[label1,label2] mas_makeConstraints:^(MASConstraintMaker *make) {
+    make.width.equalTo(@100).priority(500);
+}];
+</code></pre><p>大家猜猜，会怎么样？是2个Label都变成100的宽度，还是都保持原来的宽度不变？还是一个变成100，一个保持原来的宽度？<br>我们Run一下：</p>
+<p><img src="http://jiangliancheng.gitcafe.io/images/Autolayout/example2.png" alt=""></p>
+<p>咦！Label1变成了100，Label2还是原来的宽度，为什么呢？</p>
+<ol>
+<li>Label1的IntrinsicContentSize宽度比100小，所以当添加一个宽度为100的约束时，ContentHugging在起作用。ContentHugging的优先级为250。宽度为100的约束优先级为500大于ContentHugging。所以宽度为100.</li>
+<li>Label2的IntrinsicContentSize宽度比100大。所以当添加一个宽度为100的约束时，CompressionResistance在起作用，CompressionResistance的优先级为750。宽度为100的约束优先级为500小于CompressionResistance。所以宽度还是IntrinsicContentSize的宽度。</li>
+</ol>
+<p>根据这个例子，大家应该能明白ContentHugging和CompressionResistance是什么意思了吧。这里留个问题给大家，如果设置的不是宽度为100，而是Label1宽度等于Label2宽度，那么会出现什么情况？是都变成Label1的宽度了，还是都变成Label2的宽度了？还是不变？</p>
+<h1 id="调教Autolayout"><a href="#调教Autolayout" class="headerlink" title="调教Autolayout"></a>调教Autolayout</h1><p>Autolayout的动态布局虽然感觉很酷炫，但是真正用起来可能会遇到各种问题：动不动就抛了个异常，一不小心就布局冲突了。布局完成之后，突然有个View不见了，View的位置完全不正确等等。这一点也正是一直被人嫌弃的地方。</p>
+<p>Autolayout就像一个长得漂亮但性格暴躁的姑娘，需要我们好好调教，才能成为一个合格的女票~~</p>
+<h2 id="Log"><a href="#Log" class="headerlink" title="Log"></a>Log</h2><p>写布局的时候我们经常会遇到布局冲突，一般冲突都会有抛出log。<br>下面我们是以Masonry为例看看Log，masonry重写了constriant的-description方法，让log更易懂了。<br>首先我们看来一段代码</p>
+<pre><code>UIView *view = ({
+    UIView *view = [UIView new];
+    view.backgroundColor = [UIColor grayColor];
+    [self.view addSubview:view];
+    [view mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.edges.insets(UIEdgeInsetsMake(100, 100, 100, 100));
+        make.width.equalTo(@300);
+    }];
+    view;
+});
+MASAttachKeys(view);
+</code></pre><p>一个View被加在了self.view上，他的上下左右都距离父View100，然后我们又让他的宽度等于300。我们运行一下看看~</p>
+<pre><code>2015-12-01 10:04:25.558 TAutolayout[1034:32111] Unable to simultaneously satisfy constraints.
+    Probably at least one of the constraints in the following list is one you don&apos;t want. 
+    Try this: 
+        (1) look at each constraint and try to figure out which you don&apos;t expect; 
+        (2) find the code that added the unwanted constraint or constraints and fix it. 
+(
+    &quot;&lt;MASLayoutConstraint:0x7f8fe9e251c0 UIView:view.left == UIView:self.view.left + 100&gt;&quot;,
+    &quot;&lt;MASLayoutConstraint:0x7f8fe9e23630 UIView:view.right == UIView:self.view.right - 100&gt;&quot;,
+    &quot;&lt;MASLayoutConstraint:0x7f8fe9e1c430 UIView:view.width == 300&gt;&quot;,
+    &quot;&lt;NSLayoutConstraint:0x7f8fe9d306c0 UIView:self.view.width == 375&gt;&quot;
+)
+
+Will attempt to recover by breaking constraint 
+&lt;MASLayoutConstraint:0x7f8fe9e1c430 UIView:view.width == 300&gt;
+
+Make a symbolic breakpoint at     UIViewAlertForUnsatisfiableConstraints to catch this in the debugger.
+The methods in the UIConstraintBasedLayoutDebugging category on UIView listed in &lt;UIKit/UIView.h&gt; may also be helpful.
+</code></pre><p>唉妈呀，出现了这么大一堆log。<br>Log说，我们不能同时满足下面的约束，你写的这些约束里面肯定有某个约束有问题，你好好改改：</p>
+<pre><code>&quot;&lt;MASLayoutConstraint:0x7f8fe9e251c0 UIView:view.left == UIView:self.view.left + 100&gt;&quot;,
+&quot;&lt;MASLayoutConstraint:0x7f8fe9e23630 UIView:view.right == UIView:self.view.right - 100&gt;&quot;,
+&quot;&lt;MASLayoutConstraint:0x7f8fe9e1c430 UIView:view.width == 300&gt;&quot;,
+&quot;&lt;NSLayoutConstraint:0x7f8fe9d306c0 UIView:self.view.width == 375&gt;&quot;
+</code></pre><p>我们这次的运行结果是把这条约束干掉了：</p>
+<pre><code>&lt;MASLayoutConstraint:0x7f8fe9e1c430 UIView:view.width == 300&gt;
+</code></pre><p>根据Log的信息，肯定是约束有地方冲突了，而且重点还是宽度相关的约束，因为运行的时候把<code>UIView:view.width == 300</code>干掉了。让我们来看看这些约束：</p>
+<ul>
+<li>view的左边 = self.view左边+100</li>
+<li>view的右边 = self.view右边-100</li>
+<li>view的宽度 = 300</li>
+<li>self.view的宽度 = 375</li>
+</ul>
+<p>根据上面的约束关系，view的左边右边的都是参照self.view的，那么view的宽度应该是375(self.view宽度) - 100(左边) -100(右边) = 175。而我们又给view的宽度赋值了300。所以这个地方冲突了。</p>
+<p>Ok，我们把<code>make.width.equalTo(@300);</code>这句话干掉，再次运行一下。Nice，已经没有冲突了~</p>
+<h2 id="Visualizing-Views-and-Constraints"><a href="#Visualizing-Views-and-Constraints" class="headerlink" title="Visualizing Views and Constraints"></a>Visualizing Views and Constraints</h2><p>冲突问题根据log搞定了，不过你以为这样就完事了么？那就too young too simple了。有的时候我们写完布局，以为一切ok了，一运行，唉妈呀，咋这样啦？也许是view不见了，也许是view布局不对了，反正有可能是各种摸不着头脑的问题，感觉明明是对的，一运行就错了。</p>
+<p>对于这一类布局和期望不一致的问题。我们还有一个大招，使用Xcode查看布局的工具</p>
+<p>我们想要一个redView，在self.view里面包着，并且距离self.view的边框上下左右均为100。还有一个button，靠着self.view左边。</p>
+<p>于是我们写下了代码：</p>
+<pre><code>UIView *redView = ({
+    UIView *view = [UIView new];
+    view.backgroundColor = [UIColor redColor];
+    [self.view addSubview:view];
+    [view mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.right.top.bottom.offset(100);
+    }];
+    view;
+});
+
+UIButton *button = ({
+    UIButton *button = [UIButton new];
+    [self.view addSubview:button];
+    [button setTitle:@&quot;button&quot; forState:UIControlStateNormal];
+    [button mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.offset(0);
+        make.top.equalTo(redView);
+        make.size.mas_equalTo(CGSizeMake(100, 50));
+    }];
+    button;
+});
+MASAttachKeys(redView,button);
+</code></pre><p>运行一下，看看效果：</p>
+<p><img src="http://jiangliancheng.gitcafe.io/images/Autolayout/debug1.png" alt=""></p>
+<p>咦，咋这样了呢？按钮去哪儿了？redview也没有居中？检查一下代码….没问题呀！！！！难道是是手机出bug了？要不要摔一下试试？<br>还是不要轻易摔手机，我们来看看View的布局。点击查看View层级的按钮。(Xcode下方，代码和控制台的中间)</p>
+<p><img src="http://jiangliancheng.gitcafe.io/images/Autolayout/debug2.png" alt=""></p>
+<p>出来了view的层级视图，大家可以看到，这个地方就是我们的button，位置并没有错</p>
+<p><img src="http://jiangliancheng.gitcafe.io/images/Autolayout/debug3.png" alt=""></p>
+<p>点击一下，我们还可以看到他的文字。哎呀，原来是我们忘了给他的文字调整颜色了，背景是白色，文字也是白色，所以被”隐藏”了。<br>那我们的redView是怎么回事呢？</p>
+<p>点击一下工具栏最左边的按钮，下图红色框起来的就是工具栏。</p>
+<p><img src="http://jiangliancheng.gitcafe.io/images/Autolayout/debug4.png" alt=""></p>
+<p>这个按钮会显示出超出屏幕外的视图</p>
+<p><img src="http://jiangliancheng.gitcafe.io/images/Autolayout/debug5.png" alt=""></p>
+<p>我们看到，原来他们的相对位置被设置成这样了，那到底是哪里的设置出了问题呢？<br>点击工具栏左边第二个按钮，这个按钮可以显示出布局的约束。</p>
+<p><img src="http://jiangliancheng.gitcafe.io/images/Autolayout/debug6.png" alt=""></p>
+<p>我们可以看到：<br>self.right = superview.right + 100<br>self.bottom = superview.bottom +100<br>原来+100是往右往下，我们要让redView被self.view包着，并距离left，bottom为100,需要用-100。<br>ok，让我们改改代码:</p>
+<pre><code>UIView *redView = ({
+    UIView *view = [UIView new];
+    view.backgroundColor = [UIColor redColor];
+    [self.view addSubview:view];
+    [view mas_makeConstraints:^(MASConstraintMaker *make) {
+        /********修改*********/
+        make.left.top.offset(100);
+        make.bottom.right.offset(-100);
+        /*****************/
+    }];
+    view;
+});
+
+UIButton *button = ({
+    UIButton *button = [UIButton new];
+    [self.view addSubview:button];
+    [button setTitle:@&quot;button&quot; forState:UIControlStateNormal];
+    /********修改*********/
+    [button setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    /*****************/
+    [button mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.offset(0);
+        make.top.equalTo(redView);
+        make.size.mas_equalTo(CGSizeMake(100, 50));
+    }];
+    button;
+});
+MASAttachKeys(redView,button);
+</code></pre><p>运行一下看看：</p>
+<p><img src="http://jiangliancheng.gitcafe.io/images/Autolayout/debug7.png" alt=""></p>
+<p>very Good！ 跟我们期望一致了</p>
+<h1 id="Autolayout深层次的探索"><a href="#Autolayout深层次的探索" class="headerlink" title="Autolayout深层次的探索"></a>Autolayout深层次的探索</h1><h2 id="Autolayout什么时候计算frame"><a href="#Autolayout什么时候计算frame" class="headerlink" title="Autolayout什么时候计算frame"></a>Autolayout什么时候计算frame</h2><p>根据最初的介绍，Autolayout是在设置constraint的时候，将constraints存放在View的属性中，在真正布局的时候去计算出view的frame，完成布局。那么他到底是在哪个方法中进行计算的呢？<br>我们知道，计算出来结果之后，必定会改变View的位置。由于Autolayout不通过frame布局，而是直接设置center和bounds。我们给-setCenter:打一个断点。</p>
+<p><img src="http://jiangliancheng.gitcafe.io/images/Autolayout/deep1.png" alt=""></p>
+<p>通过断点，我们可以看到在layoutSubview的时候，如果使用了约束会调用_updateConstraintsAsNecessaryAndApplyLayoutFromEngine。在这个方法里面，系统会先看看是否需要更新约束，如果需要，则调用-updateConstraints更新约束。</p>
+<p>跟新结束之后，会调用到_resizeWithOldSuperviewSize:，根据这个方法名，我们可以猜到，是在这个方法里面根据约束，计算出来布局的位置。</p>
+<p>计算完成之后调用_applyISEngineLayoutValues。应用布局，调整center和bounds。</p>
+<h2 id="Autolayout做动画（12月3日新增）"><a href="#Autolayout做动画（12月3日新增）" class="headerlink" title="Autolayout做动画（12月3日新增）"></a>Autolayout做动画（12月3日新增）</h2><p>对于Autolayout，有一个问题就是怎么做动画？<br>使用Frame的时候，我们做动画一般都调用-animateWithDuration:animations:方法</p>
+<pre><code>[UIView animateWithDuration:1 animations:^{
+    self.redView.frame = CGRectMake(0, 0, 100, 100);
+}];
+</code></pre><p>在animations的block里面调整Frame即可，使用Autolayout之后，由于Autolayout是延迟布局的，并不是约束更新之后就立刻布局，所以大家可以发现。在-animateWithDuration:animations方法里面修改约束是不能实现动画的。</p>
+<p>实现动画的关键在于把更新Frame的操作在block中调用。根据前面我们知道，Autolayout是在父view的-layoutSubview中更新Frame的。我们只需要让父View的-layoutSubview方法在block中执行即可。</p>
+<p>查阅文档我们知道，iOS中不建议直接调用-layoutSubview，如果要更新布局。可以调用-layoutIfNeeded。调用-layoutIfNeeded之后，会同步执行-layoutSubview。<br>所以如果我们要做动画可以用下面这种方法：</p>
+<pre><code>[self.redView mas_updateConstraints:^(MASConstraintMaker *make) {
+    make.width.equalTo(@500);
+}];
+[UIView animateWithDuration:1 animations:^{
+    [self.redView.superview layoutIfNeeded];
+}];
+</code></pre><h2 id="当View约束发生变化时，是怎么调整布局的"><a href="#当View约束发生变化时，是怎么调整布局的" class="headerlink" title="当View约束发生变化时，是怎么调整布局的"></a><span id="jump">当View约束发生变化时，是怎么调整布局的</span></h2><p>当一个view的约束发生变化的时候，他又是怎么响应调整父view自身以及子view的布局的呢？<br>我们现在有3个view: view1, view2, view3 </p>
+<p><img src="http://jiangliancheng.gitcafe.io/images/Autolayout/deep2.png" alt=""></p>
+<p>当因为某种原因，view2的约束发生了变化，我们来看看会发生什么：</p>
+<p><img src="http://jiangliancheng.gitcafe.io/images/Autolayout/deep3.png" alt=""></p>
+<ol>
+<li>view2由于自身约束发生了改变，需要重新布局。会调用父view：view1的setNeedLayout。告诉View1，我需要重新布局了，赶紧调用layoutSubviews</li>
+<li>view1根据已有约束，看看自身布局是否需要改变，如果需要改变，则继续调用父view的setNeedLayout。如果不需要改变，直接调用自己的layoutSubviews</li>
+<li>在view1的layoutSubviews中，完成了view2的布局，这时候view2的布局发生了改变，继续调用view2的layoutSubview</li>
+<li>在view2的layoutSubview中，view3的布局没有发生改变，所以不需要继续调用layoutSubview，结束</li>
+</ol>
+<h2 id="在Autolayout下使用Frame"><a href="#在Autolayout下使用Frame" class="headerlink" title="在Autolayout下使用Frame"></a>在Autolayout下使用Frame</h2><p>在Autolayout下使用Frame分为2中情况</p>
+<ol>
+<li>Autolayout生效之前使用frame。这种情况比较常见，比如在viewDidLoad中对一个view添加了约束，之后又通过Frame调整他的位置。<br>这种情况下，通过Frame调整位置的代码是无效的。因为在真正布局显示到频幕上的时候，系统会根据约束，重新计算Frame，之前设置的Frame会被冲掉</li>
+<li>Autolayout生效之后，使用frame。这种情况稍微少一些，比如View之前就设置了约束，点击某个按钮，需要改变View的Frame。这时候不使用约束，直接setFrame：<br>这种情况下，setFrame：是可以生效的，不过由于是直接setFrame，不是根据约束计算的。所以他的子View，父View，以及同级的约束依赖的View，都不会跟着改变。而且如果他的superView被触发了layoutSubviews，又会自动根据约束设置成约束的Frame，后患无穷。所以一个View使用约束之后，强烈建议不要再对他使用frame。</li>
+</ol>
+<blockquote>
+<p>第二种情况下，如果是需要做一个动画，动画结束后，又会恢复到原有位置。可以使用Frame</p>
+</blockquote>
+<h1 id="Autolayout的小情绪"><a href="#Autolayout的小情绪" class="headerlink" title="Autolayout的小情绪"></a>Autolayout的小情绪</h1><p>Autolayout虽然好用，但是有的时候会有一些小情绪，特别在iOS6上。那时候Autolayout还不完善。</p>
+<h2 id="UITableView的layoutSubviews没有调用-super-layoutSubviews"><a href="#UITableView的layoutSubviews没有调用-super-layoutSubviews" class="headerlink" title="UITableView的layoutSubviews没有调用[super layoutSubviews]"></a>UITableView的layoutSubviews没有调用[super layoutSubviews]</h2><p>在iOS6上，UITableView的-layoutSubviews中没有到调用UIView的layoutSubviews。<br>根据前面的介绍，Autolayout自动布局是在UIView的layoutSubviews中，所以TableView上的子view(如：cell，headerView，footerView)使用了Autolayout，tableView在布局的时候调用layoutSubviews，就会抛出异常。</p>
+<pre><code>2015-12-01 21:41:55.143 TAutolayout[9186:907] *** Assertion failure in -[UITableView layoutSublayersOfLayer:], /SourceCache/UIKit/UIKit-2372/UIView.m:5776
+2015-12-01 21:41:55.145 TAutolayout[9186:907] *** Terminating app due to uncaught exception &apos;NSInternalInconsistencyException&apos;, reason: &apos;Auto Layout still required after executing -layoutSubviews. UITableView&apos;s implementation of -layoutSubviews needs to call super.&apos;
+</code></pre><blockquote>
+<p>注意：直接对TableView使用Autolayout是不会有问题的，TableView是否调用layoutSubviews在于他上面的子view是否使用Autolayout，而不是他本身。详细原因见<a href="#jump">当View约束发生变化时，是怎么调整布局的</a></p>
+</blockquote>
+<p>解决方案：</p>
+<p>如果是cell，我们经常使用<code>[cell addSubview:view]</code>再对view做一个相对cell的约束，这时候就会出现问题。解决方案就是使用<code>[cell.contentView addSubview:view]</code>。我们约束是对cell的contentView添加，跟cell无关。tableView就不会调用layoutSubviews了</p>
+<p>如果是headerView或者footView。解决方案是直接使用frame，或者自己定义一个类似Cell的contentView的view，子view相对contentView布局使用Autolayout，contentView对headerView布局使用frame</p>
+<h2 id="ScrollView的相对布局"><a href="#ScrollView的相对布局" class="headerlink" title="ScrollView的相对布局"></a>ScrollView的相对布局</h2><p>scrollView是一个特殊的View，因为他除了位置大小之外还有content内容。scrollView的attribute分为2种：</p>
+<ol>
+<li>width，height，center用来表示scrollView的frame。</li>
+<li>edge 和 margin用来表示scrollView的content</li>
+</ol>
+<p>所以在scrollView布局的时候，如果想让contentSize跟着里面的子view变化。一定要将edge设置完整。当然直接设置ContentSize也是可以的</p>
+<h2 id="不同性质的Attribute不能参照"><a href="#不同性质的Attribute不能参照" class="headerlink" title="不同性质的Attribute不能参照"></a>不同性质的Attribute不能参照</h2><p>Autolayout中，不同性质的Attribute是不能参照的，就像你不能设置View1的left距离view2的top为10像素。这明显是不合适的，因为left和top是不能对比的。</p>
+<p>那么问题就来了，哪些东西可以和哪些东西对比呢？我整理了一张表</p>
+<p><img src="http://jiangliancheng.gitcafe.io/images/Autolayout/note1.png" alt=""></p>
+<h2 id="View不在同一坐标系统下不能参照"><a href="#View不在同一坐标系统下不能参照" class="headerlink" title="View不在同一坐标系统下不能参照"></a>View不在同一坐标系统下不能参照</h2><p>所谓同一坐标系统，是指他们是否能找到共同的父view（我们把父view的父view也称为父View）。<br>举个例子:</p>
+<pre><code>self.view &gt; viewA;
+self.view &gt; viewB &gt; viewC &gt; viewD
+</code></pre><p>我们用<code>&gt;</code>符号表示包含关系，viewA和ViewB都是self.View的子view。ViewC是ViewB的子View，ViewD是ViewC的子View。ViewA和ViewD是可以相互参照的，因为他们能找到共同的父View：self.View</p>
+<p>在View没有被addSubView之前。他是不能跟其他View做对比的。因为他跟任何的View（他自己的子view除外）都找不到共同的父view，也就是说他跟任何View都不在同一的坐标系统下。</p>
+<h2 id="何时使用updateConstraints"><a href="#何时使用updateConstraints" class="headerlink" title="何时使用updateConstraints"></a>何时使用updateConstraints</h2><p>使用Autolayout之后，系统中多了一个更新约束的方法updateConstraints。看这个方法名，在自定义View的时候，是不是把约束相关的代码放这里面会更好一些呢？<br>2015年的WWDC技术讲座<a href="https://developer.apple.com/videos/play/wwdc2015-219/" target="_blank" rel="noopener">Mysteries of Auto Layout (Part 2)</a>给出了一些意见：</p>
+<pre><code>Really, all this is is a way for views to have a chance to make changes to constraints just in time for the next layout pass, but it’s often not actually needed.
+All of your initial constraint setup should ideally happen inside Interface Builder. Or if you really find that you need to allocate your constraints programmatically, some place like viewDidLoad is much better. updateConstraints is really just for work that needs to be repeated periodically.
+Also, it’s pretty straightforward to just change constraints when you find the need to do that; whereas, if you take that logic apart from the other code that’s related to it and you move it into a separate method that gets executed at a later time, your code becomes a lot harder to follow, so it will be harder for you to maintain, it will be a lot harder for other people to understand.
+So when would you need to use updateConstraints? Well, it boils down to performance. If you find that just changing your constraints in place is too slow, then update constraints might be able to help you out. It turns out that changing a constraint inside updateConstraints is actually faster than changing a constraint at other times. The reason for that is because the engine is able to treat all the constraint changes that happen in this pass as a batch.
+</code></pre><p>简单总结一下就是：<br>初始化constraint的代码放在viewDidLoad等初始化方法中更好。<br>updateConstraints方法仅用于提升性能。当你更新大量约束，发现由于约束太多，布局有点卡。这时候你可以使用updateConstraints，因为在updateConstraints中更新约束会批量操作，能获得更好的性能(一般不会遇到这种情况)</p>
+<p>所以正常情况下，我们直接在初始化的方法中写约束就好。详细资料参考<a href="http://codingobjc.com/blog/2015/09/01/he-shi-shi-yong-updateconstraints/" target="_blank" rel="noopener">何时使用updateConstraints</a></p>
+<h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><p><a href="https://developer.apple.com/library/prerelease/tvos/documentation/UserExperience/Conceptual/AutolayoutPG/AnatomyofaConstraint.html#//apple_ref/doc/uid/TP40010853-CH9-SW1" target="_blank" rel="noopener">Anatomy of a Constraint</a></p>
+<p><a href="https://github.com/SnapKit/Masonry" target="_blank" rel="noopener">Masonry</a><br><a href="http://adad184.com/2014/09/28/use-masonry-to-quick-solve-Autolayout/" target="_blank" rel="noopener">Masonry介绍与使用实践(快速上手Autolayout)</a></p>
+<p><a href="http://tutuge.me/2015/05/23/autolayout-example-with-masonry/" target="_blank" rel="noopener">有趣的Autolayout示例-Masonry实现</a></p>
+<p><a href="http://codingobjc.com/blog/2015/09/01/he-shi-shi-yong-updateconstraints/" target="_blank" rel="noopener">何时使用updateConstraints</a></p>
+
+    
+  </div>
+
+</article>
+
+
+   
+  <div class="text-center donation">
+    <div class="inner-donation">
+      <span class="btn-donation">支持一下</span>
+      <div class="donation-body">
+        <div class="tip text-center">扫一扫，支持forsigner</div>
+        <ul>
+        
+          <li class="item">
+            
+              <span>微信扫一扫</span>
+            
+            <img src="/images/qr-wechat.png" alt="">
+          </li>
+        
+          <li class="item">
+            
+              <span>支付宝扫一扫</span>
+            
+            <img src="/images/qr-alipay.png" alt="">
+          </li>
+        
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+   
+  <div class="box-prev-next clearfix">
+    <a class="show pull-left" href="/2015/11/21/刨根究底iOS—调戏Categoty/">
+        <i class="icon icon-angle-left"></i>
+    </a>
+    <a class="show pull-right" href="/2015/12/05/追求Masonry/">
+        <i class="icon icon-angle-right"></i>
+    </a>
+  </div>
+
+
+
+
+
+   
+      <div class="git"></div>
+   
+</div>
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/link/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              友链
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/atom.xml"
+              rel="noopener noreferrer"
+              target="_blank"
+              >
+              RSS
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+  <section class="disqus-comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+  </section>
+
+  <script>
+    var disqus_shortname = 'forsigner';
+    
+    var disqus_url = 'http://yoursite.com/2015/11/29/Autolayout的第一次亲密接触/';
+    
+    (function(){
+      var dsq = document.createElement('script');
+      dsq.type = 'text/javascript';
+      dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+
+  <script id="dsq-count-scr" src="//forsigner.disqus.com/count.js" async></script>
+
+
+
+    
+    
+
+    
+    
+
+    
+
+    
+    
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>

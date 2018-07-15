@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>小笨狼与LLDB的故事 | Hexo</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="LLDB," />
+  
+
+  <meta name="description" content="LLDB的Xcode默认的调试器，它与LLVM编译器一起，带给我们更丰富的流程控制和数据检测的调试功能。平时用Xcode运行程序，实际走的都是LLDB。熟练使用LLDB，可以让你debug事半功倍 LLDB基础知识LLDB控制台Xcode中内嵌了LLDB控制台，在Xcode中代码的下方，我们可以看到LLDB控制台。LLDB控制台平时会输出一些log信息。如果我们想输入命令调试，必须让程序进入暂停状">
+<meta name="keywords" content="LLDB">
+<meta property="og:type" content="article">
+<meta property="og:title" content="小笨狼与LLDB的故事">
+<meta property="og:url" content="http://yoursite.com/2015/12/13/小笨狼与LLDB的故事/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="LLDB的Xcode默认的调试器，它与LLVM编译器一起，带给我们更丰富的流程控制和数据检测的调试功能。平时用Xcode运行程序，实际走的都是LLDB。熟练使用LLDB，可以让你debug事半功倍 LLDB基础知识LLDB控制台Xcode中内嵌了LLDB控制台，在Xcode中代码的下方，我们可以看到LLDB控制台。LLDB控制台平时会输出一些log信息。如果我们想输入命令调试，必须让程序进入暂停状">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://jiangliancheng.gitcafe.io/images/LLDB/XcodeLLDB.png">
+<meta property="og:image" content="http://jiangliancheng.gitcafe.io/images/LLDB/threadreturn.png">
+<meta property="og:image" content="http://jiangliancheng.gitcafe.io/images/LLDB/threadBar.png">
+<meta property="og:image" content="http://jiangliancheng.gitcafe.io/images/LLDB/frame.png">
+<meta property="og:image" content="http://jiangliancheng.gitcafe.io/images/LLDB/weibo.jpg">
+<meta property="og:updated_time" content="2016-01-18T09:43:27.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="小笨狼与LLDB的故事">
+<meta name="twitter:description" content="LLDB的Xcode默认的调试器，它与LLVM编译器一起，带给我们更丰富的流程控制和数据检测的调试功能。平时用Xcode运行程序，实际走的都是LLDB。熟练使用LLDB，可以让你debug事半功倍 LLDB基础知识LLDB控制台Xcode中内嵌了LLDB控制台，在Xcode中代码的下方，我们可以看到LLDB控制台。LLDB控制台平时会输出一些log信息。如果我们想输入命令调试，必须让程序进入暂停状">
+<meta name="twitter:image" content="http://jiangliancheng.gitcafe.io/images/LLDB/XcodeLLDB.png">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=c114cben" rel="stylesheet">
+
+
+  
+    <link rel="stylesheet" href="/css/personal-style.css">
+  
+
+  
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+  
+  <script type="text/javascript">
+	(function(){
+	    var bp = document.createElement('script');
+	    var curProtocol = window.location.protocol.split(':')[0];
+	    if (curProtocol === 'https') {
+	        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+	    }
+	    else {
+	        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+	    }
+	    var s = document.getElementsByTagName("script")[0];
+	    s.parentNode.insertBefore(bp, s);
+	})();
+  </script>
+
+
+
+  
+    <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+
+  
+    <link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  
+</head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">盒子</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/link/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            友链
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/atom.xml"
+            rel="noopener noreferrer"
+            target="_blank"
+            >
+            RSS
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#LLDB基础知识"><span class="toc-text">LLDB基础知识</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#LLDB控制台"><span class="toc-text">LLDB控制台</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#LLDB语法"><span class="toc-text">LLDB语法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#原始-raw-命令"><span class="toc-text">原始(raw)命令</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#唯一匹配原则"><span class="toc-text">唯一匹配原则</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#lldbinit"><span class="toc-text">~/.lldbinit</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#LLDB命令"><span class="toc-text">LLDB命令</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#expression"><span class="toc-text">expression</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#p-amp-print-amp-call"><span class="toc-text">p &amp; print &amp; call</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#po"><span class="toc-text">po</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#thread"><span class="toc-text">thread</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#thread-backtrace-amp-bt"><span class="toc-text">thread backtrace &amp; bt</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#thread-return"><span class="toc-text">thread return</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#c-amp-n-amp-s-amp-finish"><span class="toc-text">c &amp; n &amp; s &amp; finish</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#thread其他不常用的命令"><span class="toc-text">thread其他不常用的命令</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#frame"><span class="toc-text">frame</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#frame-variable"><span class="toc-text">frame variable</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#其他不常用命令"><span class="toc-text">其他不常用命令</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#breakpoint"><span class="toc-text">breakpoint</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#breakpoint-set"><span class="toc-text">breakpoint set</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#breakpoint-command"><span class="toc-text">breakpoint command</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#breakpoint-command-add"><span class="toc-text">breakpoint command add</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#breakpoint-command-list"><span class="toc-text">breakpoint command list</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#breakpoint-command-delete"><span class="toc-text">breakpoint command delete</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#breakpoint-list"><span class="toc-text">breakpoint list</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#breakpoint-disable-enable"><span class="toc-text">breakpoint disable/enable</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#breakpoint-delete"><span class="toc-text">breakpoint delete</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#watchpoint"><span class="toc-text">watchpoint</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#watchpoint-set"><span class="toc-text">watchpoint set</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#watchpoint-set-variable"><span class="toc-text">watchpoint set variable</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#watchpoint-set-expression"><span class="toc-text">watchpoint set expression</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#watchpoint-command"><span class="toc-text">watchpoint command</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#watchpoint-command-add"><span class="toc-text">watchpoint command add</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#watchpoint-command-list"><span class="toc-text">watchpoint command list</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#watchpoint-command-delete"><span class="toc-text">watchpoint command delete</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#watchpoint-list"><span class="toc-text">watchpoint list</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#watchpoint-disable"><span class="toc-text">watchpoint disable</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#watchpoint-enable"><span class="toc-text">watchpoint enable</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#watchpoint-delete"><span class="toc-text">watchpoint delete</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#target"><span class="toc-text">target</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#target-modules-lookup-image-lookup"><span class="toc-text">target modules lookup(image lookup)</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#image-lookup-–address"><span class="toc-text">image lookup –address</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#image-lookup-–name"><span class="toc-text">image lookup –name</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#image-lookup-–type"><span class="toc-text">image lookup –type</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#target-stop-hook"><span class="toc-text">target stop-hook</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#target-stop-hook-add-amp-display"><span class="toc-text">target stop-hook add &amp; display</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#target-stop-hook-list"><span class="toc-text">target stop-hook list</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#target-stop-hook-delete-amp-undisplay"><span class="toc-text">target stop-hook delete &amp; undisplay</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#target-stop-hook-disable-enable"><span class="toc-text">target stop-hook disable/enable</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Extension"><span class="toc-text">Extension</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#target-symbols-add-add-dsym"><span class="toc-text">target symbols add(add-dsym)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#help-amp-apropos"><span class="toc-text">help &amp; apropos</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#help"><span class="toc-text">help</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#apropos"><span class="toc-text">apropos</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#常用的Debug快捷键"><span class="toc-text">常用的Debug快捷键</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#End"><span class="toc-text">End</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Reference"><span class="toc-text">Reference</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#About-me"><span class="toc-text">About me</span></a></li></ol>
+  </div>
+
+
+
+<div class="content content-post CENTER">
+   <article id="post-小笨狼与LLDB的故事" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">小笨狼与LLDB的故事</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2015.12.13</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>John Doe</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/调试技巧/">调试技巧</a>
+  </span>
+
+
+
+      
+        <span>
+          <i class="icon-comment"></i>
+          <a href="http://www.forsigner.com/2015/12/13/小笨狼与LLDB的故事/#disqus_thread"></a>
+        </span>
+      
+
+      
+      <i class="fa fa-eye"></i> 
+        <span id="busuanzi_container_page_pv">
+           &nbsp热度 <span id="busuanzi_value_page_pv">
+           <i class="fa fa-spinner fa-spin"></i></span>℃
+        </span>
+      
+      
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <p>LLDB的Xcode默认的调试器，它与LLVM编译器一起，带给我们更丰富的流程控制和数据检测的调试功能。平时用Xcode运行程序，实际走的都是LLDB。熟练使用LLDB，可以让你debug事半功倍</p>
+<h1 id="LLDB基础知识"><a href="#LLDB基础知识" class="headerlink" title="LLDB基础知识"></a>LLDB基础知识</h1><h2 id="LLDB控制台"><a href="#LLDB控制台" class="headerlink" title="LLDB控制台"></a>LLDB控制台</h2><p>Xcode中内嵌了LLDB控制台，在Xcode中代码的下方，我们可以看到LLDB控制台。<br><img src="http://jiangliancheng.gitcafe.io/images/LLDB/XcodeLLDB.png" alt=""><br>LLDB控制台平时会输出一些log信息。如果我们想输入命令调试，必须让程序进入暂停状态。让程序进入暂停状态的方式主要有2种：</p>
+<ol>
+<li>断点或者watchpoint: 在代码中设置一个断点（watchpoint），当程序运行到断点位置的时候，会进入stop状态</li>
+<li>直接暂停，控制台上方有一个暂停按钮，上图红框已标出，点击即可暂停程序</li>
+</ol>
+<h2 id="LLDB语法"><a href="#LLDB语法" class="headerlink" title="LLDB语法"></a>LLDB语法</h2><p>在使用LLDB之前，我们来先看看LLDB的语法，了解语法可以帮助我们清晰的使用LLDB:</p>
+<pre><code>&lt;command&gt; [&lt;subcommand&gt; [&lt;subcommand&gt;...]] &lt;action&gt; [-options [option-value]] [argument [argument...]]
+</code></pre><p>一眼看上去可能比较迷茫，给大家解释一下：</p>
+<ol>
+<li><code>&lt;command&gt;</code>(命令)和<code>&lt;subcommand&gt;</code>(子命令)：LLDB调试命令的名称。命令和子命令按层级结构来排列：一个命令对象为跟随其的子命令对象创建一个上下文，子命令又为其子命令创建一个上下文，依此类推。</li>
+<li><code>&lt;action&gt;</code>：执行命令的操作</li>
+<li><code>&lt;options&gt;</code>：命令选项</li>
+<li><code>&lt;arguement&gt;</code>：命令的参数</li>
+<li><code>[]</code>：表示命令是可选的，可以有也可以没有</li>
+</ol>
+<p>举个例子，假设我们给main方法设置一个断点，我们使用下面的命令：</p>
+<pre><code>breakpoint set -n main
+</code></pre><p>这个命令对应到上面的语法就是：</p>
+<ol>
+<li><code>command</code>: <code>breakpoint</code> 表示断点命令</li>
+<li><code>action</code>: <code>set</code> 表示设置断点</li>
+<li><code>option</code>: <code>-n</code> 表示根据方法name设置断点</li>
+<li><code>arguement</code>: <code>mian</code> 表示方法名为mian</li>
+</ol>
+<h2 id="原始-raw-命令"><a href="#原始-raw-命令" class="headerlink" title="原始(raw)命令"></a>原始(raw)命令</h2><p>LLDB支持不带命令选项(options)的原始(raw)命令，原始命令会将命令后面的所有东西当做参数(arguement)传递。不过很多原始命令也可以带命令选项，当你使用命令选项的时候，需要在命令选项后面加<code>--</code>区分命令选项和参数。</p>
+<p>e.g: 常用的<code>expression</code>就是raw命令，一般情况下我们使用<code>expression</code>打印一个东西是这样的：</p>
+<pre><code>(lldb) expression count
+(int) $2 = 4
+</code></pre><p>当我们想打印一个对象的时候。需要使用<code>-O</code>命令选项，我们应该用<code>--</code>将命令选项和参数区分：</p>
+<pre><code>(lldb) expression -O -- self
+&lt;ViewController: 0x7f9000f17660&gt;
+</code></pre><h2 id="唯一匹配原则"><a href="#唯一匹配原则" class="headerlink" title="唯一匹配原则"></a>唯一匹配原则</h2><p>LLDB的命令遵循唯一匹配原则：假如根据前n个字母已经能唯一匹配到某个命令，则只写前n个字母等效于写下完整的命令。</p>
+<p>e.g: 前面提到我设置断点的命令，我们可以使用唯一匹配原则简写，下面2条命令等效：</p>
+<pre><code>breakpoint set -n main
+br s -n main
+</code></pre><h2 id="lldbinit"><a href="#lldbinit" class="headerlink" title="~/.lldbinit"></a>~/.lldbinit</h2><p>LLDB有了一个启动时加载的文件<code>~/.lldbinit</code>，每次启动都会加载。所以一些初始化的事儿，我们可以写入<code>~/.lldbinit</code>中，比如给命令定义别名等。但是由于这时候程序还没有真正运行，也有部分操作无法在里面玩，比如设置断点。</p>
+<h1 id="LLDB命令"><a href="#LLDB命令" class="headerlink" title="LLDB命令"></a>LLDB命令</h1><h2 id="expression"><a href="#expression" class="headerlink" title="expression"></a>expression</h2><p>expression命令的作用是执行一个表达式，并将表达式返回的结果输出。expression的完整语法是这样的：</p>
+<pre><code>expression &lt;cmd-options&gt; -- &lt;expr&gt;
+</code></pre><ol>
+<li><code>&lt;cmd-options&gt;</code>：命令选项，一般情况下使用默认的即可，不需要特别标明。</li>
+<li><code>--</code>: 命令选项结束符，表示所有的命令选项已经设置完毕，如果没有命令选项，<code>--</code>可以省略</li>
+<li><code>&lt;expr&gt;</code>: 要执行的表达式</li>
+</ol>
+<p>说<code>expression</code>是LLDB里面最重要的命令都不为过。因为他能实现2个功能。</p>
+<ul>
+<li><p>执行某个表达式。<br>我们在代码运行过程中，可以通过执行某个表达式来动态改变程序运行的轨迹。<br>假如我们在运行过程中，突然想把self.view颜色改成红色，看看效果。我们不必写下代码，重新run，只需暂停程序，用<code>expression</code>改变颜色，再刷新一下界面，就能看到效果</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">// 改变颜色</span><br><span class="line">(lldb) expression -- self.view.backgroundColor = [UIColor redColor]</span><br><span class="line">// 刷新界面</span><br><span class="line">(lldb) expression -- (void)[CATransaction flush]</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<ul>
+<li>将返回值输出。<br>也就是说我们可以通过<code>expression</code>来打印东西。<br>假如我们想打印self.view：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(lldb) expression -- self.view</span><br><span class="line">(UIView *) $1 = 0x00007fe322c18a10</span><br></pre></td></tr></table></figure>
+<h3 id="p-amp-print-amp-call"><a href="#p-amp-print-amp-call" class="headerlink" title="p &amp; print &amp; call"></a>p &amp; print &amp; call</h3><p>一般情况下，我们直接用expression还是用得比较少的，更多时候我们用的是<code>p</code>、<code>print</code>、<code>call</code>。这三个命令其实都是<code>expression --</code>的别名（<code>--</code>表示不再接受命令选项，详情见前面<code>原始(raw）命令</code>这一节）</p>
+<ol>
+<li><code>print</code>: 打印某个东西，可以是变量和表达式</li>
+<li><code>p</code>: 可以看做是<code>print</code>的简写</li>
+<li><code>call</code>: 调用某个方法。</li>
+</ol>
+<p>表面上看起来他们可能有不一样的地方，实际都是执行某个表达式（变量也当做表达式），将执行的结果输出到控制台上。所以你可以用<code>p</code>调用某个方法，也可以用<code>call</code>打印东西<br>e.g: 下面代码效果相同：</p>
+<pre><code>(lldb) expression -- self.view
+(UIView *) $5 = 0x00007fb2a40344a0
+(lldb) p self.view
+(UIView *) $6 = 0x00007fb2a40344a0
+(lldb) print self.view
+(UIView *) $7 = 0x00007fb2a40344a0
+(lldb) call self.view
+(UIView *) $8 = 0x00007fb2a40344a0
+(lldb) e self.view
+(UIView *) $9 = 0x00007fb2a40344a0
+</code></pre><blockquote>
+<p>根据唯一匹配原则，如果你没有自己添加特殊的命令别名。<code>e</code>也可以表示<code>expression</code>的意思。原始命令默认没有命令选项，所以<code>e</code>也能带给你同样的效果</p>
+</blockquote>
+<h3 id="po"><a href="#po" class="headerlink" title="po"></a>po</h3><p>我们知道，OC里所有的对象都是用指针表示的，所以一般打印的时候，打印出来的是对象的指针，而不是对象本身。如果我们想打印对象。我们需要使用命令选项:<code>-O</code>。为了更方便的使用，LLDB为<code>expression -O --</code>定义了一个别名：<code>po</code></p>
+<pre><code>(lldb) expression -- self.view
+(UIView *) $13 = 0x00007fb2a40344a0
+(lldb) expression -O -- self.view
+&lt;UIView: 0x7fb2a40344a0; frame = (0 0; 375 667); autoresize = W+H; layer = &lt;CALayer: 0x7fb2a4018c80&gt;&gt;
+(lldb) po self.view
+&lt;UIView: 0x7fb2a40344a0; frame = (0 0; 375 667); autoresize = W+H; layer = &lt;CALayer: 0x7fb2a4018c80&gt;&gt;
+</code></pre><blockquote>
+<p>还有其他很多命令选项，不过我们一般用得比较少，所以我就不具体的一一介绍了，如果想了解，在LLDB控制台上输入：<code>help expression</code>即可查到expression所有的信息</p>
+</blockquote>
+<h2 id="thread"><a href="#thread" class="headerlink" title="thread"></a>thread</h2><h3 id="thread-backtrace-amp-bt"><a href="#thread-backtrace-amp-bt" class="headerlink" title="thread backtrace &amp; bt"></a><code>thread backtrace</code> &amp; bt</h3><p>有时候我们想要了解线程堆栈信息，可以使用<code>thread backtrace</code><br><code>thread backtrace</code>作用是将线程的堆栈打印出来。我们来看看他的语法</p>
+<pre><code>thread backtrace [-c &lt;count&gt;] [-s &lt;frame-index&gt;] [-e &lt;boolean&gt;]
+</code></pre><p><code>thread backtrace</code>后面跟的都是命令选项：</p>
+<ul>
+<li><code>-c</code>：设置打印堆栈的帧数(frame)</li>
+<li><code>-s</code>：设置从哪个帧(frame)开始打印</li>
+<li><code>-e</code>：是否显示额外的回溯</li>
+</ul>
+<p>实际上这些命令选项我们一般不需要使用。</p>
+<p>e.g: 当发生crash的时候，我们可以使用<code>thread backtrace</code>查看堆栈调用</p>
+<pre><code>(lldb) thread backtrace
+* thread #1: tid = 0xdd42, 0x000000010afb380b libobjc.A.dylib`objc_msgSend + 11, queue = &apos;com.apple.main-thread&apos;, stop reason = EXC_BAD_ACCESS (code=EXC_I386_GPFLT)
+    frame #0: 0x000000010afb380b libobjc.A.dylib`objc_msgSend + 11
+  * frame #1: 0x000000010aa9f75e TLLDB`-[ViewController viewDidLoad](self=0x00007fa270e1f440, _cmd=&quot;viewDidLoad&quot;) + 174 at ViewController.m:23
+    frame #2: 0x000000010ba67f98 UIKit`-[UIViewController loadViewIfRequired] + 1198
+    frame #3: 0x000000010ba682e7 UIKit`-[UIViewController view] + 27
+    frame #4: 0x000000010b93eab0 UIKit`-[UIWindow addRootViewControllerViewIfPossible] + 61
+    frame #5: 0x000000010b93f199 UIKit`-[UIWindow _setHidden:forced:] + 282
+    frame #6: 0x000000010b950c2e UIKit`-[UIWindow makeKeyAndVisible] + 42
+</code></pre><p>我们可以看到crash发生在<code>-[ViewController viewDidLoad]</code>中的第23行，只需检查这行代码是不是干了什么非法的事儿就可以了。</p>
+<p>LLDB还为backtrace专门定义了一个别名：<code>bt</code>，他的效果与<code>thread backtrace</code>相同，如果你不想写那么长一串字母，直接写下<code>bt</code>即可:</p>
+<pre><code>(lldb) bt
+</code></pre><h3 id="thread-return"><a href="#thread-return" class="headerlink" title="thread return"></a>thread return</h3><p>Debug的时候，也许会因为各种原因，我们不想让代码执行某个方法，或者要直接返回一个想要的值。这时候就该<code>thread return</code>上场了。</p>
+<pre><code>thread return [&lt;expr&gt;]
+</code></pre><p><code>thread return</code>可以接受一个表达式，调用命令之后直接从当前的frame返回表达式的值。</p>
+<p>e.g: 我们有一个<code>someMethod</code>方法，默认情况下是返回YES。我们想要让他返回NO</p>
+<p><img src="http://jiangliancheng.gitcafe.io/images/LLDB/threadreturn.png" alt=""></p>
+<p>我们只需在方法的开始位置加一个断点，当程序中断的时候，输入命令即可:</p>
+<pre><code>(lldb) thread return NO
+</code></pre><p>效果相当于在断点位置直接调用<code>return NO;</code>，不会执行断点后面的代码</p>
+<h3 id="c-amp-n-amp-s-amp-finish"><a href="#c-amp-n-amp-s-amp-finish" class="headerlink" title="c &amp; n &amp; s &amp; finish"></a>c &amp; n &amp; s &amp; finish</h3><p>一般在调试程序的时候，我们经常用到下面这4个按钮：</p>
+<p><img src="http://jiangliancheng.gitcafe.io/images/LLDB/threadBar.png" alt=""></p>
+<p>用触摸板的孩子们可能会觉得点击这4个按钮比较费劲。其实LLDB命令也可以完成上面的操作，而且如果不输入命令，直接按Enter键，LLDB会自动执行上次的命令。按一下Enter就能达到我们想要的效果，有木有顿时感觉逼格满满的！！！<br>我们来看看对应这4个按钮的LLDB命令：</p>
+<ol>
+<li><code>c</code>/ <code>continue</code>/ <code>thread continue</code>: 这三个命令效果都等同于上图中第一个按钮的。表示程序继续运行</li>
+<li><code>n</code>/ <code>next</code>/ <code>thread step-over</code>: 这三个命令效果等同于上图第二个按钮。表示单步运行</li>
+<li><code>s</code>/ <code>step</code>/ <code>thread step-in</code>: 这三个命令效果等同于上图第三个按钮。表示进入某个方法</li>
+<li><code>finish</code>/ <code>step-out</code>: 这两个命令效果等同于第四个按钮。表示直接走完当前方法，返回到上层frame</li>
+</ol>
+<h3 id="thread其他不常用的命令"><a href="#thread其他不常用的命令" class="headerlink" title="thread其他不常用的命令"></a>thread其他不常用的命令</h3><p>thread 相关的还有其他一些不常用的命令，这里就简单介绍一下即可，如果需要了解更多，可以使用命令<code>help thread</code>查阅</p>
+<ol>
+<li><code>thread jump</code>: 直接让程序跳到某一行。由于ARC下编译器实际插入了不少retain，release命令。跳过一些代码不执行很可能会造成对象内存混乱发生crash。</li>
+<li><code>thread list</code>: 列出所有的线程</li>
+<li><code>thread select</code>: 选择某个线程</li>
+<li><code>thread until</code>: 传入一个line的参数，让程序执行到这行的时候暂停</li>
+<li><code>thread info</code>: 输出当前线程的信息</li>
+</ol>
+<h2 id="frame"><a href="#frame" class="headerlink" title="frame"></a>frame</h2><p>前面我们提到过很多次frame（帧）。可能有的朋友对frame这个概念还不太了解。随便打个断点</p>
+<p><img src="http://jiangliancheng.gitcafe.io/images/LLDB/frame.png" alt=""></p>
+<p>我们在控制台上输入命令<code>bt</code>，可以打印出来所有的frame。如果仔细观察，这些frame和左边红框里的堆栈是一致的。平时我们看到的左边的堆栈就是frame。</p>
+<h3 id="frame-variable"><a href="#frame-variable" class="headerlink" title="frame variable"></a>frame variable</h3><p>平时Debug的时候我们经常做的事就是查看变量的值，通过<code>frame variable</code>命令，可以打印出当前frame的所有变量</p>
+<pre><code>(lldb) frame variable
+(ViewController *) self = 0x00007fa158526e60
+(SEL) _cmd = &quot;text:&quot;
+(BOOL) ret = YES
+(int) a = 3
+</code></pre><p>可以看到，他将<code>self</code>,<code>_cmd</code>,<code>ret</code>,<code>a</code>等本地变量都打印了出来</p>
+<p>如果我们要需要打印指定变量，也可以给<code>frame variable</code>传入参数:</p>
+<pre><code>(lldb) frame variable self-&gt;_string
+(NSString *) self-&gt;_string = nil
+</code></pre><p>不过<code>frame variable</code>只接受变量作为参数，不接受表达式，也就是说我们无法使用<code>frame variable self.string</code>，因为<code>self.string</code>是调用<code>string</code>的<code>getter</code>方法。所以一般打印指定变量，我更喜欢用<code>p</code>或者<code>po</code>。</p>
+<h3 id="其他不常用命令"><a href="#其他不常用命令" class="headerlink" title="其他不常用命令"></a>其他不常用命令</h3><p>一般<code>frame variable</code>打印所有变量用得比较多，frame还有2个不怎么常用的命令：</p>
+<p><code>frame info</code>: 查看当前frame的信息</p>
+<pre><code>(lldb) frame info
+frame #0: 0x0000000101bf87d5 TLLDB`-[ViewController text:](self=0x00007fa158526e60, _cmd=&quot;text:&quot;, ret=YES) + 37 at ViewController.m:38
+</code></pre><p><code>frame select</code>: 选择某个frame</p>
+<pre><code>(lldb) frame select 1
+frame #1: 0x0000000101bf872e TLLDB`-[ViewController viewDidLoad](self=0x00007fa158526e60, _cmd=&quot;viewDidLoad&quot;) + 78 at ViewController.m:23
+   20      
+   21      - (void)viewDidLoad {
+   22          [super viewDidLoad];
+-&gt; 23          [self text:YES];
+   24          NSLog(@&quot;1&quot;);
+   25          NSLog(@&quot;2&quot;);
+   26          NSLog(@&quot;3&quot;);
+</code></pre><p>当我们选择frame 1的时候，他会把frame1的信息和代码打印出来。不过一般我都是直接在Xcode左边点击某个frame，这样更方便</p>
+<h2 id="breakpoint"><a href="#breakpoint" class="headerlink" title="breakpoint"></a>breakpoint</h2><p>调试过程中，我们用得最多的可能就是断点了。LLDB中的断点命令也非常强大</p>
+<h3 id="breakpoint-set"><a href="#breakpoint-set" class="headerlink" title="breakpoint set"></a>breakpoint set</h3><p><code>breakpoint set</code>命令用于设置断点，LLDB提供了很多种设置断点的方式：</p>
+<p><b><em>使用<code>-n</code>根据方法名设置断点：</em></b></p>
+<p>e.g: 我们想给所有类中的<code>viewWillAppear:</code>设置一个断点:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(lldb) breakpoint set -n viewWillAppear:</span><br><span class="line">Breakpoint 13: 33 locations.</span><br></pre></td></tr></table></figure></p>
+<p><b><em>使用<code>-f</code>指定文件</em></b></p>
+<p>e.g: 我们只需要给<code>ViewController.m</code>文件中的<code>viewDidLoad</code>设置断点：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(lldb) breakpoint set -f ViewController.m -n viewDidLoad</span><br><span class="line">Breakpoint 22: where = TLLDB`-[ViewController viewDidLoad] + 20 at ViewController.m:22, address = 0x000000010272a6f4</span><br></pre></td></tr></table></figure>
+<p>这里需要注意，如果方法未写在文件中（比如写在category文件中，或者父类文件中），指定文件之后，将无法给这个方法设置断点。</p>
+<p><b><em>使用<code>-l</code>指定文件某一行设置断点</em></b></p>
+<p>e.g: 我们想给<code>ViewController.m</code>第38行设置断点</p>
+<pre><code>(lldb) breakpoint set -f ViewController.m -l 38
+Breakpoint 23: where = TLLDB`-[ViewController text:] + 37 at ViewController.m:38, address = 0x000000010272a7d5
+</code></pre><p><b><em>使用<code>-c</code>设置条件断点</em></b></p>
+<p>e.g: <code>text:</code>方法接受一个<code>ret</code>的参数，我们想让<code>ret == YES</code>的时候程序中断：</p>
+<pre><code>(lldb) breakpoint set -n text: -c ret == YES
+Breakpoint 7: where = TLLDB`-[ViewController text:] + 30 at ViewController.m:37, address = 0x0000000105ef37ce
+</code></pre><p><b><em>使用<code>-o</code>设置单次断点</em></b></p>
+<p>e.g: 如果刚刚那个断点我们只想让他中断一次：</p>
+<pre><code>(lldb) breakpoint set -n text: -o
+&apos;breakpoint 3&apos;: where = TLLDB`-[ViewController text:] + 30 at ViewController.m:37, address = 0x000000010b6f97ce
+</code></pre><h3 id="breakpoint-command"><a href="#breakpoint-command" class="headerlink" title="breakpoint command"></a>breakpoint command</h3><p>有的时候我们可能需要给断点添加一些命令，比如每次走到这个断点的时候，我们都需要打印<code>self</code>对象。我们只需要给断点添加一个<code>po self</code>命令，就不用每次执行断点再自己输入<code>po self</code>了</p>
+<h4 id="breakpoint-command-add"><a href="#breakpoint-command-add" class="headerlink" title="breakpoint command add"></a>breakpoint command add</h4><p><code>breakpoint command add</code>命令就是给断点添加命令的命令。</p>
+<p>e.g: 假设我们需要在<code>ViewController</code>的<code>viewDidLoad</code>中查看<code>self.view</code>的值<br>我们首先给<code>-[ViewController viewDidLoad]</code>添加一个断点</p>
+<pre><code>(lldb) breakpoint set -n &quot;-[ViewController viewDidLoad]&quot;
+&apos;breakpoint 3&apos;: where = TLLDB`-[ViewController viewDidLoad] + 20 at ViewController.m:23, address = 0x00000001055e6004
+</code></pre><p>可以看到添加成功之后，这个<code>breakpoint</code>的id为3，然后我们给他增加一个命令：<code>po self.view</code></p>
+<pre><code>(lldb) breakpoint command add -o &quot;po self.view&quot; 3
+</code></pre><p><code>-o</code>完整写法是<code>--one-liner</code>，表示增加一条命令。<code>3</code>表示对id为<code>3</code>的<code>breakpoint</code>增加命令。<br>添加完命令之后，每次程序执行到这个断点就可以自动打印出<code>self.view</code>的值了</p>
+<p>如果我们一下子想增加多条命令，比如我想在<code>viewDidLoad</code>中打印当前frame的所有变量，但是我们不想让他中断，也就是在打印完成之后，需要继续执行。我们可以这样玩：</p>
+<pre><code>(lldb) breakpoint command add 3
+Enter your debugger command(s).  Type &apos;DONE&apos; to end.
+&gt; frame variable
+&gt; continue
+&gt; DONE
+</code></pre><p>输入<code>breakpoint command add 3</code>对断点3增加命令。他会让你输入增加哪些命令，输入’DONE’表示结束。这时候你就可以输入多条命令了</p>
+<blockquote>
+<p>多次对同一个断点添加命令，后面命令会将前面命令覆盖</p>
+</blockquote>
+<h4 id="breakpoint-command-list"><a href="#breakpoint-command-list" class="headerlink" title="breakpoint command list"></a>breakpoint command list</h4><p>如果想查看某个断点已有的命令，可以使用<code>breakpoint command list</code>。<br>e.g: 我们查看一下刚刚的断点3已有的命令</p>
+<pre><code>(lldb) breakpoint command list 3
+&apos;breakpoint 3&apos;:
+    Breakpoint commands:
+      frame variable
+      continue
+</code></pre><p>可以看到一共有2条命令，分别为<code>frame variable</code>和<code>continue</code></p>
+<h4 id="breakpoint-command-delete"><a href="#breakpoint-command-delete" class="headerlink" title="breakpoint command delete"></a>breakpoint command delete</h4><p>有增加就有删除，<code>breakpoint command delete</code>可以让我们删除某个断点的命令<br>e.g: 我们将断点3中的命令删除:</p>
+<pre><code>(lldb) breakpoint command delete 3
+(lldb) breakpoint command list 3
+Breakpoint 3 does not have an associated command.
+</code></pre><p>可以看到删除之后，断点3就没有命令了</p>
+<h3 id="breakpoint-list"><a href="#breakpoint-list" class="headerlink" title="breakpoint list"></a>breakpoint list</h3><p>如果我们想查看已经设置了哪些断点，可以使用<code>breakpoint list</code><br>e.g:</p>
+<pre><code>(lldb) breakpoint list
+Current breakpoints:
+4: name = &apos;-[ViewController viewDidLoad]&apos;, locations = 1, resolved = 1, hit count = 0
+  4.1: where = TLLDB`-[ViewController viewDidLoad] + 20 at ViewController.m:23, address = 0x00000001055e6004, resolved, hit count = 0 
+</code></pre><p>我们可以看到当前只有一个断点，打在<code>-[ViewController viewDidLoad]</code>上，id是4</p>
+<h3 id="breakpoint-disable-enable"><a href="#breakpoint-disable-enable" class="headerlink" title="breakpoint disable/enable"></a>breakpoint disable/enable</h3><p>有的时候我们可能暂时不想要某个断点，可以使用<code>breakpoint disable</code>让某个断点暂时失效<br>e.g: 我们来让刚刚的断点4失效</p>
+<pre><code>(lldb) breakpoint disable 4
+1 breakpoints disabled.
+</code></pre><p>输入完命令之后，显示断点已经失效</p>
+<p>当我们又需要这个断点的时候，可以使用<code>breakpoint enable</code>再次让他生效<br>e.g: 重新启用断点4</p>
+<pre><code>(lldb) breakpoint enable 4
+1 breakpoints enabled.
+</code></pre><h3 id="breakpoint-delete"><a href="#breakpoint-delete" class="headerlink" title="breakpoint delete"></a>breakpoint delete</h3><p>如果我们觉得这个断点以后再也用不上了，可以用<code>breakpoint delete</code>直接删除断点.<br>e.g: 删除断点4</p>
+<pre><code>(lldb) breakpoint delete 4
+1 breakpoints deleted; 0 breakpoint locations disabled.
+</code></pre><p>如果我们想删除所有断点，只需要不指定<code>breakpoint delete</code>参数即可</p>
+<pre><code>(lldb) breakpoint delete 
+About to delete all breakpoints, do you want to do that?: [Y/n] y
+All breakpoints removed. (1 breakpoint)
+</code></pre><p>删除的时候他会提示你，是不是真的想删除所有断点，需要你再次输入<code>Y</code>确认。如果想直接删除，不需要他的提示，使用<code>-f</code>命令选项即可</p>
+<pre><code>(lldb) breakpoint delete -f
+All breakpoints removed. (1 breakpoint)
+</code></pre><blockquote>
+<p>实际平时我们真正使用<code>breakpoint</code>命令反而比较少，因为Xcode已经内置了断点工具。我们可以直接在代码上打断点，可以在断点工具栏里面查看编辑断点，这比使用LLDB命令方便很多。不过了解LLDB相关命令可以让我们对断点理解更深刻。<br>如果你想了解怎么使用Xcode设置断点，可以阅读这篇文章<a href="http://www.cocoachina.com/industry/20130701/6514.html" target="_blank" rel="noopener">《Xcode中断点的威力》</a></p>
+</blockquote>
+<h2 id="watchpoint"><a href="#watchpoint" class="headerlink" title="watchpoint"></a>watchpoint</h2><p><code>breakpoint</code>有一个孪生兄弟<code>watchpoint</code>。如果说<code>breakpoint</code>是对方法生效的断点，<code>watchpoint</code>就是对地址生效的断点</p>
+<p>如果我们想要知道某个属性什么时候被篡改了，我们该怎么办呢？有人可能会说对setter方法打个断点不就行了么？但是如果更改的时候没调用setter方法呢？<br>这时候最好的办法就是用<code>watchpoint</code>。我们可以用他观察这个属性的地址。如果地址里面的东西改变了，就让程序中断</p>
+<h3 id="watchpoint-set"><a href="#watchpoint-set" class="headerlink" title="watchpoint set"></a>watchpoint set</h3><p><code>watchpoint set</code>命令用于添加一个<code>watchpoint</code>。只要这个地址中的内容变化了，程序就会中断。</p>
+<h4 id="watchpoint-set-variable"><a href="#watchpoint-set-variable" class="headerlink" title="watchpoint set variable"></a>watchpoint set variable</h4><p>一般情况下，要观察变量或者属性，使用<code>watchpoint set variable</code>命令即可<br>e.g:  观察<code>self-&gt;_string</code></p>
+<pre><code>(lldb) watchpoint set variable self-&gt;_string
+Watchpoint created: Watchpoint 1: addr = 0x7fcf3959c418 size = 8 state = enabled type = w
+    watchpoint spec = &apos;self-&gt;_string&apos;
+    new value: 0x0000000000000000
+</code></pre><p><code>watchpoint set variable</code>传入的是变量名。需要注意的是，这里不接受方法，所以不能使用<code>watchpoint set variable self.string</code>，因为self.string调用的是string的getter方法</p>
+<h4 id="watchpoint-set-expression"><a href="#watchpoint-set-expression" class="headerlink" title="watchpoint set expression"></a>watchpoint set expression</h4><p>如果我们想直接观察某个地址，可以使用<code>watchpoint set expression</code><br>e.g: 我们先拿到_model的地址，然后对地址设置一个watchpoint</p>
+<pre><code>(lldb) p &amp;_model
+(Modek **) $3 = 0x00007fe0dbf23280
+(lldb) watchpoint set expression 0x00007fe0dbf23280
+Watchpoint created: Watchpoint 1: addr = 0x7fe0dbf23280 size = 8 state = enabled type = w
+    new value: 0
+</code></pre><h3 id="watchpoint-command"><a href="#watchpoint-command" class="headerlink" title="watchpoint command"></a>watchpoint command</h3><p>跟breakpoint类似，在watchpoint中也可以添加命令</p>
+<h4 id="watchpoint-command-add"><a href="#watchpoint-command-add" class="headerlink" title="watchpoint command add"></a>watchpoint command add</h4><p>我们来看看怎么给<code>watchpoint</code>添加命令：</p>
+<p>首先，我们设置一个watchpoint：</p>
+<pre><code>(lldb) watchpoint set variable _string
+Watchpoint created: Watchpoint 1: addr = 0x7fe4e1444760 size = 8 state = enabled type = w
+    watchpoint spec = &apos;_string&apos;
+    new value: 0x0000000000000000
+</code></pre><p>可以看到这个watchpoint的id是1。我们可以用<code>watchpoint command add -o</code>添加单条命令</p>
+<pre><code>watchpoint command add -o &apos;bt&apos; 1
+</code></pre><p>我们在watchpoint停下来的时候，打印了他的线程信息。</p>
+<p>我们也可以一次添加多条命令：</p>
+<pre><code>(lldb) watchpoint command add 1
+Enter your debugger command(s).  Type &apos;DONE&apos; to end.
+&gt; bt
+&gt; continue
+&gt; DONE
+</code></pre><p>可以看到<code>watchpoint</code>的使用方法跟<code>breakpoint</code>几乎一模一样。</p>
+<h4 id="watchpoint-command-list"><a href="#watchpoint-command-list" class="headerlink" title="watchpoint command list"></a>watchpoint command list</h4><p>我们可以用<code>watchpoint command list</code>列出某个<code>watchpoint</code>所有的<code>command</code></p>
+<pre><code>(lldb) watchpoint command list 1
+Watchpoint 1:
+    watchpoint commands:
+      bt
+      continue
+</code></pre><h4 id="watchpoint-command-delete"><a href="#watchpoint-command-delete" class="headerlink" title="watchpoint command delete"></a>watchpoint command delete</h4><p>我们也可以用<code>watchpoint command delete</code>删除某个<code>watchpoint</code>所有的<code>command</code></p>
+<pre><code>(lldb) watchpoint command delete 1
+(lldb) watchpoint command list 1
+Watchpoint 1 does not have an associated command.
+</code></pre><h3 id="watchpoint-list"><a href="#watchpoint-list" class="headerlink" title="watchpoint list"></a>watchpoint list</h3><p>如果我们想看当前所有watchpoint，可以使用<code>watchpoint list</code>:</p>
+<pre><code>(lldb) watchpoint list
+Number of supported hardware watchpoints: 4
+Current watchpoints:
+Watchpoint 1: addr = 0x7fe9f9f28e30 size = 8 state = enabled type = w
+    watchpoint spec = &apos;_string&apos;
+    old value: 0x0000000000000000
+    new value: 0x000000010128e0d0
+</code></pre><p>可以看到，只有一个watchpoint。</p>
+<h3 id="watchpoint-disable"><a href="#watchpoint-disable" class="headerlink" title="watchpoint disable"></a>watchpoint disable</h3><p>当我们不想让某个watchpoint生效的时候，可以用<code>watchpoint disable</code>:</p>
+<pre><code>(lldb) watchpoint disable 1
+1 watchpoints disabled.
+</code></pre><p>再次查看这个watchpoint，可以看到他的state已经变为了disabled</p>
+<pre><code>(lldb) watchpoint list
+Number of supported hardware watchpoints: 4
+Current watchpoints:
+Watchpoint 1: addr = 0x7fe9f9f28e30 size = 8 state = disabled type = w
+    watchpoint spec = &apos;_string&apos;
+    old value: 0x0000000000000000
+    new value: 0x000000010128e0d0
+</code></pre><h3 id="watchpoint-enable"><a href="#watchpoint-enable" class="headerlink" title="watchpoint enable"></a>watchpoint enable</h3><p>过了一会，我们又要用这个<code>watchpoint</code>了，这时候可以使用<code>watchpoint enable</code>:</p>
+<pre><code>(lldb) watchpoint enable 1
+1 watchpoints enabled.
+</code></pre><h4 id="watchpoint-delete"><a href="#watchpoint-delete" class="headerlink" title="watchpoint delete"></a>watchpoint delete</h4><p>如果我们觉得再也用不着这个<code>watchpoint</code>了，可以用<code>watchpoint delete</code>将他删除:</p>
+<pre><code>(lldb) watchpoint delete 1
+1 watchpoints deleted.
+(lldb) watchpoint list
+Number of supported hardware watchpoints: 4
+No watchpoints currently set.
+</code></pre><p>删除之后，我们可以看到<code>watchpoint list</code>里面已经没有<code>watchpoint1</code>了</p>
+<p>如果有很多个watchpoint，我们想全都干掉，只需要不指定具体哪个watchpoint即可：</p>
+<pre><code>(lldb) watchpoint delete 
+About to delete all watchpoints, do you want to do that?: [Y/n] y
+All watchpoints removed. (2 watchpoints)
+</code></pre><h2 id="target"><a href="#target" class="headerlink" title="target"></a>target</h2><h3 id="target-modules-lookup-image-lookup"><a href="#target-modules-lookup-image-lookup" class="headerlink" title="target modules lookup(image lookup)"></a>target modules lookup(image lookup)</h3><p>对于target这个命令，我们用得最多的可能就是<code>target modules lookup</code>。由于LLDB给<code>target modules</code>取了个别名<code>image</code>，所以这个命令我们又可以写成<code>image lookup</code>。</p>
+<h4 id="image-lookup-–address"><a href="#image-lookup-–address" class="headerlink" title="image lookup –address"></a>image lookup –address</h4><p>当我们有一个地址，想查找这个地址具体对应的文件位置，可以使用<code>image lookup --address</code>，简写为<code>image lookup -a</code><br>e.g: 当我们发生一个crash</p>
+<pre><code>2015-12-17 14:51:06.301 TLLDB[25086:246169] *** Terminating app due to uncaught exception &apos;NSRangeException&apos;, reason: &apos;*** -[__NSArray0 objectAtIndex:]: index 1 beyond bounds for empty NSArray&apos;
+*** First throw call stack:
+(
+    0   CoreFoundation                      0x000000010accde65 __exceptionPreprocess + 165
+    1   libobjc.A.dylib                     0x000000010a746deb objc_exception_throw + 48
+    2   CoreFoundation                      0x000000010ac7c395 -[__NSArray0 objectAtIndex:] + 101
+    3   TLLDB                               0x000000010a1c3e36 -[ViewController viewDidLoad] + 86
+    4   UIKit                               0x000000010b210f98 -[UIViewController loadViewIfRequired] + 1198
+    5   UIKit                               0x000000010b2112e7 -[UIViewController view] + 27
+</code></pre><p>我们可以看到是由于<code>-[__NSArray0 objectAtIndex:]:</code>超出边界而导致的crash，但是<code>objectAtIndex:</code>的代码到底在哪儿呢？</p>
+<pre><code>(lldb) image lookup -a 0x000000010a1c3e36
+      Address: TLLDB[0x0000000100000e36] (TLLDB.__TEXT.__text + 246)
+      Summary: TLLDB`-[ViewController viewDidLoad] + 86 at ViewController.m:32
+</code></pre><p>根据<code>0x000000010a1c3e36 -[ViewController viewDidLoad]</code>里面的地址，使用<code>image lookup --address</code>查找，我们可以看到代码位置在<code>ViewController.m</code>里面的32行</p>
+<h4 id="image-lookup-–name"><a href="#image-lookup-–name" class="headerlink" title="image lookup –name"></a>image lookup –name</h4><p>当我们想查找一个方法或者符号的信息，比如所在文件位置等。我们可以使用<code>image lookup --name</code>，简写为<code>image lookup -n</code>。</p>
+<p>e.g: 刚刚遇到的真问题，某个第三方SDK用了一个我们项目里原有的第三方库，库里面对NSDictionary添加了category。也就是有2个class对NSDictionary添加了名字相同的category，项目中调用自己的category的地方实际走到了第三方SDK里面去了。最大的问题是，这2个同名category方法行为并不一致，导致出现bug</p>
+<p>现在问题来了，怎么寻找到底是哪个第三方SDK？方法完全包在.a里面。</p>
+<p>其实只需使用<code>image lookup -n</code>即可：</p>
+<pre><code>(lldb) image lookup -n dictionaryWithXMLString:
+2 matches found in /Users/jiangliancheng/Library/Developer/Xcode/DerivedData/VideoIphone-aivsnqmlwjhxapdlvmdmrubbdxpq/Build/Products/Debug-iphoneos/BaiduIphoneVideo.app/BaiduIphoneVideo:
+        Address: BaiduIphoneVideo[0x00533a7c] (BaiduIphoneVideo.__TEXT.__text + 5414908)
+        Summary: BaiduIphoneVideo`+[NSDictionary(SAPIXmlDictionary) dictionaryWithXMLString:] at XmlDictionary.m
+         Module: file = &quot;/Users/jiangliancheng/Library/Developer/Xcode/DerivedData/VideoIphone-aivsnqmlwjhxapdlvmdmrubbdxpq/Build/Products/Debug-iphoneos/BaiduIphoneVideo.app/BaiduIphoneVideo&quot;, arch = &quot;armv7&quot;
+    CompileUnit: id = {0x00000000}, file = &quot;/Users/jiangliancheng/Development/Work/iOS_ShareLib/SharedLib/Srvcs/BDPassport4iOS/BDPassport4iOS/SAPI/Extensive/ThirdParty/XMLDictionary/XmlDictionary.m&quot;, language = &quot;Objective-C&quot;
+       Function: id = {0x23500000756}, name = &quot;+[NSDictionary(SAPIXmlDictionary) dictionaryWithXMLString:]&quot;, range = [0x005a6a7c-0x005a6b02)
+       FuncType: id = {0x23500000756}, decl = XmlDictionary.m:189, clang_type = &quot;NSDictionary *(NSString *)&quot;
+         Blocks: id = {0x23500000756}, range = [0x005a6a7c-0x005a6b02)
+      LineEntry: [0x005a6a7c-0x005a6a98): /Users/jiangliancheng/Development/Work/iOS_ShareLib/SharedLib/Srvcs/BDPassport4iOS/BDPassport4iOS/SAPI/Extensive/ThirdParty/XMLDictionary/XmlDictionary.m
+         Symbol: id = {0x0000f2d5}, range = [0x005a6a7c-0x005a6b04), name=&quot;+[NSDictionary(SAPIXmlDictionary) dictionaryWithXMLString:]&quot;
+       Variable: id = {0x23500000771}, name = &quot;self&quot;, type = &quot;Class&quot;, location =  [sp+32], decl = 
+       Variable: id = {0x2350000077e}, name = &quot;_cmd&quot;, type = &quot;SEL&quot;, location =  [sp+28], decl = 
+       Variable: id = {0x2350000078b}, name = &quot;string&quot;, type = &quot;NSString *&quot;, location =  [sp+24], decl = XmlDictionary.m:189
+       Variable: id = {0x23500000799}, name = &quot;data&quot;, type = &quot;NSData *&quot;, location =  [sp+20], decl = XmlDictionary.m:192
+        Address: BaiduIphoneVideo[0x012ee160] (BaiduIphoneVideo.__TEXT.__text + 19810016)
+        Summary: BaiduIphoneVideo`+[NSDictionary(XMLDictionary) dictionaryWithXMLString:] at XMLDictionary.m
+         Module: file = &quot;/Users/jiangliancheng/Library/Developer/Xcode/DerivedData/VideoIphone-aivsnqmlwjhxapdlvmdmrubbdxpq/Build/Products/Debug-iphoneos/BaiduIphoneVideo.app/BaiduIphoneVideo&quot;, arch = &quot;armv7&quot;
+    CompileUnit: id = {0x00000000}, file = &quot;/Users/wingle/Workspace/qqlive4iphone/iphone_4.0_fabu_20150601/Common_Proj/mobileTAD/VIDEO/Library/Third Party/XMLDictionary/XMLDictionary.m&quot;, language = &quot;Objective-C&quot;
+       Function: id = {0x79900000b02}, name = &quot;+[NSDictionary(XMLDictionary) dictionaryWithXMLString:]&quot;, range = [0x01361160-0x0136119a)
+       FuncType: id = {0x79900000b02}, decl = XMLDictionary.m:325, clang_type = &quot;NSDictionary *(NSString *)&quot;
+         Blocks: id = {0x79900000b02}, range = [0x01361160-0x0136119a)
+      LineEntry: [0x01361160-0x01361164): /Users/wingle/Workspace/qqlive4iphone/iphone_4.0_fabu_20150601/Common_Proj/mobileTAD/VIDEO/Library/Third Party/XMLDictionary/XMLDictionary.m
+         Symbol: id = {0x0003a1e9}, range = [0x01361160-0x0136119c), name=&quot;+[NSDictionary(XMLDictionary) dictionaryWithXMLString:]&quot;
+       Variable: id = {0x79900000b1e}, name = &quot;self&quot;, type = &quot;Class&quot;, location =  r0, decl = 
+       Variable: id = {0x79900000b2c}, name = &quot;_cmd&quot;, type = &quot;SEL&quot;, location =  r1, decl = 
+       Variable: id = {0x79900000b3a}, name = &quot;string&quot;, type = &quot;NSString *&quot;, location =  r2, decl = XMLDictionary.m:325
+       Variable: id = {0x79900000b4a}, name = &quot;data&quot;, type = &quot;NSData *&quot;, location =  r2, decl = XMLDictionary.m:327
+</code></pre><p>东西有点多，我们只需关注里面的file这一行：</p>
+<pre><code>CompileUnit: id = {0x00000000}, file = &quot;/Users/jiangliancheng/Development/Work/iOS_ShareLib/SharedLib/Srvcs/BDPassport4iOS/BDPassport4iOS/SAPI/Extensive/ThirdParty/XMLDictionary/XmlDictionary.m&quot;, language = &quot;Objective-C&quot;
+CompileUnit: id = {0x00000000}, file = &quot;/Users/wingle/Workspace/qqlive4iphone/iphone_4.0_fabu_20150601/Common_Proj/mobileTAD/VIDEO/Library/Third Party/XMLDictionary/XMLDictionary.m&quot;, language = &quot;Objective-C&quot;
+</code></pre><p>可以清晰的看到，LLDB给我们找出来了这个方法的位置。<br>当然这个命令也可以找到方法的其他相关信息，比如参数等.</p>
+<h4 id="image-lookup-–type"><a href="#image-lookup-–type" class="headerlink" title="image lookup –type"></a>image lookup –type</h4><p>当我们想查看一个类型的时候，可以使用<code>image lookup --type</code>，简写为<code>image lookup -t</code>:</p>
+<p>e.g: 我们来看看Model的类型：</p>
+<pre><code>(lldb) image lookup -t Model
+Best match found in /Users/jiangliancheng/Library/Developer/Xcode/DerivedData/TLLDB-beqoowskwzbttrejseahdoaivpgq/Build/Products/Debug-iphonesimulator/TLLDB.app/TLLDB:
+id = {0x30000002f}, name = &quot;Model&quot;, byte-size = 32, decl = Modek.h:11, clang_type = &quot;@interface Model : NSObject{
+    NSString * _bb;
+    NSString * _cc;
+    NSString * _name;
+}
+@property ( getter = name,setter = setName:,readwrite,nonatomic ) NSString * name;
+@end
+&quot;
+</code></pre><p>可以看到，LLDB把Model这个class的所有属性和成员变量都打印了出来，当我们想了解某个类的时候，直接使用<code>image lookup -t</code>即可</p>
+<h3 id="target-stop-hook"><a href="#target-stop-hook" class="headerlink" title="target stop-hook"></a>target stop-hook</h3><p>我们知道，用LLDB debug，大多数时候需要让程序stop，不管用<code>breakpoint</code>还是用<code>watchpoint</code>。</p>
+<p><code>target stop-hook</code>命令就是让你可以在每次stop的时候去执行一些命令</p>
+<blockquote>
+<p><code>target stop-hook</code>只对<code>breakpoint</code>和<code>watchpoint</code>的程序stop生效，直接点击Xcode上的<code>pause</code>或者<code>debug view hierarchy</code>不会生效</p>
+</blockquote>
+<h4 id="target-stop-hook-add-amp-display"><a href="#target-stop-hook-add-amp-display" class="headerlink" title="target stop-hook add &amp; display"></a>target stop-hook add &amp; display</h4><p>假如我们想在每次程序stop的时候，都用命令打印当前frame的所有变量。我们可以添加一个stop-hook：</p>
+<pre><code>(lldb) target stop-hook add -o &quot;frame variable&quot;
+Stop hook #4 added.
+</code></pre><p><code>target stop-hook add</code>表示添加stop-hook，<code>-o</code>的全称是<code>--one-liner</code>，表示添加一条命令。</p>
+<p>我们看一下，当执行到一个断点的时候会发生什么？</p>
+<pre><code>- Hook 1 (frame variable)
+(ViewController *) self = 0x00007fd55b12e380
+(SEL) _cmd = &quot;viewDidLoad&quot;
+(NSMutableURLRequest *) request = 0x00007fd55b1010c0
+</code></pre><p>在程序stop的时候，他会自动执行<code>frame variable</code>，打印出了所有的变量。</p>
+<p>大多情况下，我们在stop的时候可能想要做的是打印一个东西。正常情况我们需要用<code>target stop-hook add -o &quot;p xxx&quot;</code>，LLDB提供了一个更简便的命令<code>display</code>。</p>
+<p>e.g: 下面2行代码效果相同</p>
+<pre><code>(lldb) target stop-hook add -o &quot;p self.view&quot;
+(lldb) display self.view
+</code></pre><blockquote>
+<p>也可以用<code>display</code>来执行某一个命令。<code>p</code>,<code>e</code>,<code>expression</code>是等效的。</p>
+</blockquote>
+<h4 id="target-stop-hook-list"><a href="#target-stop-hook-list" class="headerlink" title="target stop-hook list"></a>target stop-hook list</h4><p>当添加完stop-hook之后，我们想看当前所有的<code>stop-hook</code>怎么办呢？使用<code>stop-hook list</code></p>
+<pre><code>(lldb) target stop-hook list
+Hook: 4
+  State: enabled
+  Commands: 
+    frame variable
+
+Hook: 5
+  State: enabled
+  Commands: 
+    expression self.view
+
+Hook: 6
+  State: enabled
+  Commands: 
+    expr -- self.view
+</code></pre><p>我们可以看到，我们添加了4个<code>stop-hook</code>，每个<code>stop-hook</code>都有一个id，他们分别是4，5，6</p>
+<h4 id="target-stop-hook-delete-amp-undisplay"><a href="#target-stop-hook-delete-amp-undisplay" class="headerlink" title="target stop-hook delete &amp; undisplay"></a>target stop-hook delete &amp; undisplay</h4><p>有添加的命令，当然也就有删除的命令。使用<code>target stop-hook delete</code>可以删除<code>stop-hook</code>，如果你觉得这个命令有点长，懒得敲。你也可以用<code>undisplay</code></p>
+<pre><code>(lldb) target stop-hook delete 4
+(lldb) undisplay 5
+</code></pre><p>我们用<code>target stop-hook delete</code>和<code>undisplay</code>分别删除了id为4和5的<code>stop-hook</code></p>
+<h4 id="target-stop-hook-disable-enable"><a href="#target-stop-hook-disable-enable" class="headerlink" title="target stop-hook disable/enable"></a>target stop-hook disable/enable</h4><p>当我们暂时想让某个<code>stop-hook</code>失效的时候，可以使用<code>target stop-hook disable</code></p>
+<pre><code>(lldb) target stop-hook disable 8
+</code></pre><p>如果我们想让所有的<code>stop-hook</code>失效，只需不传入<code>stop-hook</code>id即可：</p>
+<pre><code>(lldb) target stop-hook disable
+</code></pre><p>有<code>disable</code>就有<code>enable</code>，我们又想让<code>stop-hook</code>生效了。可以使用<code>target stop-hook enable</code></p>
+<pre><code>(lldb) target stop-hook enable 8
+</code></pre><p>同理，不传入参数表示让所有<code>stop-hook</code>生效</p>
+<pre><code>(lldb) target stop-hook enable
+</code></pre><h4 id="Extension"><a href="#Extension" class="headerlink" title="Extension"></a>Extension</h4><p>前几天@兔be南玻1在微博上给出一个小技巧。LLDB中<code>@import UIKit</code>即可打印frame等变量（默认情况下打不出来）<a href="http://weibo.com/1882658432/D7vw8g12c?type=comment#_rnd1450347536772" target="_blank" rel="noopener">微博链接</a>。</p>
+<pre><code>(lldb) p self.view.frame
+error: property &apos;frame&apos; not found on object of type &apos;UIView *&apos;
+error: 1 errors parsing expression
+(lldb) e @import UIKit
+(lldb) p self.view.frame
+(CGRect) $0 = (origin = (x = 0, y = 0), size = (width = 375, height = 667))
+</code></pre><p>由于每次run Xcode，LLDB的东西都会被清空。所以每次run你都需要在LLDB中输入<code>e @import UIKit</code>才能使用这个方便的功能，有点麻烦呀！</p>
+<p>之后有人提出了比较方便的一个办法。给UIApplicationMain设置一个断点，在断点中添加执行<code>e @import UIKit</code>。<br><img src="http://jiangliancheng.gitcafe.io/images/LLDB/weibo.jpg" alt=""><br>这种方法非常方便，不用自己输入了，但是断点我们可能会误删，而且断点是对应工程的。换一个工程又得重新打一个这样的断点。还是有点麻烦。有没有更简便的方法呢？</p>
+<p>我们首先想到的是LLDB在每次启动的时候都会load ‘~/.lldbinit’文件。在这里面执行<code>e @import UIKit</code>不就行了么？不会被误删，对每个工程都有效！</p>
+<p>然而想法是美好的，现实却是残酷的！因为<code>UIKit</code>这个库是在target中。而load ‘~/.lldbinit’的时候target还没创建。所以无法<code>import UIKit</code>。<a href="http://stackoverflow.com/questions/31743326/lldbinit-doesnt-work-in-xcode" target="_blank" rel="noopener">stackoverflow详细解释</a></p>
+<p>这时候我们又想到，可不可以在’~/.lldbinit’中给UIApplicationMain设置一个断点，在断点中添加执行<code>e @import UIKit</code>呢？</p>
+<p>答案是不行。原因跟前面一样，load ‘~/.lldbinit’执行时间太早。断点是依赖target的，target还未创建，断点加不上去。好事多磨，道路坎坷呀~~~</p>
+<p>后来我们又想到用<code>stop-hook</code>行不行呢？<code>stop-hook</code>不依赖target。一般我们<code>p frame</code>的时候，都需要先stop，理论上是可行的</p>
+<p>事实证明<code>stop-hook</code>的方法完全ok。只需要在’~/.lldbinit’中添加这2条命令即可：</p>
+<pre><code>display @import UIKit
+target stop-hook add -o &quot;target stop-hook disable&quot; 
+</code></pre><ul>
+<li>命令1：使用<code>display</code>表示在stop的时候执行<code>@import UIKit</code></li>
+<li>命令2：由于我们只需要执行一次<code>@import UIKit</code>，所以执行完成之后，执行<code>target stop-hook disable</code>，使原有的所有<code>stop-hook</code>失效</li>
+</ul>
+<blockquote>
+<p>这个命令有个缺陷，直接点击Xcode上的<code>pause</code>和<code>debug view hierarchy</code>，<code>stop-hook</code>不会生效。正在探索有没有更好的办法完成<code>@import UIKit</code>，如果你想到了，可以联系我~</p>
+</blockquote>
+<h3 id="target-symbols-add-add-dsym"><a href="#target-symbols-add-add-dsym" class="headerlink" title="target symbols add(add-dsym)"></a>target symbols add(add-dsym)</h3><p>说这个命令之前，先简单解释一下dSYM文件。程序运行的时候，都会编译成二进制文件。因为计算机只识别二进制文件，那为什么我们还能在代码上打断点？</p>
+<p>这主要是因为在编译的时候Xcode会生成dSYM文件，dSYM文件记录了哪行代码对应着哪些二进制，这样我们对代码打断点就会对应到二进制上。<a href="http://www.csdn.net/article/2015-08-04/2825369" target="_blank" rel="noopener">dSYM详细资料</a></p>
+<p>当Xcode找不着dSYM文件的时候，我们就无法对代码打断点，进行调试。<code>target symbols add</code>命令的作用就是让我们可以手动的将dSYM文件添加上去。LLBD对这个命令起了一个别名: <code>add-dsym</code></p>
+<p>e.g: 当我们对接framework的时候，如果只有framework代码，没有工程代码，能不能debug呢？其实我们只需要拿到工程的ipa和dSYM文件，就可以debug了，通过Attach to Process，使用命令<code>add-dsym</code>将dSYM文件加入target，即可只debug framework，不需要工程的代码</p>
+<pre><code>add-dsym ~/.../XXX.dSYM
+</code></pre><p>详细细节可以查看<a href="http://jiangliancheng.gitcafe.io/2015/07/25/iOS%E4%B8%ADframework%E7%9A%84%E8%81%94%E8%B0%83/" target="_blank" rel="noopener">iOS中framework的联调</a></p>
+<h2 id="help-amp-apropos"><a href="#help-amp-apropos" class="headerlink" title="help &amp; apropos"></a>help &amp; apropos</h2><p>LLDB的命令其实还有很多，很多命令我也没玩过。就算玩过的命令，我们也非常容易忘记，下次可能就不记得是怎么用的了。还好LLDB给我们提供了2个查找命令的命令:<code>help</code> &amp; <code>apropos</code></p>
+<h3 id="help"><a href="#help" class="headerlink" title="help"></a>help</h3><p>直接在LLDB中输入help。可以查看所有的LLDB命令</p>
+<pre><code>(lldb) help
+Debugger commands:
+
+  apropos           -- Find a list of debugger commands related to a particular
+                       word/subject.
+  breakpoint        -- A set of commands for operating on breakpoints. Also see
+                       _regexp-break.
+  help              -- Show a list of all debugger commands, or give details
+                       about specific commands.
+  script            -- Pass an expression to the script interpreter for
+                       evaluation and return the results. Drop into the
+                       interactive interpreter if no expression is given.
+  settings          -- A set of commands for manipulating internal settable
+                       debugger variables.
+  source            -- A set of commands for accessing source file information
+  target            -- A set of commands for operating on debugger targets.
+  thread            -- A set of commands for operating on one or more threads
+                       within a running process.
+  type              -- A set of commands for operating on the type system
+  version           -- Show version of LLDB debugger.
+  watchpoint        -- A set of commands for operating on watchpoints.
+  ....(东西太多，只截取了一部分)
+</code></pre><p>如果我们想看具体某一个命令的详细用法，可以使用<code>help &lt;command-name&gt;</code><br>e.g: 我们查看<code>watchpoint</code>命令</p>
+<pre><code>(lldb) help watchpoint
+The following subcommands are supported:
+
+      command -- A set of commands for adding, removing and examining bits of
+                 code to be executed when the watchpoint is hit (watchpoint
+                 &apos;commmands&apos;).
+      delete  -- Delete the specified watchpoint(s).  If no watchpoints are
+                 specified, delete them all.
+      disable -- Disable the specified watchpoint(s) without removing it/them. 
+                 If no watchpoints are specified, disable them all.
+      enable  -- Enable the specified disabled watchpoint(s). If no watchpoints
+                 are specified, enable all of them.
+      ignore  -- Set ignore count on the specified watchpoint(s).  If no
+                 watchpoints are specified, set them all.
+      list    -- List all watchpoints at configurable levels of detail.
+      modify  -- Modify the options on a watchpoint or set of watchpoints in
+                 the executable.  If no watchpoint is specified, act on the
+                 last created watchpoint.  Passing an empty argument clears the
+                 modification.
+      set     -- A set of commands for setting a watchpoint.
+</code></pre><h3 id="apropos"><a href="#apropos" class="headerlink" title="apropos"></a>apropos</h3><p>有的时候，我们可能并不能完全记得某个命令，如果只记得命令中的某个关键字。这时候我们可以使用<code>apropos</code>搜索相关命令信息。</p>
+<p>e.g: 我们想使用<code>stop-hook</code>的命令，但是已经不记得<code>stop-hook</code>命令是啥样了</p>
+<pre><code>(lldb) apropos stop-hook
+The following built-in commands may relate to &apos;stop-hook&apos;:
+  _regexp-display          -- Add an expression evaluation stop-hook.
+  _regexp-undisplay        -- Remove an expression evaluation stop-hook.
+  target stop-hook         -- A set of commands for operating on debugger
+                              target stop-hooks.
+  target stop-hook add     -- Add a hook to be executed when the target stops.
+  target stop-hook delete  -- Delete a stop-hook.
+  target stop-hook disable -- Disable a stop-hook.
+  target stop-hook enable  -- Enable a stop-hook.
+  target stop-hook list    -- List all stop-hooks.
+</code></pre><p>可以看到使用<code>apropos stop-hook</code>搜索一下，即可将所有<code>stop-hook</code>相关命令搜索出来</p>
+<h1 id="常用的Debug快捷键"><a href="#常用的Debug快捷键" class="headerlink" title="常用的Debug快捷键"></a>常用的Debug快捷键</h1><p>debug的时候，使用快捷键是一个很好的习惯，我简单列举了几个debug的快捷键</p>
+<table>
+<thead>
+<tr>
+<th>功能</th>
+<th>命令</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>暂停/继续</td>
+<td>cmd + ctrl + Y</td>
+</tr>
+<tr>
+<td>断点失效/生效</td>
+<td>cmd + Y</td>
+</tr>
+<tr>
+<td>控制台显示/隐藏</td>
+<td>cmd + shift + Y</td>
+</tr>
+<tr>
+<td>光标切换到控制台</td>
+<td>cmd + shift + C</td>
+</tr>
+<tr>
+<td>清空控制台</td>
+<td>cmd + K</td>
+</tr>
+<tr>
+<td>step over</td>
+<td>F6</td>
+</tr>
+<tr>
+<td>step into</td>
+<td>F7</td>
+</tr>
+<tr>
+<td>step out</td>
+<td>F8</td>
+</tr>
+</tbody>
+</table>
+<h1 id="End"><a href="#End" class="headerlink" title="End"></a>End</h1><p>东西有点多，感谢大家耐心看完这篇文章。LLDB命令非常多，有很多LLDB命令我也没玩过。这些命令我们不一定要完全记住，只要有个印象LLDB可以实现哪些功能就可以了。具体用的时候再用<code>help</code>或者<code>apropos</code>查找</p>
+<h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><p><a href="http://lldb.llvm.org/tutorial.html" target="_blank" rel="noopener">The LLDB Debugger</a></p>
+<p><a href="http://objccn.io/issue-19-2/" target="_blank" rel="noopener">与调试器共舞 - LLDB 的华尔兹</a></p>
+<p><a href="http://southpeak.gitpage.net/blog/2015/01/25/tool-lldb/" target="_blank" rel="noopener">LLDB调试器使用简介</a></p>
+<p><a href="http://www.cocoachina.com/industry/20130701/6514.html" target="_blank" rel="noopener">Xcode中断点的威力</a></p>
+<p><a href="http://www.csdn.net/article/2015-08-04/2825369" target="_blank" rel="noopener">dSYM详细资料</a></p>
+<h1 id="About-me"><a href="#About-me" class="headerlink" title="About me"></a>About me</h1><p><a href="http://jiangliancheng.gitcafe.io/" target="_blank" rel="noopener">博客</a> <a href="http://weibo.com/u/5592239559" target="_blank" rel="noopener">微博</a> QQ群：159974494</p>
+
+    
+  </div>
+
+</article>
+
+
+   
+  <div class="text-center donation">
+    <div class="inner-donation">
+      <span class="btn-donation">支持一下</span>
+      <div class="donation-body">
+        <div class="tip text-center">扫一扫，支持forsigner</div>
+        <ul>
+        
+          <li class="item">
+            
+              <span>微信扫一扫</span>
+            
+            <img src="/images/qr-wechat.png" alt="">
+          </li>
+        
+          <li class="item">
+            
+              <span>支付宝扫一扫</span>
+            
+            <img src="/images/qr-alipay.png" alt="">
+          </li>
+        
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+   
+  <div class="box-prev-next clearfix">
+    <a class="show pull-left" href="/2015/12/05/追求Masonry/">
+        <i class="icon icon-angle-left"></i>
+    </a>
+    <a class="show pull-right" href="/2015/12/19/小笨狼的LLDB技巧：chisel/">
+        <i class="icon icon-angle-right"></i>
+    </a>
+  </div>
+
+
+
+
+
+   
+      <div class="git"></div>
+   
+</div>
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/link/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              友链
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/atom.xml"
+              rel="noopener noreferrer"
+              target="_blank"
+              >
+              RSS
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+  <section class="disqus-comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+  </section>
+
+  <script>
+    var disqus_shortname = 'forsigner';
+    
+    var disqus_url = 'http://yoursite.com/2015/12/13/小笨狼与LLDB的故事/';
+    
+    (function(){
+      var dsq = document.createElement('script');
+      dsq.type = 'text/javascript';
+      dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+
+  <script id="dsq-count-scr" src="//forsigner.disqus.com/count.js" async></script>
+
+
+
+    
+    
+
+    
+    
+
+    
+
+    
+    
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>

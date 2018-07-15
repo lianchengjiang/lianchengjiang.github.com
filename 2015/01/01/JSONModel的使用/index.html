@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>JSONModel的使用 | Hexo</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="JSONModel," />
+  
+
+  <meta name="description" content="大部分的项目里都会涉及到json到model的转换，一般正常情况下，大家都是自己写代码来转换。写多了就会发现转化这个过程中，代码的重复率很高，很浪费时间。正好前一阵看了一篇唱吧使用Mantle的文章，在文章的引导下，我对比了一下Mantle和JSONModel，Mantle和JSONModel各有优势，但是整体来说JSONModel使用起来更简答，功能也非常的全，所以最终决定使用JSONModel">
+<meta name="keywords" content="JSONModel">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JSONModel的使用">
+<meta property="og:url" content="http://yoursite.com/2015/01/01/JSONModel的使用/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="大部分的项目里都会涉及到json到model的转换，一般正常情况下，大家都是自己写代码来转换。写多了就会发现转化这个过程中，代码的重复率很高，很浪费时间。正好前一阵看了一篇唱吧使用Mantle的文章，在文章的引导下，我对比了一下Mantle和JSONModel，Mantle和JSONModel各有优势，但是整体来说JSONModel使用起来更简答，功能也非常的全，所以最终决定使用JSONModel">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2015-10-31T16:09:18.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="JSONModel的使用">
+<meta name="twitter:description" content="大部分的项目里都会涉及到json到model的转换，一般正常情况下，大家都是自己写代码来转换。写多了就会发现转化这个过程中，代码的重复率很高，很浪费时间。正好前一阵看了一篇唱吧使用Mantle的文章，在文章的引导下，我对比了一下Mantle和JSONModel，Mantle和JSONModel各有优势，但是整体来说JSONModel使用起来更简答，功能也非常的全，所以最终决定使用JSONModel">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=c114cben" rel="stylesheet">
+
+
+  
+    <link rel="stylesheet" href="/css/personal-style.css">
+  
+
+  
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+  
+  <script type="text/javascript">
+	(function(){
+	    var bp = document.createElement('script');
+	    var curProtocol = window.location.protocol.split(':')[0];
+	    if (curProtocol === 'https') {
+	        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+	    }
+	    else {
+	        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+	    }
+	    var s = document.getElementsByTagName("script")[0];
+	    s.parentNode.insertBefore(bp, s);
+	})();
+  </script>
+
+
+
+  
+    <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+
+  
+    <link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  
+</head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">盒子</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/link/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            友链
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/atom.xml"
+            rel="noopener noreferrer"
+            target="_blank"
+            >
+            RSS
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-JSONModel的好处"><span class="toc-text">1.JSONModel的好处</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-JSONModel的使用"><span class="toc-text">2.JSONModel的使用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-基本用法"><span class="toc-text">2.1 基本用法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-嵌套JSONModel"><span class="toc-text">2.2 嵌套JSONModel</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3对于NSArray的解析"><span class="toc-text">2.3对于NSArray的解析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-4-keyMapping"><span class="toc-text">2.4 keyMapping</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-5-procotol的使用"><span class="toc-text">2.5 procotol的使用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-6-自定义解析方式"><span class="toc-text">2.6 自定义解析方式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-7-Model-gt-Dictionary-or-Model-gt-JSON-Text"><span class="toc-text">2.7 Model-&gt;Dictionary or Model-&gt;JSON Text</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-recap"><span class="toc-text">3.recap</span></a></li></ol>
+  </div>
+
+
+
+<div class="content content-post CENTER">
+   <article id="post-JSONModel的使用" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">JSONModel的使用</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2015.01.01</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>John Doe</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/JSONModel/">JSONModel</a>
+  </span>
+
+
+
+      
+        <span>
+          <i class="icon-comment"></i>
+          <a href="http://www.forsigner.com/2015/01/01/JSONModel的使用/#disqus_thread"></a>
+        </span>
+      
+
+      
+      <i class="fa fa-eye"></i> 
+        <span id="busuanzi_container_page_pv">
+           &nbsp热度 <span id="busuanzi_value_page_pv">
+           <i class="fa fa-spinner fa-spin"></i></span>℃
+        </span>
+      
+      
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <p>大部分的项目里都会涉及到json到model的转换，一般正常情况下，大家都是自己写代码来转换。写多了就会发现转化这个过程中，代码的重复率很高，很浪费时间。正好前一阵看了一篇<a href="http://www.iwangke.me/2014/10/13/Why-Changba-iOS-choose-Mantle/" target="_blank" rel="noopener">唱吧使用Mantle的文章</a>，在文章的引导下，我对比了一下Mantle和JSONModel，Mantle和JSONModel各有优势，但是整体来说JSONModel使用起来更简答，功能也非常的全，所以最终决定使用JSONModel</p>
+<h1 id="1-JSONModel的好处"><a href="#1-JSONModel的好处" class="headerlink" title="1.JSONModel的好处"></a>1.JSONModel的好处</h1><p>了解了JSONModel之后发现JSONModel有非常多的好处。</p>
+<ol>
+<li>自动解析（JSON-&gt;Model）</li>
+<li>keyMap映射（让逻辑一目了然）</li>
+<li>属性转化（自动转化成想要的属性，我们只需要在定义property时写下需要的类型即可）</li>
+<li>缺省值校验（排除书写错误，如果我们写错了名字，在debug时会有log提示）</li>
+<li>lazy解析（使用时再解析，提高解析效率）</li>
+<li>-toDictionary,-toJSONString的实现（Model-&gt;JSON直接使用）</li>
+<li>NSCoping，NSCoding协议实现（直接copy，coding，使用NSUserDefault时再也不用担心了）</li>
+<li>-Description的实现（调试时直接po出属性）</li>
+<li>-isEqual和-hash的实现</li>
+</ol>
+<p>简单总结了一下这些好处，也许总结的不到位，还有其他的好处等待大家的发现。</p>
+<p>说完了好处那我们来看看JSONModel是怎么用的吧</p>
+<h1 id="2-JSONModel的使用"><a href="#2-JSONModel的使用" class="headerlink" title="2.JSONModel的使用"></a>2.JSONModel的使用</h1><h3 id="2-1-基本用法"><a href="#2-1-基本用法" class="headerlink" title="2.1 基本用法"></a>2.1 基本用法</h3><pre><code>{
+    &quot;id&quot;: &quot;123&quot;,
+    &quot;name&quot;: &quot;product name&quot;
+    &quot;price&quot;: 35.4
+    &quot;url&quot;:&quot;http://www.taobao.com/&quot;
+}
+</code></pre><p>对于上面这段JSON数据，传统的model定义方式是这样的：</p>
+<pre><code>@interface Product : NSObject
+@property (nonatomic, assign)NSInteger id;
+@property (nonatomic, strong)NSString* name;
+@property (nonatomic, assign)float price;
+@property (nonatomic, strong)NSURL* url;
+@end
+
+@implementation Product
+- (instancetype)initWithDictionary:(NSDictionary*)jsonDic
+{
+    if (self = [super init]) {
+        self.id = [jsonDic[@&quot;id&quot;] integerValue];
+        self.name = jsonDic[@&quot;name&quot;];
+        self.price = [jsonDic[@&quot;price&quot;] floatValue];
+        self.url = [NSURL URLWithString:jsonDic[@&quot;url&quot;]];
+    }
+    return self;
+}    
+@end
+</code></pre><p>我们可以看到，解析JSON的过程很繁琐，下面我们开看看用JSONModel之后的写法。</p>
+<pre><code>@interface Product : JSONModel
+@property (nonatomic, assign)NSInteger id;
+@property (nonatomic, strong)NSString* name;
+@property (nonatomic, assign)float price;
+@property (nonatomic, strong)NSURL* url;
+@end
+
+@implementation Product
+@end
+</code></pre><p>只要让Product继承JSONModel，我们就完全可以省略掉解析JSON的过程。JSONModel会自动帮我们解析JSON，在使用时调用JSONModel的这些方法即可：</p>
+<pre><code>//String -&gt; Model
+-(instancetype)initWithString:(NSString*)string error:(JSONModelError**)err;
+
+//Dictionary -&gt; Model
+-(instancetype)initWithDictionary:(NSDictionary*)dict error:(NSError **)err;
+
+//Data -&gt; Model
+-(instancetype)initWithData:(NSData *)data error:(NSError **)error;
+</code></pre><p>看！使用起来非常方便吧？而且功能也非常强大。在转换的过程中，它会自动匹配类型。</p>
+<ol>
+<li>id：String -&gt; NSInteger</li>
+<li>name: String -&gt; String</li>
+<li>price: float -&gt; float</li>
+<li>url: String -&gt; NSURL</li>
+</ol>
+<p>我们只需要关注我们需要的类型，而不用管<code>JSON</code>中返回是什么类型。基本的类型<code>JSONModel</code>都会自动转换，当然如果是不正常的类型转换，<code>JSONModel</code>是无法完成的，比如NSArray -&gt; NSInteger</p>
+<h3 id="2-2-嵌套JSONModel"><a href="#2-2-嵌套JSONModel" class="headerlink" title="2.2 嵌套JSONModel"></a>2.2 嵌套JSONModel</h3><pre><code>{
+    &quot;order_id&quot;: 104,
+    &quot;total_price&quot;: 13.45,
+    &quot;product&quot; : {
+        &quot;id&quot;: &quot;123&quot;,
+        &quot;name&quot;: &quot;Product name&quot;,
+        &quot;price&quot;: 12.95
+        &quot;url&quot;:&quot;http://www.taobao.com/&quot;
+    }
+}
+</code></pre><p>对于上面这个JSON，我们也许需要2个model：</p>
+<pre><code>@class Product;
+
+@interface OrderModel : JSONModel
+@property (nonatomic, assign)NSInteger order_id;
+@property (nonatomic, assign)float total_price;
+@property (nonatomic, strong)Product* product;
+@end
+
+@implementation OrderModel
+@end
+
+@interface Product : JSONModel
+@property (nonatomic, assign)NSInteger id;
+@property (nonatomic, strong)NSString* name;
+@property (nonatomic, assign)float price;
+@property (nonatomic, strong)NSURL* url;
+@end
+
+@implementation Product
+@end
+</code></pre><p>使用<code>JSONModel</code>之后，我们只需要这样定义2个<code>Model</code>，在解析<code>OrderModel</code>的时候就会自动解析<code>product</code>属性。当然前提是<code>OrderModel</code>和<code>Product</code>都继承<code>JSOMModel</code></p>
+<h3 id="2-3对于NSArray的解析"><a href="#2-3对于NSArray的解析" class="headerlink" title="2.3对于NSArray的解析"></a>2.3对于NSArray的解析</h3><pre><code>{
+    &quot;order_id&quot;: 104,
+    &quot;total_price&quot;: 103.45,
+    &quot;products&quot; : [
+         {
+             &quot;id&quot;: &quot;123&quot;,
+             &quot;name&quot;: &quot;Product1&quot;,
+             &quot;price&quot;: 12.95
+             &quot;url&quot;:&quot;http://www.taobao.com/&quot;
+         },
+         {
+             &quot;id&quot;: &quot;137&quot;,
+             &quot;name&quot;: &quot;Product2&quot;,
+             &quot;price&quot;: 82.95
+             &quot;url&quot;:&quot;http://www.taobao.com/&quot;
+         }
+    ]
+}
+</code></pre><p>解析JSON的时候，我们会经常碰到Array，而Array中是另一个model。</p>
+<pre><code>@protocol Product &lt;NSObject&gt;
+@end ;
+
+@interface OrderModel : JSONModel
+@property (nonatomic, assign)NSInteger order_id;
+@property (nonatomic, assign)float total_price;
+@property (nonatomic, strong)NSArray&lt;Product&gt;* product;
+@end
+
+@implementation OrderModel
+@end
+
+@interface Product : JSONModel
+@property (nonatomic, assign)NSInteger id;
+@property (nonatomic, strong)NSString* name;
+@property (nonatomic, assign)float price;
+@property (nonatomic, strong)NSURL* url;
+@end
+
+@implementation Product
+@end
+</code></pre><p>对于这样的情况，我们首先需要声明一个<code>protocol</code>,<code>protocol</code>的名字要和<code>Array</code>中<code>model</code>的名字相同，这里是<code>Product</code>，然后让<code>Array</code>遵从这个<code>protocol</code>即可。这样的好处非常明显，对于<code>Array</code>，在定义的时候我们就知道里面存放的是什么数据类型</p>
+<h3 id="2-4-keyMapping"><a href="#2-4-keyMapping" class="headerlink" title="2.4 keyMapping"></a>2.4 keyMapping</h3><p>也许大家都发现了，在上面的例子中，所有property的名字和JSON中key是完全一样的，如果他们的名字不一样怎么办呢？这时候我们就需要用到keyMapping了，当然keyMapping的用法不止这一点</p>
+<pre><code>{
+    &quot;order_id&quot;: 104,
+    &quot;url&quot;:&quot;http://www.taobao.com/&quot;
+    &quot;order_detail&quot; : {
+        &quot;price&quot;:18.6
+    }
+    &quot;products&quot; : [
+      {
+          &quot;name&quot;: &quot;Product1&quot;,
+      },
+      {
+          &quot;name&quot;: &quot;Product2&quot;,
+      }
+      ]
+}
+</code></pre><p>对于上面这个JSON，我们可以这么玩：</p>
+<pre><code>@interface OrderModel : JSONModel
+@property (nonatomic, assign)NSInteger orderId;
+@property (nonatomic, strong)NSString* url;
+@property (nonatomic, assign)float price;
+@property (nonatomic, strong)NSArray* productNames;
+@end
+
+@implementation OrderModel
+
++ (JSONKeyMapper*)keyMapper
+{
+    return [[JSONKeyMapper alloc] initWithDictionary:@{
+            @&quot;order_id&quot;:@&quot;orderId&quot;,
+            @&quot;order_detail.price&quot;:@&quot;price&quot;,
+            @&quot;products.name&quot;:@&quot;productNames&quot;}];
+}
+@end
+</code></pre><p><code>-keyMapper</code>会建立一个映射关系，将<code>JSON</code>中的<code>key</code>，映射到<code>property</code>上:</p>
+<ol>
+<li><code>orderId</code>（property）的名字和<code>order_id</code>（JSON）不一样，所以要建立映射</li>
+<li><code>url</code>的名字在<code>property</code>和<code>JSON</code>中相同，所以不需要映射，直接忽略</li>
+<li>对于<code>price</code>，它对应着<code>order_detail</code>中的<code>price</code>，所以直接使用<code>order_detail.price</code>映射</li>
+<li>对于<code>productNames</code>数组，对应这<code>products</code>种的<code>name</code>，也直接使用<code>products.name</code>映射。（注意：这里映射出来是数组）</li>
+</ol>
+<h3 id="2-5-procotol的使用"><a href="#2-5-procotol的使用" class="headerlink" title="2.5 procotol的使用"></a>2.5 procotol的使用</h3><p>在前面，对于Array中存放其他model的情况，我们使用了procotol。事实上除了这种自定义的协议之外，还有一些JSONModel本身的协议供我们使用。</p>
+<pre><code>{
+    &quot;order_id&quot;: 104,
+    &quot;products&quot; : [
+        {
+            &quot;id&quot;: &quot;123&quot;,
+            &quot;name&quot;: &quot;Product1&quot;,
+            &quot;price&quot;: 12.95
+        },
+        {
+            &quot;id&quot;: &quot;137&quot;,
+            &quot;name&quot;: &quot;Product2&quot;,
+        }
+    ]
+}
+</code></pre><hr>
+<pre><code>@interface OrderModel : JSONModel
+@property (nonatomic, assign)NSInteger order_id;
+@property (nonatomic, assign)NSNumber&lt;Ignore&gt;* total_price;
+@property (nonatomic, strong)NSArray&lt;Product,ConvertOnDemand&gt;* product;
+@end
+
+@implementation OrderModel
+@end
+
+@interface Product : JSONModel
+@property (nonatomic, assign)NSNumber&lt;Index&gt;* id;
+@property (nonatomic, strong)NSString&lt;Optional&gt;* name;
+@property (nonatomic, assign)float price;
+@end
+
+@implementation Product
+@end
+</code></pre><p>我们可以看到上面的model中用到了很多protocol，下面我来解释一下这些protocol的用处是什么。</p>
+<ol>
+<li><code>Ignore</code>：使用这个协议表示在解析的时候忽略这个字段</li>
+<li><code>Optional</code>：使用这个协议表示这个字段可以为空，或者没有（默认情况下是不允许为空的）</li>
+<li><code>ConvertOnDemand</code>:这个协议一般只对Array使用，表示暂时不对Array中的数据进行解析，在使用时再解析，也就是lazy模式。使用后这个property会解析成JSONModelArray类型</li>
+<li><code>Index</code>：这个协议表示这个property是关键字，对于JSONModelArray使用<code>-modelWithIndexValue:</code>方法查找的时候，会查找有Index协议的property</li>
+</ol>
+<h3 id="2-6-自定义解析方式"><a href="#2-6-自定义解析方式" class="headerlink" title="2.6 自定义解析方式"></a>2.6 自定义解析方式</h3><p>对于某些数据，也许不能直接解析，我们需要对这个数据专门定制一个解析方式</p>
+<pre><code>{
+    &quot;name&quot;:&quot;xiaoming&quot;,
+    &quot;score&quot;:@85
+}
+</code></pre><hr>
+<pre><code>typedef NS_ENUM(NSInteger, Levels) {
+    LevelA,LevelB,LevelC,LevelD
+};
+
+@interface Student()
+@property (nonatomic, strong)NSString* name;
+@property (nonatomic, assign)Levels level;
+@end
+
+@implementation Student
++ (JSONKeyMapper*)keyMapper
+{
+    return [[JSONKeyMapper alloc] initWithDictionary:@{@&quot;score&quot;:@&quot;level&quot;}];
+}
+
+- (void)setLevelWithNSNumber:(NSNumber*)num
+{
+    float score = [num floatValue];
+    Levels level = LevelD;
+
+    if (score&gt;90)   level = LevelA;
+    else if(score &gt; 80) level = LevelB;
+    else if(score &gt;60)  level = LevelC;
+
+    self.level = level;
+}
+@end
+</code></pre><p>在这个例子中，服务器返回的是分数score，而我们需要的是等级level，所以我们需要一个专门将score转化为level的方法。方法的命名方式为set(property)With(type)。除了set其他单词首字母大写，这里property为level，type为NSNumber，所以方法为<code>-setLevelWithNSNumber:</code>。定义了这个方法之后解析时，JSONModel会自动调用这个方法来解析level。</p>
+<h3 id="2-7-Model-gt-Dictionary-or-Model-gt-JSON-Text"><a href="#2-7-Model-gt-Dictionary-or-Model-gt-JSON-Text" class="headerlink" title="2.7 Model-&gt;Dictionary or Model-&gt;JSON Text"></a>2.7 Model-&gt;Dictionary or Model-&gt;JSON Text</h3><p>对于JSONModel，不仅可以直接从JSON转化为Model，也可以将model逆转为JSON</p>
+<pre><code>ProductModel* pm = [[ProductModel alloc] initWithString:jsonString error:nil];
+pm.name = @&quot;Changed Name&quot;;
+
+//convert to dictionary
+NSDictionary* dict = [pm toDictionary];
+
+//convert to text
+NSString* string = [pm toJSONString];
+</code></pre><p>看！使用起来非常方便，直接<code>-toDictionary</code>或者<code>-toJSONString</code>就转化成了JSON</p>
+<h1 id="3-recap"><a href="#3-recap" class="headerlink" title="3.recap"></a>3.recap</h1><p>整体来说JSONModel是一个非常棒的JSON-&gt;Model解析工具。是非常值得使用的，当然他里面也还有一些东西不够完善，不过都是一些比较偏的东西，基本的东西是够用了的，而且我正在联系作者修改，不过那哥们貌似比较忙……<br>不出意外的话下一篇我会将JSONModel的内部实现，和一些不完善的坑写出来~</p>
+
+    
+  </div>
+
+</article>
+
+
+   
+  <div class="text-center donation">
+    <div class="inner-donation">
+      <span class="btn-donation">支持一下</span>
+      <div class="donation-body">
+        <div class="tip text-center">扫一扫，支持forsigner</div>
+        <ul>
+        
+          <li class="item">
+            
+              <span>微信扫一扫</span>
+            
+            <img src="/images/qr-wechat.png" alt="">
+          </li>
+        
+          <li class="item">
+            
+              <span>支付宝扫一扫</span>
+            
+            <img src="/images/qr-alipay.png" alt="">
+          </li>
+        
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+   
+  <div class="box-prev-next clearfix">
+    <a class="show pull-left" href="/2014/12/08/iOS开发Tips/">
+        <i class="icon icon-angle-left"></i>
+    </a>
+    <a class="show pull-right" href="/2015/01/31/MethodSwizzling1/">
+        <i class="icon icon-angle-right"></i>
+    </a>
+  </div>
+
+
+
+
+
+   
+      <div class="git"></div>
+   
+</div>
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/link/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              友链
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/atom.xml"
+              rel="noopener noreferrer"
+              target="_blank"
+              >
+              RSS
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+  <section class="disqus-comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+  </section>
+
+  <script>
+    var disqus_shortname = 'forsigner';
+    
+    var disqus_url = 'http://yoursite.com/2015/01/01/JSONModel的使用/';
+    
+    (function(){
+      var dsq = document.createElement('script');
+      dsq.type = 'text/javascript';
+      dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+
+  <script id="dsq-count-scr" src="//forsigner.disqus.com/count.js" async></script>
+
+
+
+    
+    
+
+    
+    
+
+    
+
+    
+    
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>

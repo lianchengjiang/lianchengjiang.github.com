@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>Blcok的那些事 | Hexo</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="forsigner,前端,设计,Hexo主题,前端开发,用户体验,设计,frontend,design,nodejs,JavaScript" />
+  
+
+  <meta name="description" content="2015年3月2日，新年的第二篇博客。 这篇博客适合对block有一定的了解的人阅读，如果你对还不知道什么是block，那也许这篇文章更适合你。 block实现假设你对Block已经有了一定了解。首先对于block，我们看看他到底是怎么实现的。 int main() {     __block id obj = [NSObject new];     void (^blk)(void) = ^{">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Blcok的那些事">
+<meta property="og:url" content="http://yoursite.com/2015/03/02/blcok的那些事/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="2015年3月2日，新年的第二篇博客。 这篇博客适合对block有一定的了解的人阅读，如果你对还不知道什么是block，那也许这篇文章更适合你。 block实现假设你对Block已经有了一定了解。首先对于block，我们看看他到底是怎么实现的。 int main() {     __block id obj = [NSObject new];     void (^blk)(void) = ^{">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://yoursite.com/images/block_forwarding1.png">
+<meta property="og:image" content="http://yoursite.com/images/block_forwarding2.png">
+<meta property="og:updated_time" content="2015-11-24T06:47:56.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Blcok的那些事">
+<meta name="twitter:description" content="2015年3月2日，新年的第二篇博客。 这篇博客适合对block有一定的了解的人阅读，如果你对还不知道什么是block，那也许这篇文章更适合你。 block实现假设你对Block已经有了一定了解。首先对于block，我们看看他到底是怎么实现的。 int main() {     __block id obj = [NSObject new];     void (^blk)(void) = ^{">
+<meta name="twitter:image" content="http://yoursite.com/images/block_forwarding1.png">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=c114cben" rel="stylesheet">
+
+
+  
+    <link rel="stylesheet" href="/css/personal-style.css">
+  
+
+  
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+  
+  <script type="text/javascript">
+	(function(){
+	    var bp = document.createElement('script');
+	    var curProtocol = window.location.protocol.split(':')[0];
+	    if (curProtocol === 'https') {
+	        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+	    }
+	    else {
+	        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+	    }
+	    var s = document.getElementsByTagName("script")[0];
+	    s.parentNode.insertBefore(bp, s);
+	})();
+  </script>
+
+
+
+  
+    <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+
+  
+    <link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  
+</head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">盒子</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/link/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            友链
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/atom.xml"
+            rel="noopener noreferrer"
+            target="_blank"
+            >
+            RSS
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#block实现"><span class="toc-text">block实现</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#block的一些问题"><span class="toc-text">block的一些问题</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-block有几种类型"><span class="toc-text">1.block有几种类型</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-block-copy做了什么？"><span class="toc-text">2.block copy做了什么？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-block的循环引用怎么避免"><span class="toc-text">3.block的循环引用怎么避免</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-非ARC下-block为什么能避免循环引用"><span class="toc-text">4.非ARC下,__block为什么能避免循环引用</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5-ARC下-block为什么不能避免循环引用"><span class="toc-text">5.ARC下,__block为什么不能避免循环引用</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#6-ARC下，-weak为什么能避免循环引用"><span class="toc-text">6.ARC下，__weak为什么能避免循环引用</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考"><span class="toc-text">参考</span></a></li></ol>
+  </div>
+
+
+
+<div class="content content-post CENTER">
+   <article id="post-blcok的那些事" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">Blcok的那些事</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2015.03.02</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>John Doe</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/刨根究底iOS/">刨根究底iOS</a>
+  </span>
+
+
+
+      
+        <span>
+          <i class="icon-comment"></i>
+          <a href="http://www.forsigner.com/2015/03/02/blcok的那些事/#disqus_thread"></a>
+        </span>
+      
+
+      
+      <i class="fa fa-eye"></i> 
+        <span id="busuanzi_container_page_pv">
+           &nbsp热度 <span id="busuanzi_value_page_pv">
+           <i class="fa fa-spinner fa-spin"></i></span>℃
+        </span>
+      
+      
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <p>2015年3月2日，新年的第二篇博客。</p>
+<p>这篇博客适合对block有一定的了解的人阅读，如果你对还不知道什么是block，那也许<a href="http://blog.csdn.net/enuola/article/details/8674063" target="_blank" rel="noopener">这篇文章</a>更适合你。</p>
+<h2 id="block实现"><a href="#block实现" class="headerlink" title="block实现"></a>block实现</h2><p>假设你对Block已经有了一定了解。首先对于block，我们看看他到底是怎么实现的。</p>
+<pre><code>int main() {
+    __block id obj = [NSObject new];
+    void (^blk)(void) = ^{
+        NSLog(@&quot;%@&quot;,obj);
+    };
+    return 1;
+}
+</code></pre><p>对于这样一个block，我们使用clang工具将a.m(代码的文件)编译为C语言</p>
+<pre><code>clang -rewrite-objc a.m
+</code></pre><p>找到a.cpp文件，里面的代码有很多。首先我们来看block的定义</p>
+<pre><code>/** block 对象(结构体) */
+struct __main_block_impl_0 {
+    void *isa;  //Class指针，指向block的Class
+    int Flags;  //用于保存block引用计数，是堆上还是栈上或者全局区，是否有拷贝函数等信息
+    int Reserved;   //保留变量
+    void *FuncPtr;  //函数指针，指向block的实现
+    struct __main_block_desc_0* Desc;   //block的附加信息
+    __Block_byref_obj_0 *obj;   //捕获的变量
+};
+</code></pre><ol>
+<li>isa指针，如果对Objective-C对象熟悉的朋友应该知道，isa是Objective-C对象的标志，它指向对应的类Class，所以Block其实是一个对象</li>
+<li>flag标志，使用位存储一些信息，包括block的引用计数，所处位置(堆上，栈上或者数据区)等</li>
+<li>Reserved，保留变量，留给以后升级使用</li>
+<li>FuncPtr，函数指针，指向具体的block实现的函数调用地址。</li>
+<li>Desc，block的附加信息</li>
+<li>obj，block中捕获的对象</li>
+</ol>
+<p>这个里面有两个地方不是太清楚，<code>__main_block_desc_0</code>和<code>__Block_byref_obj_0</code>，下面我们来看看</p>
+<pre><code>/** block的附加信息 */
+static struct __main_block_desc_0 {
+    size_t reserved;    //保留变量
+    size_t Block_size;  //block 的大小
+
+    // copy和dispose函数。用于将block中捕获的对象copy到堆上和释放。
+    void (*copy)(struct __main_block_impl_0*, struct __main_block_impl_0*);
+    void (*dispose)(struct __main_block_impl_0*);
+}
+</code></pre><p>我们可以看到<code>__main_block_desc_0</code>是一个结构体，用于保存block的附加信息</p>
+<ol>
+<li>reserved，保留变量，留给以后升级使用</li>
+<li>Block_size，block的大小，当block需要从栈上复制到堆上时，使用这个大小来开辟内存</li>
+<li>copy和dispose函数，用于对block中捕获的对象保存和释放，当block copy时，会调用这里的copy函数，将捕获的对象复制到堆上。若没有捕获对象，将不存在这两个函数</li>
+</ol>
+<p>我们再来看看<code>__Block_byref_obj_0</code>是个什么东东？</p>
+<pre><code>struct __Block_byref_obj_0 {
+    void *__isa;  //Class指针
+    __Block_byref_obj_0 *__forwarding;  //保证block复制到堆上时，原来栈上block也能访问到堆上的block
+    int __flags;   //使用位存储一些信息，包括捕获的对象在栈上还是堆上
+    int __size;    //结构体大小
+    //内存管理用，copy和dispose
+    void (*__Block_byref_id_object_copy)(void*, void*);
+    void (*__Block_byref_id_object_dispose)(void*);
+    id obj; //捕获的对象
+};
+</code></pre><p>当我们对一个变量使用<strong>block参数时，编译器会自动将变量转换成`</strong>Block_byref_obj_0<code>对象。下面我们来看看</code>__Block_byref_obj_0`对象的具体细节</p>
+<ol>
+<li>__isa指针，指向对象的Class地址，不过这里会指向NULL(0)</li>
+<li>__forwarding指针，用于block从栈上复制到堆上时，使用的是同一个block</li>
+<li>__flags，使用位存储一些信息，包括捕获的对象在栈上还是堆上等信息</li>
+<li>__size，结构体的大小</li>
+<li>copy和dispose， 用于对捕获的对象进行保存和释放，若捕获的非对象，这里不存在这两个函数</li>
+</ol>
+<p>对于__forwarding指针说的不是太清楚，下面我来单独说说。</p>
+<p>当block生成时，__forwarding指向自身</p>
+<p><img src="/images/block_forwarding1.png" alt=""></p>
+<p>当block从栈上copy到堆上时，栈上的<code>__Block_byref_obj_0</code>的<strong>forwarding指向堆上的`</strong>Block_byref_obj_0<code>。堆上的</code><strong>Block_byref_obj_0`的</strong>forwarding指向自身</p>
+<p><img src="/images/block_forwarding2.png" alt=""></p>
+<p>当block从栈上copy到堆上后，可能栈上的block和堆上的block同时都在使用(某些地方只能拿到栈上的block)，如果直接使用<code>__Block_byref_obj_0</code>本身，将会导致数据不同步的问题，所以代码所有地方都不直接使用<code>__Block_byref_obj_0</code>，而是使用<code>__Block_byref_obj_0</code>的__forwarding指针。</p>
+<p>另外对于Block的捕获关系希望大家弄清楚：</p>
+<ol>
+<li>block(<strong>main_block_impl_0)捕获</strong>block(__Block_byref_obj_0)obj</li>
+<li><strong>block(</strong>Block_byref_obj_0)捕获对象<code>id obj</code></li>
+</ol>
+<h2 id="block的一些问题"><a href="#block的一些问题" class="headerlink" title="block的一些问题"></a>block的一些问题</h2><h4 id="1-block有几种类型"><a href="#1-block有几种类型" class="headerlink" title="1.block有几种类型"></a>1.block有几种类型</h4><p>block主要分为三种Block：</p>
+<ol>
+<li>全局block(NSConcreteGlobalBlock):当block没有捕获变量，或者捕获的只有全局变量，block为NSConcreteGlobalBlock</li>
+<li>栈上block(NSConcreteStackBlock):block捕获了非全局变量，并且未copy之前，block为NSConcreteStackBlock</li>
+<li>堆上block(NSConcreteMallocBlock):block copy后，<del>从堆上复制到栈上</del> 从栈上复制到堆上，为NSConcreteMallocBlock</li>
+</ol>
+<h4 id="2-block-copy做了什么？"><a href="#2-block-copy做了什么？" class="headerlink" title="2.block copy做了什么？"></a>2.block copy做了什么？</h4><p>根据block不同类型，copy分为三种情况：</p>
+<ol>
+<li>全局block：不做任何处理，返回自己</li>
+<li>堆上block：retainCount+1并返回</li>
+<li>栈上block：①将block对象copy到堆上.②改变flag和isa指针.③调用__main_block_desc_0中的copy函数</li>
+</ol>
+<h4 id="3-block的循环引用怎么避免"><a href="#3-block的循环引用怎么避免" class="headerlink" title="3.block的循环引用怎么避免"></a>3.block的循环引用怎么避免</h4><ol>
+<li>ARC条件下，使用__weak避免循环引用</li>
+<li>非ARC条件下，使用__block避免循环引用</li>
+</ol>
+<h4 id="4-非ARC下-block为什么能避免循环引用"><a href="#4-非ARC下-block为什么能避免循环引用" class="headerlink" title="4.非ARC下,__block为什么能避免循环引用"></a>4.非ARC下,__block为什么能避免循环引用</h4><p>首先我们来看循环应用的原因。一般情况下，self持有block，block又持有self，照成循环引用。iOS中的持有是指引用计数+1.</p>
+<ol>
+<li>由于block是self的属性，block生成时，必然会引用计数+1，所以self持有block。</li>
+<li>由于block要使用必须要copy到堆上，否则栈上block夸区域使用会崩溃。block对象中捕获了self作为属性，当block copy到堆上时，调用block调用__main_block_desc_0中的copy函数,函数中会对self进行retain，使self引用计数+1.所以block持有self</li>
+</ol>
+<p>当使用<strong>block属性时，block捕获</strong>Block_byref_obj_0对象，<strong>Block_byref_obj_0对象捕获self。block copy时，使得</strong>Block_byref_obj_0对象的retainCount+1，block持有<strong>Block_byref_obj_0对象，然后self的引用计数不会增加，</strong>Block_byref_obj_0对象不会持有self。所以block不持有self，打破循环引用</p>
+<h4 id="5-ARC下-block为什么不能避免循环引用"><a href="#5-ARC下-block为什么不能避免循环引用" class="headerlink" title="5.ARC下,__block为什么不能避免循环引用"></a>5.ARC下,__block为什么不能避免循环引用</h4><pre><code>__block id blockSelf = self;   //① 这里是block持有self的关键
+self.blk = ^{                      //② ARC不会释放blockSelf
+    NSLog(@&quot;%@&quot;,blockSelf);
+};
+</code></pre><p>我们看上面的代码，在ARC下，由于blockSelf默认为__strong类型，所以①位置处retainCount+1，blockSelf持有self。而block中捕获了blockSelf，只要block存在，系统就不会释放blockSelf。间接导致block持有self。<br>非ARC下由于①处不会使retainCount+1，所以能避免block持有self。</p>
+<h4 id="6-ARC下，-weak为什么能避免循环引用"><a href="#6-ARC下，-weak为什么能避免循环引用" class="headerlink" title="6.ARC下，__weak为什么能避免循环引用"></a>6.ARC下，__weak为什么能避免循环引用</h4><p>ARC下，block copy，调用<strong>main_block_desc_0中的copy函数时，对</strong>weak对象会做单独处理，不做retain操作，所以block不持有self</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="http://devtang.com/blog/2013/07/28/a-look-inside-blocks/" target="_blank" rel="noopener">唐巧大神的博客</a></p>
+<p><a href="http://pan.baidu.com/s/1dDy6ZNb" target="_blank" rel="noopener">Objective-C高级编程</a></p>
+<hr>
+<p>如果发现博客写的有问题，欢迎指正。如果希望讨论iOS技术，欢迎加QQ群：159974494</p>
+
+    
+  </div>
+
+</article>
+
+
+   
+  <div class="text-center donation">
+    <div class="inner-donation">
+      <span class="btn-donation">支持一下</span>
+      <div class="donation-body">
+        <div class="tip text-center">扫一扫，支持forsigner</div>
+        <ul>
+        
+          <li class="item">
+            
+              <span>微信扫一扫</span>
+            
+            <img src="/images/qr-wechat.png" alt="">
+          </li>
+        
+          <li class="item">
+            
+              <span>支付宝扫一扫</span>
+            
+            <img src="/images/qr-alipay.png" alt="">
+          </li>
+        
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+   
+  <div class="box-prev-next clearfix">
+    <a class="show pull-left" href="/2015/02/25/MethodSwizzling2/">
+        <i class="icon icon-angle-left"></i>
+    </a>
+    <a class="show pull-right" href="/2015/07/25/iOS中framework的联调/">
+        <i class="icon icon-angle-right"></i>
+    </a>
+  </div>
+
+
+
+
+
+   
+      <div class="git"></div>
+   
+</div>
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/link/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              友链
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/atom.xml"
+              rel="noopener noreferrer"
+              target="_blank"
+              >
+              RSS
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+  <section class="disqus-comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+  </section>
+
+  <script>
+    var disqus_shortname = 'forsigner';
+    
+    var disqus_url = 'http://yoursite.com/2015/03/02/blcok的那些事/';
+    
+    (function(){
+      var dsq = document.createElement('script');
+      dsq.type = 'text/javascript';
+      dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+
+  <script id="dsq-count-scr" src="//forsigner.disqus.com/count.js" async></script>
+
+
+
+    
+    
+
+    
+    
+
+    
+
+    
+    
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>
