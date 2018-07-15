@@ -1,28 +1,92 @@
 <!DOCTYPE html>
 
 
-  <html class="light page-post">
+
+  
 
 
+<html class="theme-next mist use-motion" lang="zh-Hans">
 <head>
-  <meta charset="utf-8">
-  
-  <title>小笨狼与LLDB的故事 | Hexo</title>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
 
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   
-    <meta name="keywords" content="LLDB," />
   
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
 
-  <meta name="description" content="LLDB的Xcode默认的调试器，它与LLVM编译器一起，带给我们更丰富的流程控制和数据检测的调试功能。平时用Xcode运行程序，实际走的都是LLDB。熟练使用LLDB，可以让你debug事半功倍 LLDB基础知识LLDB控制台Xcode中内嵌了LLDB控制台，在Xcode中代码的下方，我们可以看到LLDB控制台。LLDB控制台平时会输出一些log信息。如果我们想输入命令调试，必须让程序进入暂停状">
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="LLDB," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="LLDB的Xcode默认的调试器，它与LLVM编译器一起，带给我们更丰富的流程控制和数据检测的调试功能。平时用Xcode运行程序，实际走的都是LLDB。熟练使用LLDB，可以让你debug事半功倍 LLDB基础知识LLDB控制台Xcode中内嵌了LLDB控制台，在Xcode中代码的下方，我们可以看到LLDB控制台。LLDB控制台平时会输出一些log信息。如果我们想输入命令调试，必须让程序进入暂停状">
 <meta name="keywords" content="LLDB">
 <meta property="og:type" content="article">
 <meta property="og:title" content="小笨狼与LLDB的故事">
 <meta property="og:url" content="http://yoursite.com/2015/12/13/小笨狼与LLDB的故事/index.html">
 <meta property="og:site_name" content="Hexo">
 <meta property="og:description" content="LLDB的Xcode默认的调试器，它与LLVM编译器一起，带给我们更丰富的流程控制和数据检测的调试功能。平时用Xcode运行程序，实际走的都是LLDB。熟练使用LLDB，可以让你debug事半功倍 LLDB基础知识LLDB控制台Xcode中内嵌了LLDB控制台，在Xcode中代码的下方，我们可以看到LLDB控制台。LLDB控制台平时会输出一些log信息。如果我们想输入命令调试，必须让程序进入暂停状">
-<meta property="og:locale" content="default">
+<meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://jiangliancheng.gitcafe.io/images/LLDB/XcodeLLDB.png">
 <meta property="og:image" content="http://jiangliancheng.gitcafe.io/images/LLDB/threadreturn.png">
 <meta property="og:image" content="http://jiangliancheng.gitcafe.io/images/LLDB/threadBar.png">
@@ -34,215 +98,237 @@
 <meta name="twitter:description" content="LLDB的Xcode默认的调试器，它与LLVM编译器一起，带给我们更丰富的流程控制和数据检测的调试功能。平时用Xcode运行程序，实际走的都是LLDB。熟练使用LLDB，可以让你debug事半功倍 LLDB基础知识LLDB控制台Xcode中内嵌了LLDB控制台，在Xcode中代码的下方，我们可以看到LLDB控制台。LLDB控制台平时会输出一些log信息。如果我们想输入命令调试，必须让程序进入暂停状">
 <meta name="twitter:image" content="http://jiangliancheng.gitcafe.io/images/LLDB/XcodeLLDB.png">
 
-  
-
-  
-    <link rel="icon" href="/favicon.ico">
-  
-
-  <link href="/css/styles.css?v=c114cben" rel="stylesheet">
 
 
-  
-    <link rel="stylesheet" href="/css/personal-style.css">
-  
-
-  
-
-  
-  <script type="text/javascript">
-    var _hmt = _hmt || [];
-    (function() {
-      var hm = document.createElement("script");
-      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
-      var s = document.getElementsByTagName("script")[0];
-      s.parentNode.insertBefore(hm, s);
-    })();
-  </script>
-
-
-  
-  <script type="text/javascript">
-	(function(){
-	    var bp = document.createElement('script');
-	    var curProtocol = window.location.protocol.split(':')[0];
-	    if (curProtocol === 'https') {
-	        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
-	    }
-	    else {
-	        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
-	    }
-	    var s = document.getElementsByTagName("script")[0];
-	    s.parentNode.insertBefore(bp, s);
-	})();
-  </script>
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
 
 
 
-  
-    <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  <link rel="canonical" href="http://yoursite.com/2015/12/13/小笨狼与LLDB的故事/"/>
+
+
+
+
+
+  <title>小笨狼与LLDB的故事 | Hexo</title>
   
 
-  
-    <link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
-  
+
+
+
+
+
+
+
 </head>
 
-<body>
-
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
   
-    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+    
   
 
-  <div class="post-header CENTER">
-   
-  <div class="toolbox">
-    <a class="toolbox-entry" href="/">
-      <span class="toolbox-entry-text">盒子</span>
-      <i class="icon-angle-down"></i>
-      <i class="icon-home"></i>
-    </a>
-    <ul class="list-toolbox">
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
       
-        <li class="item-toolbox">
-          <a
-            class="CIRCLE"
-            href="/archives/"
-            rel="noopener noreferrer"
-            target="_self"
-            >
-            博客
-          </a>
-        </li>
+        <p class="site-subtitle"></p>
       
-        <li class="item-toolbox">
-          <a
-            class="CIRCLE"
-            href="/category/"
-            rel="noopener noreferrer"
-            target="_self"
-            >
-            分类
-          </a>
-        </li>
-      
-        <li class="item-toolbox">
-          <a
-            class="CIRCLE"
-            href="/tag/"
-            rel="noopener noreferrer"
-            target="_self"
-            >
-            标签
-          </a>
-        </li>
-      
-        <li class="item-toolbox">
-          <a
-            class="CIRCLE"
-            href="/link/"
-            rel="noopener noreferrer"
-            target="_self"
-            >
-            友链
-          </a>
-        </li>
-      
-        <li class="item-toolbox">
-          <a
-            class="CIRCLE"
-            href="/about/"
-            rel="noopener noreferrer"
-            target="_self"
-            >
-            关于
-          </a>
-        </li>
-      
-        <li class="item-toolbox">
-          <a
-            class="CIRCLE"
-            href="/atom.xml"
-            rel="noopener noreferrer"
-            target="_blank"
-            >
-            RSS
-          </a>
-        </li>
-      
-        <li class="item-toolbox">
-          <a
-            class="CIRCLE"
-            href="/search/"
-            rel="noopener noreferrer"
-            target="_self"
-            >
-            搜索
-          </a>
-        </li>
-      
-    </ul>
   </div>
 
-
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
 </div>
 
+<nav class="site-nav">
+  
 
-  <div id="toc" class="toc-article">
-    <strong class="toc-title">文章目录</strong>
-    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#LLDB基础知识"><span class="toc-text">LLDB基础知识</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#LLDB控制台"><span class="toc-text">LLDB控制台</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#LLDB语法"><span class="toc-text">LLDB语法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#原始-raw-命令"><span class="toc-text">原始(raw)命令</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#唯一匹配原则"><span class="toc-text">唯一匹配原则</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#lldbinit"><span class="toc-text">~/.lldbinit</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#LLDB命令"><span class="toc-text">LLDB命令</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#expression"><span class="toc-text">expression</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#p-amp-print-amp-call"><span class="toc-text">p &amp; print &amp; call</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#po"><span class="toc-text">po</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#thread"><span class="toc-text">thread</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#thread-backtrace-amp-bt"><span class="toc-text">thread backtrace &amp; bt</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#thread-return"><span class="toc-text">thread return</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#c-amp-n-amp-s-amp-finish"><span class="toc-text">c &amp; n &amp; s &amp; finish</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#thread其他不常用的命令"><span class="toc-text">thread其他不常用的命令</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#frame"><span class="toc-text">frame</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#frame-variable"><span class="toc-text">frame variable</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#其他不常用命令"><span class="toc-text">其他不常用命令</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#breakpoint"><span class="toc-text">breakpoint</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#breakpoint-set"><span class="toc-text">breakpoint set</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#breakpoint-command"><span class="toc-text">breakpoint command</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#breakpoint-command-add"><span class="toc-text">breakpoint command add</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#breakpoint-command-list"><span class="toc-text">breakpoint command list</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#breakpoint-command-delete"><span class="toc-text">breakpoint command delete</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#breakpoint-list"><span class="toc-text">breakpoint list</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#breakpoint-disable-enable"><span class="toc-text">breakpoint disable/enable</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#breakpoint-delete"><span class="toc-text">breakpoint delete</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#watchpoint"><span class="toc-text">watchpoint</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#watchpoint-set"><span class="toc-text">watchpoint set</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#watchpoint-set-variable"><span class="toc-text">watchpoint set variable</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#watchpoint-set-expression"><span class="toc-text">watchpoint set expression</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#watchpoint-command"><span class="toc-text">watchpoint command</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#watchpoint-command-add"><span class="toc-text">watchpoint command add</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#watchpoint-command-list"><span class="toc-text">watchpoint command list</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#watchpoint-command-delete"><span class="toc-text">watchpoint command delete</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#watchpoint-list"><span class="toc-text">watchpoint list</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#watchpoint-disable"><span class="toc-text">watchpoint disable</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#watchpoint-enable"><span class="toc-text">watchpoint enable</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#watchpoint-delete"><span class="toc-text">watchpoint delete</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#target"><span class="toc-text">target</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#target-modules-lookup-image-lookup"><span class="toc-text">target modules lookup(image lookup)</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#image-lookup-–address"><span class="toc-text">image lookup –address</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#image-lookup-–name"><span class="toc-text">image lookup –name</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#image-lookup-–type"><span class="toc-text">image lookup –type</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#target-stop-hook"><span class="toc-text">target stop-hook</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#target-stop-hook-add-amp-display"><span class="toc-text">target stop-hook add &amp; display</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#target-stop-hook-list"><span class="toc-text">target stop-hook list</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#target-stop-hook-delete-amp-undisplay"><span class="toc-text">target stop-hook delete &amp; undisplay</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#target-stop-hook-disable-enable"><span class="toc-text">target stop-hook disable/enable</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Extension"><span class="toc-text">Extension</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#target-symbols-add-add-dsym"><span class="toc-text">target symbols add(add-dsym)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#help-amp-apropos"><span class="toc-text">help &amp; apropos</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#help"><span class="toc-text">help</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#apropos"><span class="toc-text">apropos</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#常用的Debug快捷键"><span class="toc-text">常用的Debug快捷键</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#End"><span class="toc-text">End</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Reference"><span class="toc-text">Reference</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#About-me"><span class="toc-text">About me</span></a></li></ol>
-  </div>
-
-
-
-<div class="content content-post CENTER">
-   <article id="post-小笨狼与LLDB的故事" class="article article-type-post" itemprop="blogPost">
-  <header class="article-header">
-    <h1 class="post-title">小笨狼与LLDB的故事</h1>
-
-    <div class="article-meta">
-      <span>
-        <i class="icon-calendar"></i>
-        <span>2015.12.13</span>
-      </span>
-
+  
+    <ul id="menu" class="menu">
       
-        <span class="article-author">
-          <i class="icon-user"></i>
-          <span>John Doe</span>
-        </span>
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
       
-
-      
-  <span class="article-category">
-    <i class="icon-list"></i>
-    <a class="article-category-link" href="/categories/调试技巧/">调试技巧</a>
-  </span>
-
-
-
-      
-        <span>
-          <i class="icon-comment"></i>
-          <a href="https://lianchengjiang.github.io/archives/2015/12/13/小笨狼与LLDB的故事/#disqus_thread"></a>
-        </span>
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
       
 
       
-      <i class="fa fa-eye"></i> 
-        <span id="busuanzi_container_page_pv">
-           &nbsp热度 <span id="busuanzi_value_page_pv">
-           <i class="fa fa-spinner fa-spin"></i></span>℃
-        </span>
-      
-      
-    </div>
-  </header>
+    </ul>
+  
 
-  <div class="article-content">
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
     
-      <p>LLDB的Xcode默认的调试器，它与LLVM编译器一起，带给我们更丰富的流程控制和数据检测的调试功能。平时用Xcode运行程序，实际走的都是LLDB。熟练使用LLDB，可以让你debug事半功倍</p>
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2015/12/13/小笨狼与LLDB的故事/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">小笨狼与LLDB的故事</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2015-12-13T14:30:08+08:00">
+                2015-12-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/调试技巧/" itemprop="url" rel="index">
+                    <span itemprop="name">调试技巧</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>LLDB的Xcode默认的调试器，它与LLVM编译器一起，带给我们更丰富的流程控制和数据检测的调试功能。平时用Xcode运行程序，实际走的都是LLDB。熟练使用LLDB，可以让你debug事半功倍</p>
 <h1 id="LLDB基础知识"><a href="#LLDB基础知识" class="headerlink" title="LLDB基础知识"></a>LLDB基础知识</h1><h2 id="LLDB控制台"><a href="#LLDB控制台" class="headerlink" title="LLDB控制台"></a>LLDB控制台</h2><p>Xcode中内嵌了LLDB控制台，在Xcode中代码的下方，我们可以看到LLDB控制台。<br><img src="http://jiangliancheng.gitcafe.io/images/LLDB/XcodeLLDB.png" alt=""><br>LLDB控制台平时会输出一些log信息。如果我们想输入命令调试，必须让程序进入暂停状态。让程序进入暂停状态的方式主要有2种：</p>
 <ol>
 <li>断点或者watchpoint: 在代码中设置一个断点（watchpoint），当程序运行到断点位置的时候，会进入stop状态</li>
@@ -810,233 +896,383 @@ The following built-in commands may relate to &apos;stop-hook&apos;:
 <p><a href="http://www.csdn.net/article/2015-08-04/2825369" target="_blank" rel="noopener">dSYM详细资料</a></p>
 <h1 id="About-me"><a href="#About-me" class="headerlink" title="About me"></a>About me</h1><p><a href="http://jiangliancheng.gitcafe.io/" target="_blank" rel="noopener">博客</a> <a href="http://weibo.com/u/5592239559" target="_blank" rel="noopener">微博</a> QQ群：159974494</p>
 
+      
+    </div>
     
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/LLDB/" rel="tag"># LLDB</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/12/05/追求Masonry/" rel="next" title="追求Masonry">
+                <i class="fa fa-chevron-left"></i> 追求Masonry
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/12/19/小笨狼的LLDB技巧：chisel/" rel="prev" title="小笨狼的LLDB技巧:chisel">
+                小笨狼的LLDB技巧:chisel <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
   </div>
 
-</article>
+
+          </div>
+          
 
 
-   
-  <div class="text-center donation">
-    <div class="inner-donation">
-      <span class="btn-donation">支持一下</span>
-      <div class="donation-body">
-        <div class="tip text-center">扫一扫，支持forsigner</div>
-        <ul>
+          
+
+  
+
+
+
+        </div>
         
-          <li class="item">
-            
-              <span>微信扫一扫</span>
-            
-            <img src="/images/qr-wechat.png" alt="">
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
           </li>
-        
-          <li class="item">
-            
-              <span>支付宝扫一扫</span>
-            
-            <img src="/images/qr-alipay.png" alt="">
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
           </li>
-        
         </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">21</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">分类</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#LLDB基础知识"><span class="nav-number">1.</span> <span class="nav-text">LLDB基础知识</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#LLDB控制台"><span class="nav-number">1.1.</span> <span class="nav-text">LLDB控制台</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#LLDB语法"><span class="nav-number">1.2.</span> <span class="nav-text">LLDB语法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#原始-raw-命令"><span class="nav-number">1.3.</span> <span class="nav-text">原始(raw)命令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#唯一匹配原则"><span class="nav-number">1.4.</span> <span class="nav-text">唯一匹配原则</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#lldbinit"><span class="nav-number">1.5.</span> <span class="nav-text">~/.lldbinit</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#LLDB命令"><span class="nav-number">2.</span> <span class="nav-text">LLDB命令</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#expression"><span class="nav-number">2.1.</span> <span class="nav-text">expression</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#p-amp-print-amp-call"><span class="nav-number">2.1.1.</span> <span class="nav-text">p &amp; print &amp; call</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#po"><span class="nav-number">2.1.2.</span> <span class="nav-text">po</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#thread"><span class="nav-number">2.2.</span> <span class="nav-text">thread</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#thread-backtrace-amp-bt"><span class="nav-number">2.2.1.</span> <span class="nav-text">thread backtrace &amp; bt</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#thread-return"><span class="nav-number">2.2.2.</span> <span class="nav-text">thread return</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#c-amp-n-amp-s-amp-finish"><span class="nav-number">2.2.3.</span> <span class="nav-text">c &amp; n &amp; s &amp; finish</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#thread其他不常用的命令"><span class="nav-number">2.2.4.</span> <span class="nav-text">thread其他不常用的命令</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#frame"><span class="nav-number">2.3.</span> <span class="nav-text">frame</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#frame-variable"><span class="nav-number">2.3.1.</span> <span class="nav-text">frame variable</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#其他不常用命令"><span class="nav-number">2.3.2.</span> <span class="nav-text">其他不常用命令</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#breakpoint"><span class="nav-number">2.4.</span> <span class="nav-text">breakpoint</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#breakpoint-set"><span class="nav-number">2.4.1.</span> <span class="nav-text">breakpoint set</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#breakpoint-command"><span class="nav-number">2.4.2.</span> <span class="nav-text">breakpoint command</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#breakpoint-command-add"><span class="nav-number">2.4.2.1.</span> <span class="nav-text">breakpoint command add</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#breakpoint-command-list"><span class="nav-number">2.4.2.2.</span> <span class="nav-text">breakpoint command list</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#breakpoint-command-delete"><span class="nav-number">2.4.2.3.</span> <span class="nav-text">breakpoint command delete</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#breakpoint-list"><span class="nav-number">2.4.3.</span> <span class="nav-text">breakpoint list</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#breakpoint-disable-enable"><span class="nav-number">2.4.4.</span> <span class="nav-text">breakpoint disable/enable</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#breakpoint-delete"><span class="nav-number">2.4.5.</span> <span class="nav-text">breakpoint delete</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#watchpoint"><span class="nav-number">2.5.</span> <span class="nav-text">watchpoint</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#watchpoint-set"><span class="nav-number">2.5.1.</span> <span class="nav-text">watchpoint set</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#watchpoint-set-variable"><span class="nav-number">2.5.1.1.</span> <span class="nav-text">watchpoint set variable</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#watchpoint-set-expression"><span class="nav-number">2.5.1.2.</span> <span class="nav-text">watchpoint set expression</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#watchpoint-command"><span class="nav-number">2.5.2.</span> <span class="nav-text">watchpoint command</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#watchpoint-command-add"><span class="nav-number">2.5.2.1.</span> <span class="nav-text">watchpoint command add</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#watchpoint-command-list"><span class="nav-number">2.5.2.2.</span> <span class="nav-text">watchpoint command list</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#watchpoint-command-delete"><span class="nav-number">2.5.2.3.</span> <span class="nav-text">watchpoint command delete</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#watchpoint-list"><span class="nav-number">2.5.3.</span> <span class="nav-text">watchpoint list</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#watchpoint-disable"><span class="nav-number">2.5.4.</span> <span class="nav-text">watchpoint disable</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#watchpoint-enable"><span class="nav-number">2.5.5.</span> <span class="nav-text">watchpoint enable</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#watchpoint-delete"><span class="nav-number">2.5.5.1.</span> <span class="nav-text">watchpoint delete</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#target"><span class="nav-number">2.6.</span> <span class="nav-text">target</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#target-modules-lookup-image-lookup"><span class="nav-number">2.6.1.</span> <span class="nav-text">target modules lookup(image lookup)</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#image-lookup-–address"><span class="nav-number">2.6.1.1.</span> <span class="nav-text">image lookup –address</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#image-lookup-–name"><span class="nav-number">2.6.1.2.</span> <span class="nav-text">image lookup –name</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#image-lookup-–type"><span class="nav-number">2.6.1.3.</span> <span class="nav-text">image lookup –type</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#target-stop-hook"><span class="nav-number">2.6.2.</span> <span class="nav-text">target stop-hook</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#target-stop-hook-add-amp-display"><span class="nav-number">2.6.2.1.</span> <span class="nav-text">target stop-hook add &amp; display</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#target-stop-hook-list"><span class="nav-number">2.6.2.2.</span> <span class="nav-text">target stop-hook list</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#target-stop-hook-delete-amp-undisplay"><span class="nav-number">2.6.2.3.</span> <span class="nav-text">target stop-hook delete &amp; undisplay</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#target-stop-hook-disable-enable"><span class="nav-number">2.6.2.4.</span> <span class="nav-text">target stop-hook disable/enable</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Extension"><span class="nav-number">2.6.2.5.</span> <span class="nav-text">Extension</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#target-symbols-add-add-dsym"><span class="nav-number">2.6.3.</span> <span class="nav-text">target symbols add(add-dsym)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#help-amp-apropos"><span class="nav-number">2.7.</span> <span class="nav-text">help &amp; apropos</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#help"><span class="nav-number">2.7.1.</span> <span class="nav-text">help</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#apropos"><span class="nav-number">2.7.2.</span> <span class="nav-text">apropos</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#常用的Debug快捷键"><span class="nav-number">3.</span> <span class="nav-text">常用的Debug快捷键</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#End"><span class="nav-number">4.</span> <span class="nav-text">End</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Reference"><span class="nav-number">5.</span> <span class="nav-text">Reference</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#About-me"><span class="nav-number">6.</span> <span class="nav-text">About me</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
       </div>
-    </div>
-  </div>
+    </main>
 
-
-   
-  <div class="box-prev-next clearfix">
-    <a class="show pull-left" href="/2015/12/05/追求Masonry/">
-        <i class="icon icon-angle-left"></i>
-    </a>
-    <a class="show pull-right" href="/2015/12/19/小笨狼的LLDB技巧：chisel/">
-        <i class="icon icon-angle-right"></i>
-    </a>
-  </div>
-
-
-
-
-
-   
-      <div class="git"></div>
-   
-</div>
-
-
-  <a id="backTop" class="back-top">
-    <i class="icon-angle-up"></i>
-  </a>
-
-
-
-
-  <div class="modal" id="modal">
-  <span id="cover" class="cover hide"></span>
-  <div id="modal-dialog" class="modal-dialog hide-dialog">
-    <div class="modal-header">
-      <span id="close" class="btn-close">关闭</span>
-    </div>
-    <hr>
-    <div class="modal-body">
-      <ul class="list-toolbox">
-        
-          <li class="item-toolbox">
-            <a
-              class="CIRCLE"
-              href="/archives/"
-              rel="noopener noreferrer"
-              target="_self"
-              >
-              博客
-            </a>
-          </li>
-        
-          <li class="item-toolbox">
-            <a
-              class="CIRCLE"
-              href="/category/"
-              rel="noopener noreferrer"
-              target="_self"
-              >
-              分类
-            </a>
-          </li>
-        
-          <li class="item-toolbox">
-            <a
-              class="CIRCLE"
-              href="/tag/"
-              rel="noopener noreferrer"
-              target="_self"
-              >
-              标签
-            </a>
-          </li>
-        
-          <li class="item-toolbox">
-            <a
-              class="CIRCLE"
-              href="/link/"
-              rel="noopener noreferrer"
-              target="_self"
-              >
-              友链
-            </a>
-          </li>
-        
-          <li class="item-toolbox">
-            <a
-              class="CIRCLE"
-              href="/about/"
-              rel="noopener noreferrer"
-              target="_self"
-              >
-              关于
-            </a>
-          </li>
-        
-          <li class="item-toolbox">
-            <a
-              class="CIRCLE"
-              href="/atom.xml"
-              rel="noopener noreferrer"
-              target="_blank"
-              >
-              RSS
-            </a>
-          </li>
-        
-          <li class="item-toolbox">
-            <a
-              class="CIRCLE"
-              href="/search/"
-              rel="noopener noreferrer"
-              target="_self"
-              >
-              搜索
-            </a>
-          </li>
-        
-      </ul>
-
-    </div>
-  </div>
-</div>
-
-
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
 
   
-      <div class="fexo-comments comments-post">
-    
-  <section class="disqus-comments">
-    <div id="disqus_thread">
-      <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-    </div>
-  </section>
+</div>
 
-  <script>
-    var disqus_shortname = 'forsigner';
-    
-    var disqus_url = 'http://yoursite.com/2015/12/13/小笨狼与LLDB的故事/';
-    
-    (function(){
-      var dsq = document.createElement('script');
-      dsq.type = 'text/javascript';
-      dsq.async = true;
-      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    })();
-  </script>
 
-  <script id="dsq-count-scr" src="//forsigner.disqus.com/count.js" async></script>
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
 
 
 
-    
-    
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
 
     
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
     
 
-    
-
-    
     
 
   </div>
 
   
 
-  <script type="text/javascript">
-  function loadScript(url, callback) {
-    var script = document.createElement('script')
-    script.type = 'text/javascript';
-
-    if (script.readyState) { //IE
-      script.onreadystatechange = function() {
-        if (script.readyState == 'loaded' ||
-          script.readyState == 'complete') {
-          script.onreadystatechange = null;
-          callback();
-        }
-      };
-    } else { //Others
-      script.onload = function() {
-        callback();
-      };
-    }
-
-    script.src = url;
-    document.getElementsByTagName('head')[0].appendChild(script);
-  }
-
-  window.onload = function() {
-    loadScript('/js/bundle.js?235683', function() {
-      // load success
-    });
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
   }
 </script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
 
 </body>
 </html>

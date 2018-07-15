@@ -1,241 +1,327 @@
 <!DOCTYPE html>
 
 
-  <html class="light page-post">
+
+  
 
 
+<html class="theme-next mist use-motion" lang="zh-Hans">
 <head>
-  <meta charset="utf-8">
-  
-  <title>让代码更帅一点 | Hexo</title>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
 
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   
-    <meta name="keywords" content="forsigner,前端,设计,Hexo主题,前端开发,用户体验,设计,frontend,design,nodejs,JavaScript" />
   
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
 
-  <meta name="description" content="写代码最重要的是实现功能，但是除了实现功能之外，我们还应该想办法，让代码变得更规范，更漂亮最近在读《禅与Objective-C编程艺术》和《Effective Objective C 2.0:编写高质量iOS与OS X代码的52个有效方法》，这两本都讲解了代码规范方面的东西，结合自己平时的代码习惯，发现有很多地方自己做的还是不够好，代码写得不够帅，所以总结一下，让以后的代码更帅一点 条件语句条件语">
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="写代码最重要的是实现功能，但是除了实现功能之外，我们还应该想办法，让代码变得更规范，更漂亮最近在读《禅与Objective-C编程艺术》和《Effective Objective C 2.0:编写高质量iOS与OS X代码的52个有效方法》，这两本都讲解了代码规范方面的东西，结合自己平时的代码习惯，发现有很多地方自己做的还是不够好，代码写得不够帅，所以总结一下，让以后的代码更帅一点 条件语句条件语">
 <meta property="og:type" content="article">
 <meta property="og:title" content="让代码更帅一点">
 <meta property="og:url" content="http://yoursite.com/2015/08/09/让代码更帅一点/index.html">
 <meta property="og:site_name" content="Hexo">
 <meta property="og:description" content="写代码最重要的是实现功能，但是除了实现功能之外，我们还应该想办法，让代码变得更规范，更漂亮最近在读《禅与Objective-C编程艺术》和《Effective Objective C 2.0:编写高质量iOS与OS X代码的52个有效方法》，这两本都讲解了代码规范方面的东西，结合自己平时的代码习惯，发现有很多地方自己做的还是不够好，代码写得不够帅，所以总结一下，让以后的代码更帅一点 条件语句条件语">
-<meta property="og:locale" content="default">
+<meta property="og:locale" content="zh-Hans">
 <meta property="og:updated_time" content="2015-10-31T16:06:18.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="让代码更帅一点">
 <meta name="twitter:description" content="写代码最重要的是实现功能，但是除了实现功能之外，我们还应该想办法，让代码变得更规范，更漂亮最近在读《禅与Objective-C编程艺术》和《Effective Objective C 2.0:编写高质量iOS与OS X代码的52个有效方法》，这两本都讲解了代码规范方面的东西，结合自己平时的代码习惯，发现有很多地方自己做的还是不够好，代码写得不够帅，所以总结一下，让以后的代码更帅一点 条件语句条件语">
 
-  
-
-  
-    <link rel="icon" href="/favicon.ico">
-  
-
-  <link href="/css/styles.css?v=c114cben" rel="stylesheet">
 
 
-  
-    <link rel="stylesheet" href="/css/personal-style.css">
-  
-
-  
-
-  
-  <script type="text/javascript">
-    var _hmt = _hmt || [];
-    (function() {
-      var hm = document.createElement("script");
-      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
-      var s = document.getElementsByTagName("script")[0];
-      s.parentNode.insertBefore(hm, s);
-    })();
-  </script>
-
-
-  
-  <script type="text/javascript">
-	(function(){
-	    var bp = document.createElement('script');
-	    var curProtocol = window.location.protocol.split(':')[0];
-	    if (curProtocol === 'https') {
-	        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
-	    }
-	    else {
-	        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
-	    }
-	    var s = document.getElementsByTagName("script")[0];
-	    s.parentNode.insertBefore(bp, s);
-	})();
-  </script>
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
 
 
 
-  
-    <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  <link rel="canonical" href="http://yoursite.com/2015/08/09/让代码更帅一点/"/>
+
+
+
+
+
+  <title>让代码更帅一点 | Hexo</title>
   
 
-  
-    <link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
-  
+
+
+
+
+
+
+
 </head>
 
-<body>
-
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
   
-    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+    
   
 
-  <div class="post-header CENTER">
-   
-  <div class="toolbox">
-    <a class="toolbox-entry" href="/">
-      <span class="toolbox-entry-text">盒子</span>
-      <i class="icon-angle-down"></i>
-      <i class="icon-home"></i>
-    </a>
-    <ul class="list-toolbox">
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
       
-        <li class="item-toolbox">
-          <a
-            class="CIRCLE"
-            href="/archives/"
-            rel="noopener noreferrer"
-            target="_self"
-            >
-            博客
-          </a>
-        </li>
+        <p class="site-subtitle"></p>
       
-        <li class="item-toolbox">
-          <a
-            class="CIRCLE"
-            href="/category/"
-            rel="noopener noreferrer"
-            target="_self"
-            >
-            分类
-          </a>
-        </li>
-      
-        <li class="item-toolbox">
-          <a
-            class="CIRCLE"
-            href="/tag/"
-            rel="noopener noreferrer"
-            target="_self"
-            >
-            标签
-          </a>
-        </li>
-      
-        <li class="item-toolbox">
-          <a
-            class="CIRCLE"
-            href="/link/"
-            rel="noopener noreferrer"
-            target="_self"
-            >
-            友链
-          </a>
-        </li>
-      
-        <li class="item-toolbox">
-          <a
-            class="CIRCLE"
-            href="/about/"
-            rel="noopener noreferrer"
-            target="_self"
-            >
-            关于
-          </a>
-        </li>
-      
-        <li class="item-toolbox">
-          <a
-            class="CIRCLE"
-            href="/atom.xml"
-            rel="noopener noreferrer"
-            target="_blank"
-            >
-            RSS
-          </a>
-        </li>
-      
-        <li class="item-toolbox">
-          <a
-            class="CIRCLE"
-            href="/search/"
-            rel="noopener noreferrer"
-            target="_self"
-            >
-            搜索
-          </a>
-        </li>
-      
-    </ul>
   </div>
 
-
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
 </div>
 
+<nav class="site-nav">
+  
 
-  <div id="toc" class="toc-article">
-    <strong class="toc-title">文章目录</strong>
-    <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#条件语句"><span class="toc-text">条件语句</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#括号"><span class="toc-text">括号</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#nil和BOOL判断"><span class="toc-text">nil和BOOL判断</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#避免嵌套if"><span class="toc-text">避免嵌套if</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#多用字面量语法"><span class="toc-text">多用字面量语法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#复杂的表达式"><span class="toc-text">复杂的表达式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#用常量代替宏"><span class="toc-text">用常量代替宏</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#static"><span class="toc-text">static</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#类"><span class="toc-text">类</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#命名冲突"><span class="toc-text">命名冲突</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Designated-Initializer"><span class="toc-text">Designated Initializer</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#类的封装"><span class="toc-text">类的封装</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#protocol"><span class="toc-text">protocol</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#属性"><span class="toc-text">属性</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#规范"><span class="toc-text">规范</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#setter-amp-getter"><span class="toc-text">setter&amp;getter</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#可变对象赋值"><span class="toc-text">可变对象赋值</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#点符号"><span class="toc-text">点符号</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Block"><span class="toc-text">Block</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#后记"><span class="toc-text">后记</span></a></li></ol>
-  </div>
-
-
-
-<div class="content content-post CENTER">
-   <article id="post-让代码更帅一点" class="article article-type-post" itemprop="blogPost">
-  <header class="article-header">
-    <h1 class="post-title">让代码更帅一点</h1>
-
-    <div class="article-meta">
-      <span>
-        <i class="icon-calendar"></i>
-        <span>2015.08.09</span>
-      </span>
-
+  
+    <ul id="menu" class="menu">
       
-        <span class="article-author">
-          <i class="icon-user"></i>
-          <span>John Doe</span>
-        </span>
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
       
-
-      
-  <span class="article-category">
-    <i class="icon-list"></i>
-    <a class="article-category-link" href="/categories/代码规范和技巧/">代码规范和技巧</a>
-  </span>
-
-
-
-      
-        <span>
-          <i class="icon-comment"></i>
-          <a href="https://lianchengjiang.github.io/archives/2015/08/09/让代码更帅一点/#disqus_thread"></a>
-        </span>
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
       
 
       
-      <i class="fa fa-eye"></i> 
-        <span id="busuanzi_container_page_pv">
-           &nbsp热度 <span id="busuanzi_value_page_pv">
-           <i class="fa fa-spinner fa-spin"></i></span>℃
-        </span>
-      
-      
-    </div>
-  </header>
+    </ul>
+  
 
-  <div class="article-content">
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
     
-      <p>写代码最重要的是实现功能，但是除了实现功能之外，我们还应该想办法，让代码变得更规范，更漂亮<br>最近在读<a href="https://github.com/oa414/objc-zen-book-cn/#init-%E5%92%8C-dealloc" target="_blank" rel="noopener">《禅与Objective-C编程艺术》</a>和<a href="http://www.amazon.cn/dp/B00IDSGY06/ref=cm_sw_r_qz_2_dp_A2OPub0CH96YH" target="_blank" rel="noopener">《Effective Objective C 2.0:编写高质量iOS与OS X代码的52个有效方法》</a>，这两本都讲解了代码规范方面的东西，结合自己平时的代码习惯，发现有很多地方自己做的还是不够好，代码写得不够帅，所以总结一下，让以后的代码更帅一点</p>
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2015/08/09/让代码更帅一点/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">让代码更帅一点</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2015-08-09T10:51:45+08:00">
+                2015-08-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/代码规范和技巧/" itemprop="url" rel="index">
+                    <span itemprop="name">代码规范和技巧</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>写代码最重要的是实现功能，但是除了实现功能之外，我们还应该想办法，让代码变得更规范，更漂亮<br>最近在读<a href="https://github.com/oa414/objc-zen-book-cn/#init-%E5%92%8C-dealloc" target="_blank" rel="noopener">《禅与Objective-C编程艺术》</a>和<a href="http://www.amazon.cn/dp/B00IDSGY06/ref=cm_sw_r_qz_2_dp_A2OPub0CH96YH" target="_blank" rel="noopener">《Effective Objective C 2.0:编写高质量iOS与OS X代码的52个有效方法》</a>，这两本都讲解了代码规范方面的东西，结合自己平时的代码习惯，发现有很多地方自己做的还是不够好，代码写得不够帅，所以总结一下，让以后的代码更帅一点</p>
 <h3 id="条件语句"><a href="#条件语句" class="headerlink" title="条件语句"></a>条件语句</h3><p>条件语句一定要使用括号，如果不使用括号，if后面的那行代码删除，之后的代码会成为if语句里面的代码<br>推荐：</p>
 <pre><code>if (!error) {
     return success;
@@ -361,233 +447,377 @@ NSString * const ZOCCacheControllerDidClearCacheNotification = @&quot;ZOCCacheCo
 </code></pre><p>在block外面用weak持有self，避免循环引用<br>在block里面用strong持有self，避免多线程中block执行到一半，self被释放为nil，而出现的隐患<br>其他的block问题，可以看以前写的<a href="http://jiangliancheng.gitcafe.io/2015/03/02/blcok%E7%9A%84%E9%82%A3%E4%BA%9B%E4%BA%8B/" target="_blank" rel="noopener">这篇文章</a></p>
 <h3 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h3><p>主要的东西来自<a href="https://github.com/oa414/objc-zen-book-cn/#init-%E5%92%8C-dealloc" target="_blank" rel="noopener">《禅与Objective-C编程艺术》</a>和<a href="http://www.amazon.cn/dp/B00IDSGY06/ref=cm_sw_r_qz_2_dp_A2OPub0CH96YH" target="_blank" rel="noopener">Effective Objective C 2.0:编写高质量iOS与OS X代码的52个有效方法</a>，有兴趣的同学可以读一下原书，后续发现其他规范方面的东西，我会继续更新，如果大家有这方面的东西，也欢迎提出来~~~</p>
 
+      
+    </div>
     
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/07/25/iOS中framework的联调/" rel="next" title="iOS中framework的联调">
+                <i class="fa fa-chevron-left"></i> iOS中framework的联调
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/08/14/让代码更帅一点（二）/" rel="prev" title="让代码更帅一点（二）">
+                让代码更帅一点（二） <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
   </div>
 
-</article>
+
+          </div>
+          
 
 
-   
-  <div class="text-center donation">
-    <div class="inner-donation">
-      <span class="btn-donation">支持一下</span>
-      <div class="donation-body">
-        <div class="tip text-center">扫一扫，支持forsigner</div>
-        <ul>
+          
+
+  
+
+
+
+        </div>
         
-          <li class="item">
-            
-              <span>微信扫一扫</span>
-            
-            <img src="/images/qr-wechat.png" alt="">
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
           </li>
-        
-          <li class="item">
-            
-              <span>支付宝扫一扫</span>
-            
-            <img src="/images/qr-alipay.png" alt="">
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
           </li>
-        
         </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">21</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">分类</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#条件语句"><span class="nav-number">1.</span> <span class="nav-text">条件语句</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#括号"><span class="nav-number">2.</span> <span class="nav-text">括号</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#nil和BOOL判断"><span class="nav-number">3.</span> <span class="nav-text">nil和BOOL判断</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#避免嵌套if"><span class="nav-number">4.</span> <span class="nav-text">避免嵌套if</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#多用字面量语法"><span class="nav-number">5.</span> <span class="nav-text">多用字面量语法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#复杂的表达式"><span class="nav-number">6.</span> <span class="nav-text">复杂的表达式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#用常量代替宏"><span class="nav-number">7.</span> <span class="nav-text">用常量代替宏</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#static"><span class="nav-number">7.1.</span> <span class="nav-text">static</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#类"><span class="nav-number">8.</span> <span class="nav-text">类</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#命名冲突"><span class="nav-number">8.1.</span> <span class="nav-text">命名冲突</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Designated-Initializer"><span class="nav-number">8.2.</span> <span class="nav-text">Designated Initializer</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#类的封装"><span class="nav-number">8.3.</span> <span class="nav-text">类的封装</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#protocol"><span class="nav-number">8.4.</span> <span class="nav-text">protocol</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#属性"><span class="nav-number">9.</span> <span class="nav-text">属性</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#规范"><span class="nav-number">9.0.1.</span> <span class="nav-text">规范</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#setter-amp-getter"><span class="nav-number">9.0.2.</span> <span class="nav-text">setter&amp;getter</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#可变对象赋值"><span class="nav-number">9.0.3.</span> <span class="nav-text">可变对象赋值</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#点符号"><span class="nav-number">9.0.4.</span> <span class="nav-text">点符号</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Block"><span class="nav-number">10.</span> <span class="nav-text">Block</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#后记"><span class="nav-number">11.</span> <span class="nav-text">后记</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
       </div>
-    </div>
-  </div>
+    </main>
 
-
-   
-  <div class="box-prev-next clearfix">
-    <a class="show pull-left" href="/2015/07/25/iOS中framework的联调/">
-        <i class="icon icon-angle-left"></i>
-    </a>
-    <a class="show pull-right" href="/2015/08/14/让代码更帅一点（二）/">
-        <i class="icon icon-angle-right"></i>
-    </a>
-  </div>
-
-
-
-
-
-   
-      <div class="git"></div>
-   
-</div>
-
-
-  <a id="backTop" class="back-top">
-    <i class="icon-angle-up"></i>
-  </a>
-
-
-
-
-  <div class="modal" id="modal">
-  <span id="cover" class="cover hide"></span>
-  <div id="modal-dialog" class="modal-dialog hide-dialog">
-    <div class="modal-header">
-      <span id="close" class="btn-close">关闭</span>
-    </div>
-    <hr>
-    <div class="modal-body">
-      <ul class="list-toolbox">
-        
-          <li class="item-toolbox">
-            <a
-              class="CIRCLE"
-              href="/archives/"
-              rel="noopener noreferrer"
-              target="_self"
-              >
-              博客
-            </a>
-          </li>
-        
-          <li class="item-toolbox">
-            <a
-              class="CIRCLE"
-              href="/category/"
-              rel="noopener noreferrer"
-              target="_self"
-              >
-              分类
-            </a>
-          </li>
-        
-          <li class="item-toolbox">
-            <a
-              class="CIRCLE"
-              href="/tag/"
-              rel="noopener noreferrer"
-              target="_self"
-              >
-              标签
-            </a>
-          </li>
-        
-          <li class="item-toolbox">
-            <a
-              class="CIRCLE"
-              href="/link/"
-              rel="noopener noreferrer"
-              target="_self"
-              >
-              友链
-            </a>
-          </li>
-        
-          <li class="item-toolbox">
-            <a
-              class="CIRCLE"
-              href="/about/"
-              rel="noopener noreferrer"
-              target="_self"
-              >
-              关于
-            </a>
-          </li>
-        
-          <li class="item-toolbox">
-            <a
-              class="CIRCLE"
-              href="/atom.xml"
-              rel="noopener noreferrer"
-              target="_blank"
-              >
-              RSS
-            </a>
-          </li>
-        
-          <li class="item-toolbox">
-            <a
-              class="CIRCLE"
-              href="/search/"
-              rel="noopener noreferrer"
-              target="_self"
-              >
-              搜索
-            </a>
-          </li>
-        
-      </ul>
-
-    </div>
-  </div>
-</div>
-
-
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
 
   
-      <div class="fexo-comments comments-post">
-    
-  <section class="disqus-comments">
-    <div id="disqus_thread">
-      <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-    </div>
-  </section>
+</div>
 
-  <script>
-    var disqus_shortname = 'forsigner';
-    
-    var disqus_url = 'http://yoursite.com/2015/08/09/让代码更帅一点/';
-    
-    (function(){
-      var dsq = document.createElement('script');
-      dsq.type = 'text/javascript';
-      dsq.async = true;
-      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    })();
-  </script>
 
-  <script id="dsq-count-scr" src="//forsigner.disqus.com/count.js" async></script>
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
 
 
 
-    
-    
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
 
     
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
     
 
-    
-
-    
     
 
   </div>
 
   
 
-  <script type="text/javascript">
-  function loadScript(url, callback) {
-    var script = document.createElement('script')
-    script.type = 'text/javascript';
-
-    if (script.readyState) { //IE
-      script.onreadystatechange = function() {
-        if (script.readyState == 'loaded' ||
-          script.readyState == 'complete') {
-          script.onreadystatechange = null;
-          callback();
-        }
-      };
-    } else { //Others
-      script.onload = function() {
-        callback();
-      };
-    }
-
-    script.src = url;
-    document.getElementsByTagName('head')[0].appendChild(script);
-  }
-
-  window.onload = function() {
-    loadScript('/js/bundle.js?235683', function() {
-      // load success
-    });
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
   }
 </script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
 
 </body>
 </html>

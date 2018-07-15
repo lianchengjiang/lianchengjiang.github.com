@@ -1,27 +1,91 @@
 <!DOCTYPE html>
 
 
-  <html class="light page-post">
+
+  
 
 
+<html class="theme-next mist use-motion" lang="zh-Hans">
 <head>
-  <meta charset="utf-8">
-  
-  <title>AVFoundation(一):基础知识 | Hexo</title>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
 
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   
-    <meta name="keywords" content="forsigner,前端,设计,Hexo主题,前端开发,用户体验,设计,frontend,design,nodejs,JavaScript" />
   
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
 
-  <meta name="description" content="说好的一周一篇博客，还是懈怠了，博客这个事儿，得自己抓紧，从今天开始争取努力完成这个目标。最近在玩一个类似小咖秀的项目，所以对AVFoundation有了一些的研究。这是AVFoundation的第一篇，准备先介绍一些AVFoundation中的基础知识  音频采样大自然中的声音，他的形态是一种波。我们通过采样，将这种波量化成数据，记录下来，如下图所示： 如上图所示，采样的数据并不能完整的还原出原">
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="说好的一周一篇博客，还是懈怠了，博客这个事儿，得自己抓紧，从今天开始争取努力完成这个目标。最近在玩一个类似小咖秀的项目，所以对AVFoundation有了一些的研究。这是AVFoundation的第一篇，准备先介绍一些AVFoundation中的基础知识  音频采样大自然中的声音，他的形态是一种波。我们通过采样，将这种波量化成数据，记录下来，如下图所示： 如上图所示，采样的数据并不能完整的还原出原">
 <meta property="og:type" content="article">
 <meta property="og:title" content="AVFoundation(一):基础知识">
 <meta property="og:url" content="http://yoursite.com/2015/10/17/AVFoundation(一)：基础知识/index.html">
 <meta property="og:site_name" content="Hexo">
 <meta property="og:description" content="说好的一周一篇博客，还是懈怠了，博客这个事儿，得自己抓紧，从今天开始争取努力完成这个目标。最近在玩一个类似小咖秀的项目，所以对AVFoundation有了一些的研究。这是AVFoundation的第一篇，准备先介绍一些AVFoundation中的基础知识  音频采样大自然中的声音，他的形态是一种波。我们通过采样，将这种波量化成数据，记录下来，如下图所示： 如上图所示，采样的数据并不能完整的还原出原">
-<meta property="og:locale" content="default">
+<meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://jiangliancheng.gitcafe.io/images/AVFoundation/dicaiyang.png">
 <meta property="og:image" content="http://jiangliancheng.gitcafe.io/images/AVFoundation/gaocaiyang.png">
 <meta property="og:updated_time" content="2016-02-23T11:09:56.000Z">
@@ -30,215 +94,237 @@
 <meta name="twitter:description" content="说好的一周一篇博客，还是懈怠了，博客这个事儿，得自己抓紧，从今天开始争取努力完成这个目标。最近在玩一个类似小咖秀的项目，所以对AVFoundation有了一些的研究。这是AVFoundation的第一篇，准备先介绍一些AVFoundation中的基础知识  音频采样大自然中的声音，他的形态是一种波。我们通过采样，将这种波量化成数据，记录下来，如下图所示： 如上图所示，采样的数据并不能完整的还原出原">
 <meta name="twitter:image" content="http://jiangliancheng.gitcafe.io/images/AVFoundation/dicaiyang.png">
 
-  
-
-  
-    <link rel="icon" href="/favicon.ico">
-  
-
-  <link href="/css/styles.css?v=c114cben" rel="stylesheet">
 
 
-  
-    <link rel="stylesheet" href="/css/personal-style.css">
-  
-
-  
-
-  
-  <script type="text/javascript">
-    var _hmt = _hmt || [];
-    (function() {
-      var hm = document.createElement("script");
-      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
-      var s = document.getElementsByTagName("script")[0];
-      s.parentNode.insertBefore(hm, s);
-    })();
-  </script>
-
-
-  
-  <script type="text/javascript">
-	(function(){
-	    var bp = document.createElement('script');
-	    var curProtocol = window.location.protocol.split(':')[0];
-	    if (curProtocol === 'https') {
-	        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
-	    }
-	    else {
-	        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
-	    }
-	    var s = document.getElementsByTagName("script")[0];
-	    s.parentNode.insertBefore(bp, s);
-	})();
-  </script>
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
 
 
 
-  
-    <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  <link rel="canonical" href="http://yoursite.com/2015/10/17/AVFoundation(一)：基础知识/"/>
+
+
+
+
+
+  <title>AVFoundation(一):基础知识 | Hexo</title>
   
 
-  
-    <link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
-  
+
+
+
+
+
+
+
 </head>
 
-<body>
-
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
   
-    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+    
   
 
-  <div class="post-header CENTER">
-   
-  <div class="toolbox">
-    <a class="toolbox-entry" href="/">
-      <span class="toolbox-entry-text">盒子</span>
-      <i class="icon-angle-down"></i>
-      <i class="icon-home"></i>
-    </a>
-    <ul class="list-toolbox">
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
       
-        <li class="item-toolbox">
-          <a
-            class="CIRCLE"
-            href="/archives/"
-            rel="noopener noreferrer"
-            target="_self"
-            >
-            博客
-          </a>
-        </li>
+        <p class="site-subtitle"></p>
       
-        <li class="item-toolbox">
-          <a
-            class="CIRCLE"
-            href="/category/"
-            rel="noopener noreferrer"
-            target="_self"
-            >
-            分类
-          </a>
-        </li>
-      
-        <li class="item-toolbox">
-          <a
-            class="CIRCLE"
-            href="/tag/"
-            rel="noopener noreferrer"
-            target="_self"
-            >
-            标签
-          </a>
-        </li>
-      
-        <li class="item-toolbox">
-          <a
-            class="CIRCLE"
-            href="/link/"
-            rel="noopener noreferrer"
-            target="_self"
-            >
-            友链
-          </a>
-        </li>
-      
-        <li class="item-toolbox">
-          <a
-            class="CIRCLE"
-            href="/about/"
-            rel="noopener noreferrer"
-            target="_self"
-            >
-            关于
-          </a>
-        </li>
-      
-        <li class="item-toolbox">
-          <a
-            class="CIRCLE"
-            href="/atom.xml"
-            rel="noopener noreferrer"
-            target="_blank"
-            >
-            RSS
-          </a>
-        </li>
-      
-        <li class="item-toolbox">
-          <a
-            class="CIRCLE"
-            href="/search/"
-            rel="noopener noreferrer"
-            target="_self"
-            >
-            搜索
-          </a>
-        </li>
-      
-    </ul>
   </div>
 
-
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
 </div>
 
+<nav class="site-nav">
+  
 
-  <div id="toc" class="toc-article">
-    <strong class="toc-title">文章目录</strong>
-    <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#音频采样"><span class="toc-text">音频采样</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#音频压缩"><span class="toc-text">音频压缩</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#色彩二次抽样"><span class="toc-text">色彩二次抽样</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#H-264"><span class="toc-text">H.264</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#视频码率-bitRate"><span class="toc-text">视频码率(bitRate)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Reference"><span class="toc-text">Reference</span></a></li></ol>
-  </div>
-
-
-
-<div class="content content-post CENTER">
-   <article id="post-AVFoundation(一)：基础知识" class="article article-type-post" itemprop="blogPost">
-  <header class="article-header">
-    <h1 class="post-title">AVFoundation(一):基础知识</h1>
-
-    <div class="article-meta">
-      <span>
-        <i class="icon-calendar"></i>
-        <span>2015.10.17</span>
-      </span>
-
+  
+    <ul id="menu" class="menu">
       
-        <span class="article-author">
-          <i class="icon-user"></i>
-          <span>John Doe</span>
-        </span>
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
       
-
-      
-  <span class="article-category">
-    <i class="icon-list"></i>
-    <a class="article-category-link" href="/categories/AVFoundation/">AVFoundation</a>
-  </span>
-
-
-
-      
-        <span>
-          <i class="icon-comment"></i>
-          <a href="https://lianchengjiang.github.io/archives/2015/10/17/AVFoundation(一)：基础知识/#disqus_thread"></a>
-        </span>
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
       
 
       
-      <i class="fa fa-eye"></i> 
-        <span id="busuanzi_container_page_pv">
-           &nbsp热度 <span id="busuanzi_value_page_pv">
-           <i class="fa fa-spinner fa-spin"></i></span>℃
-        </span>
-      
-      
-    </div>
-  </header>
+    </ul>
+  
 
-  <div class="article-content">
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
     
-      <p>说好的一周一篇博客，还是懈怠了，博客这个事儿，得自己抓紧，从今天开始争取努力完成这个目标。<br>最近在玩一个类似小咖秀的项目，所以对AVFoundation有了一些的研究。这是AVFoundation的第一篇，准备先介绍一些AVFoundation中的基础知识</p>
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2015/10/17/AVFoundation(一)：基础知识/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">AVFoundation(一):基础知识</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2015-10-17T09:50:47+08:00">
+                2015-10-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/AVFoundation/" itemprop="url" rel="index">
+                    <span itemprop="name">AVFoundation</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>说好的一周一篇博客，还是懈怠了，博客这个事儿，得自己抓紧，从今天开始争取努力完成这个目标。<br>最近在玩一个类似小咖秀的项目，所以对AVFoundation有了一些的研究。这是AVFoundation的第一篇，准备先介绍一些AVFoundation中的基础知识</p>
 <hr>
 <h3 id="音频采样"><a href="#音频采样" class="headerlink" title="音频采样"></a>音频采样</h3><p>大自然中的声音，他的形态是一种波。我们通过采样，将这种波量化成数据，记录下来，如下图所示：<br><img src="http://jiangliancheng.gitcafe.io/images/AVFoundation/dicaiyang.png" alt=""><br><img src="http://jiangliancheng.gitcafe.io/images/AVFoundation/gaocaiyang.png" alt=""></p>
 <p>如上图所示，采样的数据并不能完整的还原出原来的波形，只能做到尽量接近原波形。并且采样率（采样的次数）越高，波形越接近原波形。不过采样的次数增多，必然会导致存储的数据量要增加，所以我们不可能无限提升采样率。经过长期的研究人们发现，当采样率等于波形中最高频率的2倍时，已经足够将波形还原到可接受的程度了。这个频率称为<a href="http://baike.baidu.com/link?url=uznAc6udCar8O7I3kwBt_QZhRByp4_79Y-TaGDoCAmp_jCYyNCFqkLAdZ_mVwkmbKxuhLwEM4gErQy01HwkgL_" target="_blank" rel="noopener">奈奎斯特频率</a>。人耳能接受的最高频率为20kHz，所以只要采样率超过40kHz，就可以呈现出可接受的声音。目前常见的CD采样率为44.1kHz。</p>
@@ -338,233 +424,377 @@ CV_EXPORT const CFStringRef CV_NONNULL kCVImageBufferChromaSubsampling_411 __OSX
 <pre><code>AVF_EXPORT NSString *const AVVideoAverageBitRateKey /* NSNumber (bits per second, H.264 only) */         NS_AVAILABLE(10_7, 4_0);
 </code></pre><h3 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h3><p><a href="http://item.jd.com/11742630.html" target="_blank" rel="noopener">AV Foundation 开发秘籍</a><br><a href="http://msching.github.io/blog/2014/07/07/audio-in-ios/" target="_blank" rel="noopener">iOS音频播放 (一)：概述</a><br><a href="https://en.wikipedia.org/wiki/H.264/MPEG-4_AVC" target="_blank" rel="noopener">H.264中profile和level</a><br><a href="http://zhidao.baidu.com/link?url=Af7OKj4bCFEp5LK3nGgIrrAOcv8wP0onN_u_fevah0ENxmSQl-HOSGeylSrpJrp6IO1ETCtGA6IKUCXhGiuAwHVvjovypCOYar_zOQaXnQa" target="_blank" rel="noopener">音频的位元深度</a><br><a href="http://baike.baidu.com/link?url=uznAc6udCar8O7I3kwBt_QZhRByp4_79Y-TaGDoCAmp_jCYyNCFqkLAdZ_mVwkmbKxuhLwEM4gErQy01HwkgL_" target="_blank" rel="noopener">奈奎斯特频率</a></p>
 
+      
+    </div>
     
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/08/14/JSONModel的使用（二）/" rel="next" title="JSONModel的使用（二）">
+                <i class="fa fa-chevron-left"></i> JSONModel的使用（二）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/10/27/Xcode7新特性AddressSanitizer/" rel="prev" title="Xcode7新特性AddressSanitizer">
+                Xcode7新特性AddressSanitizer <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
   </div>
 
-</article>
+
+          </div>
+          
 
 
-   
-  <div class="text-center donation">
-    <div class="inner-donation">
-      <span class="btn-donation">支持一下</span>
-      <div class="donation-body">
-        <div class="tip text-center">扫一扫，支持forsigner</div>
-        <ul>
+          
+
+  
+
+
+
+        </div>
         
-          <li class="item">
-            
-              <span>微信扫一扫</span>
-            
-            <img src="/images/qr-wechat.png" alt="">
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
           </li>
-        
-          <li class="item">
-            
-              <span>支付宝扫一扫</span>
-            
-            <img src="/images/qr-alipay.png" alt="">
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
           </li>
-        
         </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">21</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">分类</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#音频采样"><span class="nav-number">1.</span> <span class="nav-text">音频采样</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#音频压缩"><span class="nav-number">2.</span> <span class="nav-text">音频压缩</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#色彩二次抽样"><span class="nav-number">3.</span> <span class="nav-text">色彩二次抽样</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#H-264"><span class="nav-number">4.</span> <span class="nav-text">H.264</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#视频码率-bitRate"><span class="nav-number">5.</span> <span class="nav-text">视频码率(bitRate)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Reference"><span class="nav-number">6.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
       </div>
-    </div>
-  </div>
+    </main>
 
-
-   
-  <div class="box-prev-next clearfix">
-    <a class="show pull-left" href="/2015/08/14/JSONModel的使用（二）/">
-        <i class="icon icon-angle-left"></i>
-    </a>
-    <a class="show pull-right" href="/2015/10/27/Xcode7新特性AddressSanitizer/">
-        <i class="icon icon-angle-right"></i>
-    </a>
-  </div>
-
-
-
-
-
-   
-      <div class="git"></div>
-   
-</div>
-
-
-  <a id="backTop" class="back-top">
-    <i class="icon-angle-up"></i>
-  </a>
-
-
-
-
-  <div class="modal" id="modal">
-  <span id="cover" class="cover hide"></span>
-  <div id="modal-dialog" class="modal-dialog hide-dialog">
-    <div class="modal-header">
-      <span id="close" class="btn-close">关闭</span>
-    </div>
-    <hr>
-    <div class="modal-body">
-      <ul class="list-toolbox">
-        
-          <li class="item-toolbox">
-            <a
-              class="CIRCLE"
-              href="/archives/"
-              rel="noopener noreferrer"
-              target="_self"
-              >
-              博客
-            </a>
-          </li>
-        
-          <li class="item-toolbox">
-            <a
-              class="CIRCLE"
-              href="/category/"
-              rel="noopener noreferrer"
-              target="_self"
-              >
-              分类
-            </a>
-          </li>
-        
-          <li class="item-toolbox">
-            <a
-              class="CIRCLE"
-              href="/tag/"
-              rel="noopener noreferrer"
-              target="_self"
-              >
-              标签
-            </a>
-          </li>
-        
-          <li class="item-toolbox">
-            <a
-              class="CIRCLE"
-              href="/link/"
-              rel="noopener noreferrer"
-              target="_self"
-              >
-              友链
-            </a>
-          </li>
-        
-          <li class="item-toolbox">
-            <a
-              class="CIRCLE"
-              href="/about/"
-              rel="noopener noreferrer"
-              target="_self"
-              >
-              关于
-            </a>
-          </li>
-        
-          <li class="item-toolbox">
-            <a
-              class="CIRCLE"
-              href="/atom.xml"
-              rel="noopener noreferrer"
-              target="_blank"
-              >
-              RSS
-            </a>
-          </li>
-        
-          <li class="item-toolbox">
-            <a
-              class="CIRCLE"
-              href="/search/"
-              rel="noopener noreferrer"
-              target="_self"
-              >
-              搜索
-            </a>
-          </li>
-        
-      </ul>
-
-    </div>
-  </div>
-</div>
-
-
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
 
   
-      <div class="fexo-comments comments-post">
-    
-  <section class="disqus-comments">
-    <div id="disqus_thread">
-      <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-    </div>
-  </section>
+</div>
 
-  <script>
-    var disqus_shortname = 'forsigner';
-    
-    var disqus_url = 'http://yoursite.com/2015/10/17/AVFoundation(一)：基础知识/';
-    
-    (function(){
-      var dsq = document.createElement('script');
-      dsq.type = 'text/javascript';
-      dsq.async = true;
-      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    })();
-  </script>
 
-  <script id="dsq-count-scr" src="//forsigner.disqus.com/count.js" async></script>
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
 
 
 
-    
-    
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
 
     
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
     
 
-    
-
-    
     
 
   </div>
 
   
 
-  <script type="text/javascript">
-  function loadScript(url, callback) {
-    var script = document.createElement('script')
-    script.type = 'text/javascript';
-
-    if (script.readyState) { //IE
-      script.onreadystatechange = function() {
-        if (script.readyState == 'loaded' ||
-          script.readyState == 'complete') {
-          script.onreadystatechange = null;
-          callback();
-        }
-      };
-    } else { //Others
-      script.onload = function() {
-        callback();
-      };
-    }
-
-    script.src = url;
-    document.getElementsByTagName('head')[0].appendChild(script);
-  }
-
-  window.onload = function() {
-    loadScript('/js/bundle.js?235683', function() {
-      // load success
-    });
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
   }
 </script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
 
 </body>
 </html>
