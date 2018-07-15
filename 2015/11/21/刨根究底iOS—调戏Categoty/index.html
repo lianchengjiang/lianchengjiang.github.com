@@ -80,21 +80,22 @@
 
 
 <meta name="description" content="##起因我们项目中很多公用的类都封装在framework中，以便iPhone、iPad共同调用。某些逻辑不一样的东西我们会在主工程用category实现，然而category默认是不能定义属性的。 ##AssociatedObjectiOS有些基础的朋友应该会知道，runtime里有objc_setAssociatedObject和objc_getAssociatedObject两个方法，可以将属">
+<meta name="keywords" content="ios, OOM, runtime, block, RTL">
 <meta property="og:type" content="article">
 <meta property="og:title" content="刨根究底iOS—调戏Categoty">
-<meta property="og:url" content="http://yoursite.com/2015/11/21/刨根究底iOS—调戏Categoty/index.html">
-<meta property="og:site_name" content="Hexo">
+<meta property="og:url" content="http://www.jiangliancheng.com/2015/11/21/刨根究底iOS—调戏Categoty/index.html">
+<meta property="og:site_name" content="蒋连成的天空">
 <meta property="og:description" content="##起因我们项目中很多公用的类都封装在framework中，以便iPhone、iPad共同调用。某些逻辑不一样的东西我们会在主工程用category实现，然而category默认是不能定义属性的。 ##AssociatedObjectiOS有些基础的朋友应该会知道，runtime里有objc_setAssociatedObject和objc_getAssociatedObject两个方法，可以将属">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://yoursite.com/images/category_property/class_addMethod.png">
-<meta property="og:image" content="http://yoursite.com/images/category_property/IMP.png">
-<meta property="og:image" content="http://yoursite.com/images/category_property/imp_block.png">
-<meta property="og:image" content="http://yoursite.com/images/category_property/S_imp_block.png">
+<meta property="og:image" content="http://www.jiangliancheng.com/images/category_property/class_addMethod.png">
+<meta property="og:image" content="http://www.jiangliancheng.com/images/category_property/IMP.png">
+<meta property="og:image" content="http://www.jiangliancheng.com/images/category_property/imp_block.png">
+<meta property="og:image" content="http://www.jiangliancheng.com/images/category_property/S_imp_block.png">
 <meta property="og:updated_time" content="2015-11-22T05:04:46.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="刨根究底iOS—调戏Categoty">
 <meta name="twitter:description" content="##起因我们项目中很多公用的类都封装在framework中，以便iPhone、iPad共同调用。某些逻辑不一样的东西我们会在主工程用category实现，然而category默认是不能定义属性的。 ##AssociatedObjectiOS有些基础的朋友应该会知道，runtime里有objc_setAssociatedObject和objc_getAssociatedObject两个方法，可以将属">
-<meta name="twitter:image" content="http://yoursite.com/images/category_property/class_addMethod.png">
+<meta name="twitter:image" content="http://www.jiangliancheng.com/images/category_property/class_addMethod.png">
 
 
 
@@ -124,13 +125,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2015/11/21/刨根究底iOS—调戏Categoty/"/>
+  <link rel="canonical" href="http://www.jiangliancheng.com/2015/11/21/刨根究底iOS—调戏Categoty/"/>
 
 
 
 
 
-  <title>刨根究底iOS—调戏Categoty | Hexo</title>
+  <title>刨根究底iOS—调戏Categoty | 蒋连成的天空</title>
   
 
 
@@ -160,7 +161,7 @@
     <div class="custom-logo-site-title">
       <a href="/"  class="brand" rel="start">
         <span class="logo-line-before"><i></i></span>
-        <span class="site-title">Hexo</span>
+        <span class="site-title">蒋连成的天空</span>
         <span class="logo-line-after"><i></i></span>
       </a>
     </div>
@@ -237,16 +238,16 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2015/11/21/刨根究底iOS—调戏Categoty/">
+    <link itemprop="mainEntityOfPage" href="http://www.jiangliancheng.com/2015/11/21/刨根究底iOS—调戏Categoty/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="John Doe">
+      <meta itemprop="name" content="蒋连成">
       <meta itemprop="description" content="">
       <meta itemprop="image" content="/images/avatar.gif">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Hexo">
+      <meta itemprop="name" content="蒋连成的天空">
     </span>
 
     
@@ -570,8 +571,8 @@ static void *kName = &amp;kName;
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
-              <p class="site-author-name" itemprop="name">John Doe</p>
-              <p class="site-description motion-element" itemprop="description"></p>
+              <p class="site-author-name" itemprop="name">蒋连成</p>
+              <p class="site-description motion-element" itemprop="description">this is my world</p>
           </div>
 
           <nav class="site-state motion-element">
@@ -660,7 +661,7 @@ static void *kName = &amp;kName;
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>
-  <span class="author" itemprop="copyrightHolder">John Doe</span>
+  <span class="author" itemprop="copyrightHolder">蒋连成</span>
 
   
 </div>

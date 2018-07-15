@@ -80,19 +80,20 @@
 
 
 <meta name="description" content="2015年3月2日，新年的第二篇博客。 这篇博客适合对block有一定的了解的人阅读，如果你对还不知道什么是block，那也许这篇文章更适合你。 block实现假设你对Block已经有了一定了解。首先对于block，我们看看他到底是怎么实现的。 int main() {     __block id obj = [NSObject new];     void (^blk)(void) = ^{">
+<meta name="keywords" content="ios, OOM, runtime, block, RTL">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Blcok的那些事">
-<meta property="og:url" content="http://yoursite.com/2015/03/02/blcok的那些事/index.html">
-<meta property="og:site_name" content="Hexo">
+<meta property="og:url" content="http://www.jiangliancheng.com/2015/03/02/blcok的那些事/index.html">
+<meta property="og:site_name" content="蒋连成的天空">
 <meta property="og:description" content="2015年3月2日，新年的第二篇博客。 这篇博客适合对block有一定的了解的人阅读，如果你对还不知道什么是block，那也许这篇文章更适合你。 block实现假设你对Block已经有了一定了解。首先对于block，我们看看他到底是怎么实现的。 int main() {     __block id obj = [NSObject new];     void (^blk)(void) = ^{">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://yoursite.com/images/block_forwarding1.png">
-<meta property="og:image" content="http://yoursite.com/images/block_forwarding2.png">
+<meta property="og:image" content="http://www.jiangliancheng.com/images/block_forwarding1.png">
+<meta property="og:image" content="http://www.jiangliancheng.com/images/block_forwarding2.png">
 <meta property="og:updated_time" content="2015-11-24T06:47:56.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Blcok的那些事">
 <meta name="twitter:description" content="2015年3月2日，新年的第二篇博客。 这篇博客适合对block有一定的了解的人阅读，如果你对还不知道什么是block，那也许这篇文章更适合你。 block实现假设你对Block已经有了一定了解。首先对于block，我们看看他到底是怎么实现的。 int main() {     __block id obj = [NSObject new];     void (^blk)(void) = ^{">
-<meta name="twitter:image" content="http://yoursite.com/images/block_forwarding1.png">
+<meta name="twitter:image" content="http://www.jiangliancheng.com/images/block_forwarding1.png">
 
 
 
@@ -122,13 +123,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2015/03/02/blcok的那些事/"/>
+  <link rel="canonical" href="http://www.jiangliancheng.com/2015/03/02/blcok的那些事/"/>
 
 
 
 
 
-  <title>Blcok的那些事 | Hexo</title>
+  <title>Blcok的那些事 | 蒋连成的天空</title>
   
 
 
@@ -158,7 +159,7 @@
     <div class="custom-logo-site-title">
       <a href="/"  class="brand" rel="start">
         <span class="logo-line-before"><i></i></span>
-        <span class="site-title">Hexo</span>
+        <span class="site-title">蒋连成的天空</span>
         <span class="logo-line-after"><i></i></span>
       </a>
     </div>
@@ -235,16 +236,16 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2015/03/02/blcok的那些事/">
+    <link itemprop="mainEntityOfPage" href="http://www.jiangliancheng.com/2015/03/02/blcok的那些事/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="John Doe">
+      <meta itemprop="name" content="蒋连成">
       <meta itemprop="description" content="">
       <meta itemprop="image" content="/images/avatar.gif">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Hexo">
+      <meta itemprop="name" content="蒋连成的天空">
     </span>
 
     
@@ -534,8 +535,8 @@ self.blk = ^{                      //② ARC不会释放blockSelf
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
-              <p class="site-author-name" itemprop="name">John Doe</p>
-              <p class="site-description motion-element" itemprop="description"></p>
+              <p class="site-author-name" itemprop="name">蒋连成</p>
+              <p class="site-description motion-element" itemprop="description">this is my world</p>
           </div>
 
           <nav class="site-state motion-element">
@@ -624,7 +625,7 @@ self.blk = ^{                      //② ARC不会释放blockSelf
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>
-  <span class="author" itemprop="copyrightHolder">John Doe</span>
+  <span class="author" itemprop="copyrightHolder">蒋连成</span>
 
   
 </div>

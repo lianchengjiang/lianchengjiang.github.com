@@ -80,10 +80,11 @@
 
 
 <meta name="description" content="背景由于我对SDWebImage这块比较熟悉，并且基于SDWebImage封装了一层对业务更友好的HTSWebImage库。所以一直以来SDWebImage的相关Crash都是我在负责。 由于图片加载频繁使用到多线程，所以SDWebImage的crash总是时不时会带来些惊喜（惊悚）。也有不少常年未解之谜，明明看上去没有任何问题，但是就是发生了EXC_BAD_ACCESS。 近日，与李卓立同学聊到">
+<meta name="keywords" content="ios, OOM, runtime, block, RTL">
 <meta property="og:type" content="article">
 <meta property="og:title" content="谈nonatomic非线程安全问题">
-<meta property="og:url" content="http://yoursite.com/2018/07/15/谈nonatomic非线程安全问题/index.html">
-<meta property="og:site_name" content="Hexo">
+<meta property="og:url" content="http://www.jiangliancheng.com/2018/07/15/谈nonatomic非线程安全问题/index.html">
+<meta property="og:site_name" content="蒋连成的天空">
 <meta property="og:description" content="背景由于我对SDWebImage这块比较熟悉，并且基于SDWebImage封装了一层对业务更友好的HTSWebImage库。所以一直以来SDWebImage的相关Crash都是我在负责。 由于图片加载频繁使用到多线程，所以SDWebImage的crash总是时不时会带来些惊喜（惊悚）。也有不少常年未解之谜，明明看上去没有任何问题，但是就是发生了EXC_BAD_ACCESS。 近日，与李卓立同学聊到">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:updated_time" content="2018-07-15T10:16:41.559Z">
@@ -119,13 +120,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2018/07/15/谈nonatomic非线程安全问题/"/>
+  <link rel="canonical" href="http://www.jiangliancheng.com/2018/07/15/谈nonatomic非线程安全问题/"/>
 
 
 
 
 
-  <title>谈nonatomic非线程安全问题 | Hexo</title>
+  <title>谈nonatomic非线程安全问题 | 蒋连成的天空</title>
   
 
 
@@ -155,7 +156,7 @@
     <div class="custom-logo-site-title">
       <a href="/"  class="brand" rel="start">
         <span class="logo-line-before"><i></i></span>
-        <span class="site-title">Hexo</span>
+        <span class="site-title">蒋连成的天空</span>
         <span class="logo-line-after"><i></i></span>
       </a>
     </div>
@@ -232,16 +233,16 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/15/谈nonatomic非线程安全问题/">
+    <link itemprop="mainEntityOfPage" href="http://www.jiangliancheng.com/2018/07/15/谈nonatomic非线程安全问题/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="John Doe">
+      <meta itemprop="name" content="蒋连成">
       <meta itemprop="description" content="">
       <meta itemprop="image" content="/images/avatar.gif">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Hexo">
+      <meta itemprop="name" content="蒋连成的天空">
     </span>
 
     
@@ -421,8 +422,8 @@
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
-              <p class="site-author-name" itemprop="name">John Doe</p>
-              <p class="site-description motion-element" itemprop="description"></p>
+              <p class="site-author-name" itemprop="name">蒋连成</p>
+              <p class="site-description motion-element" itemprop="description">this is my world</p>
           </div>
 
           <nav class="site-state motion-element">
@@ -511,7 +512,7 @@
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>
-  <span class="author" itemprop="copyrightHolder">John Doe</span>
+  <span class="author" itemprop="copyrightHolder">蒋连成</span>
 
   
 </div>

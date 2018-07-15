@@ -80,17 +80,18 @@
 
 
 <meta name="description" content="Time Flies，好久没写博客了，最近一直在玩设计模式，而设计模式这个东西比较大，自认为还没到将他们写出来的时候，等再过一阵吧。正好这几天看了一个好玩的小东西，觉得不错，所以分享一下。 缘起相信大家都用过NSMutableDictionary的-setObject:forKey:方法，使用这个方法当object为nil时，将会崩溃。我们写代码时，每次都需要对nil进行判断，非常麻烦。而且有时候">
+<meta name="keywords" content="ios, OOM, runtime, block, RTL">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Method Swizzling(一)">
-<meta property="og:url" content="http://yoursite.com/2015/01/31/MethodSwizzling1/index.html">
-<meta property="og:site_name" content="Hexo">
+<meta property="og:url" content="http://www.jiangliancheng.com/2015/01/31/MethodSwizzling1/index.html">
+<meta property="og:site_name" content="蒋连成的天空">
 <meta property="og:description" content="Time Flies，好久没写博客了，最近一直在玩设计模式，而设计模式这个东西比较大，自认为还没到将他们写出来的时候，等再过一阵吧。正好这几天看了一个好玩的小东西，觉得不错，所以分享一下。 缘起相信大家都用过NSMutableDictionary的-setObject:forKey:方法，使用这个方法当object为nil时，将会崩溃。我们写代码时，每次都需要对nil进行判断，非常麻烦。而且有时候">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://img.blog.csdn.net/20130718230259187">
 <meta property="og:image" content="http://img.blog.csdn.net/20130718230430859">
-<meta property="og:image" content="http://yoursite.com/images/swizzling_finally.jpeg">
+<meta property="og:image" content="http://www.jiangliancheng.com/images/swizzling_finally.jpeg">
 <meta property="og:image" content="https://developer.apple.com/library/ios/documentation/General/Conceptual/CocoaEncyclopedia/Art/cluster3.gif">
-<meta property="og:image" content="http://yoursite.com/images/Swizzling_NSDictionaryM">
+<meta property="og:image" content="http://www.jiangliancheng.com/images/Swizzling_NSDictionaryM">
 <meta property="og:updated_time" content="2015-10-31T16:10:20.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Method Swizzling(一)">
@@ -125,13 +126,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2015/01/31/MethodSwizzling1/"/>
+  <link rel="canonical" href="http://www.jiangliancheng.com/2015/01/31/MethodSwizzling1/"/>
 
 
 
 
 
-  <title>Method Swizzling(一) | Hexo</title>
+  <title>Method Swizzling(一) | 蒋连成的天空</title>
   
 
 
@@ -161,7 +162,7 @@
     <div class="custom-logo-site-title">
       <a href="/"  class="brand" rel="start">
         <span class="logo-line-before"><i></i></span>
-        <span class="site-title">Hexo</span>
+        <span class="site-title">蒋连成的天空</span>
         <span class="logo-line-after"><i></i></span>
       </a>
     </div>
@@ -238,16 +239,16 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2015/01/31/MethodSwizzling1/">
+    <link itemprop="mainEntityOfPage" href="http://www.jiangliancheng.com/2015/01/31/MethodSwizzling1/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="John Doe">
+      <meta itemprop="name" content="蒋连成">
       <meta itemprop="description" content="">
       <meta itemprop="image" content="/images/avatar.gif">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Hexo">
+      <meta itemprop="name" content="蒋连成的天空">
     </span>
 
     
@@ -566,8 +567,8 @@ void methodSwizzling(Class class,SEL originSel,SEL overrideSel)
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
-              <p class="site-author-name" itemprop="name">John Doe</p>
-              <p class="site-description motion-element" itemprop="description"></p>
+              <p class="site-author-name" itemprop="name">蒋连成</p>
+              <p class="site-description motion-element" itemprop="description">this is my world</p>
           </div>
 
           <nav class="site-state motion-element">
@@ -656,7 +657,7 @@ void methodSwizzling(Class class,SEL originSel,SEL overrideSel)
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>
-  <span class="author" itemprop="copyrightHolder">John Doe</span>
+  <span class="author" itemprop="copyrightHolder">蒋连成</span>
 
   
 </div>

@@ -80,10 +80,11 @@
 
 
 <meta name="description" content="多线程是程序开发中非常基础的一个概念，大家在开发过程中应该或多或少用过相关的东西。同时这恰恰又是一个比较棘手的概念，一切跟多线程挂钩的东西都会变得复杂。如果使用过程中对多线程不够熟悉，很可能会埋下一些难以预料的坑。 iOS中的多线程技术主要有NSThread, GCD和NSOperation。他们的封装层次依次递增，其中  NSThread封装性最差，最偏向于底层，主要基于thread使用 GCD">
+<meta name="keywords" content="ios, OOM, runtime, block, RTL">
 <meta property="og:type" content="article">
 <meta property="og:title" content="小笨狼漫谈多线程：GCD(一)">
-<meta property="og:url" content="http://yoursite.com/2016/01/23/小笨狼漫谈多线程：GCD-queue/index.html">
-<meta property="og:site_name" content="Hexo">
+<meta property="og:url" content="http://www.jiangliancheng.com/2016/01/23/小笨狼漫谈多线程：GCD-queue/index.html">
+<meta property="og:site_name" content="蒋连成的天空">
 <meta property="og:description" content="多线程是程序开发中非常基础的一个概念，大家在开发过程中应该或多或少用过相关的东西。同时这恰恰又是一个比较棘手的概念，一切跟多线程挂钩的东西都会变得复杂。如果使用过程中对多线程不够熟悉，很可能会埋下一些难以预料的坑。 iOS中的多线程技术主要有NSThread, GCD和NSOperation。他们的封装层次依次递增，其中  NSThread封装性最差，最偏向于底层，主要基于thread使用 GCD">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://camo.githubusercontent.com/e337c0cb657dde8d7eeb5468a1724c751cedb484/687474703a2f2f63646e342e72617977656e6465726c6963682e636f6d2f77702d636f6e74656e742f75706c6f6164732f323031342f30312f53657269616c2d51756575652d343830783237322e706e67">
@@ -127,13 +128,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2016/01/23/小笨狼漫谈多线程：GCD-queue/"/>
+  <link rel="canonical" href="http://www.jiangliancheng.com/2016/01/23/小笨狼漫谈多线程：GCD-queue/"/>
 
 
 
 
 
-  <title>小笨狼漫谈多线程：GCD(一) | Hexo</title>
+  <title>小笨狼漫谈多线程：GCD(一) | 蒋连成的天空</title>
   
 
 
@@ -163,7 +164,7 @@
     <div class="custom-logo-site-title">
       <a href="/"  class="brand" rel="start">
         <span class="logo-line-before"><i></i></span>
-        <span class="site-title">Hexo</span>
+        <span class="site-title">蒋连成的天空</span>
         <span class="logo-line-after"><i></i></span>
       </a>
     </div>
@@ -240,16 +241,16 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/01/23/小笨狼漫谈多线程：GCD-queue/">
+    <link itemprop="mainEntityOfPage" href="http://www.jiangliancheng.com/2016/01/23/小笨狼漫谈多线程：GCD-queue/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="John Doe">
+      <meta itemprop="name" content="蒋连成">
       <meta itemprop="description" content="">
       <meta itemprop="image" content="/images/avatar.gif">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Hexo">
+      <meta itemprop="name" content="蒋连成的天空">
     </span>
 
     
@@ -730,8 +731,8 @@ void *dispatch_get_specific(const void *key);
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
-              <p class="site-author-name" itemprop="name">John Doe</p>
-              <p class="site-description motion-element" itemprop="description"></p>
+              <p class="site-author-name" itemprop="name">蒋连成</p>
+              <p class="site-description motion-element" itemprop="description">this is my world</p>
           </div>
 
           <nav class="site-state motion-element">
@@ -820,7 +821,7 @@ void *dispatch_get_specific(const void *key);
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>
-  <span class="author" itemprop="copyrightHolder">John Doe</span>
+  <span class="author" itemprop="copyrightHolder">蒋连成</span>
 
   
 </div>

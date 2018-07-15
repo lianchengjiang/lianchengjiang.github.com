@@ -80,10 +80,11 @@
 
 
 <meta name="description" content="玩iOS已经一年多了，经常用到单例，但也仅仅是停留在会用的层次，至于为什么这么用，内部怎么实现的，从未研究过。直到上次去腾讯面试，被问到了单例的一些细节，才发现自己对单例的了解还很浅薄。这几天仔细研究了一下单例，也总结了一些心得。如果有写的不好的地方，希望大家指点。    单例介绍1.什么是单例说到单例首先要提到单例模式，因为单例模式是单例存在的目的  单例模式是一种常用的软件设计模式。在它的核心">
+<meta name="keywords" content="ios, OOM, runtime, block, RTL">
 <meta property="og:type" content="article">
 <meta property="og:title" content="iOS开发之单例">
-<meta property="og:url" content="http://yoursite.com/2014/10/30/iOS开发之单例/index.html">
-<meta property="og:site_name" content="Hexo">
+<meta property="og:url" content="http://www.jiangliancheng.com/2014/10/30/iOS开发之单例/index.html">
+<meta property="og:site_name" content="蒋连成的天空">
 <meta property="og:description" content="玩iOS已经一年多了，经常用到单例，但也仅仅是停留在会用的层次，至于为什么这么用，内部怎么实现的，从未研究过。直到上次去腾讯面试，被问到了单例的一些细节，才发现自己对单例的了解还很浅薄。这几天仔细研究了一下单例，也总结了一些心得。如果有写的不好的地方，希望大家指点。    单例介绍1.什么是单例说到单例首先要提到单例模式，因为单例模式是单例存在的目的  单例模式是一种常用的软件设计模式。在它的核心">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:updated_time" content="2015-10-31T16:07:50.000Z">
@@ -119,13 +120,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2014/10/30/iOS开发之单例/"/>
+  <link rel="canonical" href="http://www.jiangliancheng.com/2014/10/30/iOS开发之单例/"/>
 
 
 
 
 
-  <title>iOS开发之单例 | Hexo</title>
+  <title>iOS开发之单例 | 蒋连成的天空</title>
   
 
 
@@ -155,7 +156,7 @@
     <div class="custom-logo-site-title">
       <a href="/"  class="brand" rel="start">
         <span class="logo-line-before"><i></i></span>
-        <span class="site-title">Hexo</span>
+        <span class="site-title">蒋连成的天空</span>
         <span class="logo-line-after"><i></i></span>
       </a>
     </div>
@@ -232,16 +233,16 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2014/10/30/iOS开发之单例/">
+    <link itemprop="mainEntityOfPage" href="http://www.jiangliancheng.com/2014/10/30/iOS开发之单例/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="John Doe">
+      <meta itemprop="name" content="蒋连成">
       <meta itemprop="description" content="">
       <meta itemprop="image" content="/images/avatar.gif">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Hexo">
+      <meta itemprop="name" content="蒋连成的天空">
     </span>
 
     
@@ -504,8 +505,8 @@
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
-              <p class="site-author-name" itemprop="name">John Doe</p>
-              <p class="site-description motion-element" itemprop="description"></p>
+              <p class="site-author-name" itemprop="name">蒋连成</p>
+              <p class="site-description motion-element" itemprop="description">this is my world</p>
           </div>
 
           <nav class="site-state motion-element">
@@ -594,7 +595,7 @@
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>
-  <span class="author" itemprop="copyrightHolder">John Doe</span>
+  <span class="author" itemprop="copyrightHolder">蒋连成</span>
 
   
 </div>
