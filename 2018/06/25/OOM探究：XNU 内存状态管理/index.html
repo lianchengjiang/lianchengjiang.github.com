@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="OOM探究：XNU 内存状态管理前言OOM全称 Out Of Memory，指的是因为内存使用过多而导致的 APP 闪退。其实这本身是一种操作系统管理内存的机制。因为手机的内存是有限的，不可能无限制的使用，当内存不够时，需要将低优先级的进程kill，腾出内存以便高优先级的进程使用。这里发生的进程 kill，就是 OOM 了。 那OOM的触发机制到底是怎么样的呢？目前市上的资料说的都比较模糊，没有一">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://yoursite.com/2018/06/25/OOM探究：XNU 内存状态管理/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="OOM探究：XNU 内存状态管理前言OOM全称 Out Of Memory，指的是因为内存使用过多而导致的 APP 闪退。其实这本身是一种操作系统管理内存的机制。因为手机的内存是有限的，不可能无限制的使用，当内存不够时，需要将低优先级的进程kill，腾出内存以便高优先级的进程使用。这里发生的进程 kill，就是 OOM 了。 那OOM的触发机制到底是怎么样的呢？目前市上的资料说的都比较模糊，没有一">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-06-25T14:15:33.157Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Hexo">
+<meta name="twitter:description" content="OOM探究：XNU 内存状态管理前言OOM全称 Out Of Memory，指的是因为内存使用过多而导致的 APP 闪退。其实这本身是一种操作系统管理内存的机制。因为手机的内存是有限的，不可能无限制的使用，当内存不够时，需要将低优先级的进程kill，腾出内存以便高优先级的进程使用。这里发生的进程 kill，就是 OOM 了。 那OOM的触发机制到底是怎么样的呢？目前市上的资料说的都比较模糊，没有一">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/06/25/OOM探究：XNU 内存状态管理/"/>
+
+
+
+
+
+  <title> | Hexo</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/25/OOM探究：XNU 内存状态管理/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline"></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-25T22:15:33+08:00">
+                2018-06-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="OOM探究：XNU-内存状态管理"><a href="#OOM探究：XNU-内存状态管理" class="headerlink" title="OOM探究：XNU 内存状态管理"></a>OOM探究：XNU 内存状态管理</h1><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>OOM全称 Out Of Memory，指的是因为内存使用过多而导致的 APP 闪退。其实这本身是一种操作系统管理内存的机制。因为手机的内存是有限的，不可能无限制的使用，当内存不够时，需要将低优先级的进程kill，腾出内存以便高优先级的进程使用。这里发生的进程 kill，就是 OOM 了。</p>
+<p>那OOM的触发机制到底是怎么样的呢？目前市上的资料说的都比较模糊，没有一个很清晰的介绍，还好 xnu 是开源的，我们通过源码可以看一下操作系统到底是怎么触发 OOM 的</p>
+<p>##源码探究<br>幸好xnu这块代码是开源的，在<a href="https://opensource.apple.com/tarballs/xnu/" target="_blank" rel="noopener">opensource.apple.com</a>里可以下到整个 xnu 内核的代码。内存状态管理相关的代码主要是在kern_memorystatus.c/.h中</p>
+<h3 id="优先级队列"><a href="#优先级队列" class="headerlink" title="优先级队列"></a>优先级队列</h3><p>首先系统对进程是分优先级的，整个系统会有一个优先级队列。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">#define MEMSTAT_BUCKET_COUNT (JETSAM_PRIORITY_MAX + 1)</span><br><span class="line"></span><br><span class="line">typedef struct memstat_bucket &#123;</span><br><span class="line">    TAILQ_HEAD(, proc) list;</span><br><span class="line">    int count;</span><br><span class="line">&#125; memstat_bucket_t;</span><br><span class="line"></span><br><span class="line">memstat_bucket_t memstat_bucket[MEMSTAT_BUCKET_COUNT];</span><br></pre></td></tr></table></figure>
+<p>kern_memorystatus.c中定义了一个memstat_bucket_t的结构体。结构体很简单，count 表示这个优先级下有多少个进程，list是一个链表，用来存放各个进程。（使用链表是为了插入和删除方便。）</p>
+<p>在memstat_bucket_t结构体之后，系统定义了一个memstat_bucket_t结构体的数组，用来存放系统进程的优先级队列。每个优先级对应一个memstat_bucket_t结构体，结构体中存放着这个优先级下的所有进程。</p>
+<p>在kern_memorystatus.h 中定义了优先级有哪些：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">#define JETSAM_PRIORITY_REVISION                  2</span><br><span class="line"></span><br><span class="line">#define JETSAM_PRIORITY_IDLE_HEAD                -2</span><br><span class="line">/* The value -1 is an alias to JETSAM_PRIORITY_DEFAULT */</span><br><span class="line">#define JETSAM_PRIORITY_IDLE                      0</span><br><span class="line">#define JETSAM_PRIORITY_IDLE_DEFERRED		  1 /* Keeping this around till all xnu_quick_tests can be moved away from it.*/</span><br><span class="line">#define JETSAM_PRIORITY_AGING_BAND1		  JETSAM_PRIORITY_IDLE_DEFERRED</span><br><span class="line">#define JETSAM_PRIORITY_BACKGROUND_OPPORTUNISTIC  2</span><br><span class="line">#define JETSAM_PRIORITY_AGING_BAND2		  JETSAM_PRIORITY_BACKGROUND_OPPORTUNISTIC</span><br><span class="line">#define JETSAM_PRIORITY_BACKGROUND                3</span><br><span class="line">#define JETSAM_PRIORITY_ELEVATED_INACTIVE	  JETSAM_PRIORITY_BACKGROUND</span><br><span class="line">#define JETSAM_PRIORITY_MAIL                      4</span><br><span class="line">#define JETSAM_PRIORITY_PHONE                     5</span><br><span class="line">#define JETSAM_PRIORITY_UI_SUPPORT                8</span><br><span class="line">#define JETSAM_PRIORITY_FOREGROUND_SUPPORT        9</span><br><span class="line">#define JETSAM_PRIORITY_FOREGROUND               10</span><br><span class="line">#define JETSAM_PRIORITY_AUDIO_AND_ACCESSORY      12</span><br><span class="line">#define JETSAM_PRIORITY_CONDUCTOR                13</span><br><span class="line">#define JETSAM_PRIORITY_HOME                     16</span><br><span class="line">#define JETSAM_PRIORITY_EXECUTIVE                17</span><br><span class="line">#define JETSAM_PRIORITY_IMPORTANT                18</span><br><span class="line">#define JETSAM_PRIORITY_CRITICAL                 19</span><br><span class="line"></span><br><span class="line">#define JETSAM_PRIORITY_MAX                      21</span><br><span class="line"></span><br><span class="line">/* TODO - tune. This should probably be lower priority */</span><br><span class="line">#define JETSAM_PRIORITY_DEFAULT                  18</span><br><span class="line">#define JETSAM_PRIORITY_TELEPHONY                19</span><br></pre></td></tr></table></figure>
+<p>可以看到foreground 是10，background 是3，当内存紧张的时候，后台的进程会优先被干掉。</p>
+<h3 id="OOM-类型"><a href="#OOM-类型" class="headerlink" title="OOM 类型"></a>OOM 类型</h3><p>目前 OOM 主要分为11种类型：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">/* Cause */</span><br><span class="line">enum &#123;</span><br><span class="line">	kMemorystatusInvalid			= JETSAM_REASON_INVALID,</span><br><span class="line">	kMemorystatusKilled			= JETSAM_REASON_GENERIC,</span><br><span class="line">	kMemorystatusKilledHiwat		= JETSAM_REASON_MEMORY_HIGHWATER, //high water</span><br><span class="line">	kMemorystatusKilledVnodes		= JETSAM_REASON_VNODE, // vnode</span><br><span class="line">	kMemorystatusKilledVMPageShortage	= JETSAM_REASON_MEMORY_VMPAGESHORTAGE, //vm page shortager</span><br><span class="line">	kMemorystatusKilledVMThrashing		= JETSAM_REASON_MEMORY_VMTHRASHING, // vm thrashing</span><br><span class="line">	kMemorystatusKilledFCThrashing		= JETSAM_REASON_MEMORY_FCTHRASHING, // fc thrashing</span><br><span class="line">	kMemorystatusKilledPerProcessLimit	= JETSAM_REASON_MEMORY_PERPROCESSLIMIT, // per process limit</span><br><span class="line">	kMemorystatusKilledDiagnostic		= JETSAM_REASON_MEMORY_DIAGNOSTIC, // diagnostic</span><br><span class="line">	kMemorystatusKilledIdleExit		= JETSAM_REASON_MEMORY_IDLE_EXIT, // idle exit</span><br><span class="line">	kMemorystatusKilledZoneMapExhaustion	= JETSAM_REASON_ZONE_MAP_EXHAUSTION // map exhaustion</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>对应每种类型，输出日志时会有相应的字符串，输出到 log 中</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">/* For logging clarity */</span><br><span class="line">static const char *memorystatus_kill_cause_name[] = &#123;</span><br><span class="line">	&quot;&quot;                      ,</span><br><span class="line">	&quot;jettisoned&quot;		,       /* kMemorystatusKilled			*/</span><br><span class="line">	&quot;highwater&quot;             ,       /* kMemorystatusKilledHiwat		*/ </span><br><span class="line">	&quot;vnode-limit&quot;           ,       /* kMemorystatusKilledVnodes		*/</span><br><span class="line">	&quot;vm-pageshortage&quot;       ,       /* kMemorystatusKilledVMPageShortage	*/</span><br><span class="line">	&quot;vm-thrashing&quot;          ,       /* kMemorystatusKilledVMThrashing	*/</span><br><span class="line">	&quot;fc-thrashing&quot;          ,       /* kMemorystatusKilledFCThrashing	*/</span><br><span class="line">	&quot;per-process-limit&quot;     ,       /* kMemorystatusKilledPerProcessLimit	*/</span><br><span class="line">	&quot;diagnostic&quot;            ,       /* kMemorystatusKilledDiagnostic	*/</span><br><span class="line">	&quot;idle-exit&quot;             ,       /* kMemorystatusKilledIdleExit		*/</span><br><span class="line">	&quot;zone-map-exhaustion&quot;   ,       /* kMemorystatusKilledZoneMapExhaustion */</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>当我们的 App 触发 OOM 时，系统会有相应的日志写到手机的设置-&gt;隐私-&gt;分析-&gt;分析数据-&gt;jstsamEvent-xxx文件中。打开文件，可以看到<code>reason</code>一栏会标明 OOM 的类型，例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line">  &quot;largestProcess&quot; : &quot;Boom&quot;,</span><br><span class="line">  &quot;genCounter&quot; : 23,</span><br><span class="line">  &quot;processes&quot; : [</span><br><span class="line">  &#123;</span><br><span class="line">    &quot;uuid&quot; : &quot;ebd916c8-96e7-3b8f-985d-027098a13fd6&quot;,</span><br><span class="line">    &quot;states&quot; : [</span><br><span class="line">      &quot;daemon&quot;,</span><br><span class="line">      &quot;idle&quot;</span><br><span class="line">    ],</span><br><span class="line">    &quot;killDelta&quot; : 1887,</span><br><span class="line">    &quot;genCount&quot; : 0,</span><br><span class="line">    &quot;age&quot; : 200706725,</span><br><span class="line">    &quot;purgeable&quot; : 0,</span><br><span class="line">    &quot;fds&quot; : 50,</span><br><span class="line">    &quot;coalition&quot; : 268,</span><br><span class="line">    &quot;rpages&quot; : 34,</span><br><span class="line">    &quot;reason&quot; : &quot;vm-pageshortage&quot;,</span><br><span class="line">    &quot;pid&quot; : 2205,</span><br><span class="line">    &quot;cpuTime&quot; : 0.0030500000000000002,</span><br><span class="line">    &quot;name&quot; : &quot;xpcproxy&quot;,</span><br><span class="line">    &quot;lifetimeMax&quot; : 79</span><br><span class="line">  &#125;,</span><br><span class="line"></span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<p>可以看到占用内存最大的进程是 boom，OOM 的类型是<code>vm-pageshortage</code></p>
+<h3 id="OOM-的触发方式"><a href="#OOM-的触发方式" class="headerlink" title="OOM 的触发方式"></a>OOM 的触发方式</h3><p>正常 OOM 的触发方式有2种，一种是同步触发，一种是异步触发。比如 VMPageShortage类型的 OOM 触发方式：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">boolean_t memorystatus_kill_on_VM_page_shortage(boolean_t async) &#123;</span><br><span class="line">	if (async) &#123;</span><br><span class="line">		return memorystatus_kill_process_async(-1, kMemorystatusKilledVMPageShortage);</span><br><span class="line">	&#125; else &#123;</span><br><span class="line">		os_reason_t jetsam_reason = os_reason_create(OS_REASON_JETSAM, JETSAM_REASON_MEMORY_VMPAGESHORTAGE);</span><br><span class="line">		if (jetsam_reason == OS_REASON_NULL) &#123;</span><br><span class="line">			printf(&quot;memorystatus_kill_on_VM_page_shortage -- sync: failed to allocate jetsam reason\n&quot;);</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		return memorystatus_kill_process_sync(-1, kMemorystatusKilledVMPageShortage, jetsam_reason);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>同步触发比较简单粗暴，直接根据pid，kill 掉相应的进程。如果 pid 传的是-1，就 kill 掉优先级队列里面优先级最低的那个进程。（如果多个进程同一个优先级，系统会根据占用内存大小排序，kill 掉内存占用最大的进程）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">static boolean_t </span><br><span class="line">memorystatus_kill_process_sync(pid_t victim_pid, uint32_t cause, os_reason_t jetsam_reason) &#123;</span><br><span class="line">	boolean_t res;</span><br><span class="line"></span><br><span class="line">	uint32_t errors = 0;</span><br><span class="line"></span><br><span class="line">	if (victim_pid == -1) &#123;</span><br><span class="line">		/* No pid, so kill first process */</span><br><span class="line">		res = memorystatus_kill_top_process(TRUE, TRUE, cause, jetsam_reason, NULL, &amp;errors);</span><br><span class="line">	&#125; else &#123;</span><br><span class="line">		res = memorystatus_kill_specific_process(victim_pid, cause, jetsam_reason);</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	if (errors) &#123;</span><br><span class="line">		memorystatus_clear_errors();</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	return res;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>而异步触发实际是通过设置一个内存标志位，标志当前内存已经有问题了，然后唤醒专门的内存管理线程去管理内存状态，触发 OOM，kill 部分进程，回收内存。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">static boolean_t </span><br><span class="line">memorystatus_kill_process_async(pid_t victim_pid, uint32_t cause) &#123;</span><br><span class="line">	/*</span><br><span class="line">	 * TODO: allow a general async path</span><br><span class="line">	 *</span><br><span class="line">	 * NOTE: If a new async kill cause is added, make sure to update memorystatus_thread() to</span><br><span class="line">	 * add the appropriate exit reason code mapping.</span><br><span class="line">	 */</span><br><span class="line">	if ((victim_pid != -1) || (cause != kMemorystatusKilledVMPageShortage &amp;&amp; cause != kMemorystatusKilledVMThrashing &amp;&amp;</span><br><span class="line">				   cause != kMemorystatusKilledFCThrashing &amp;&amp; cause != kMemorystatusKilledZoneMapExhaustion)) &#123;</span><br><span class="line">		return FALSE;</span><br><span class="line">	&#125;</span><br><span class="line">    </span><br><span class="line">	kill_under_pressure_cause = cause;</span><br><span class="line">	memorystatus_thread_wake();</span><br><span class="line">	return TRUE;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="内存状态管理线程"><a href="#内存状态管理线程" class="headerlink" title="内存状态管理线程"></a>内存状态管理线程</h3><p>系统中专门有一个线程用来管理内存状态，当内存状态出现问题或者内存压力过大时，将会通过一定的策略，干掉一些 App 回收内存。</p>
+<p>将部分无关代码删除后，内存状态管理线程代码是这样的</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br></pre></td><td class="code"><pre><span class="line">static void</span><br><span class="line">memorystatus_thread(void *param __unused, wait_result_t wr __unused)</span><br><span class="line">&#123;</span><br><span class="line">	static boolean_t is_vm_privileged = FALSE;</span><br><span class="line"></span><br><span class="line">	boolean_t post_snapshot = FALSE;</span><br><span class="line">	uint32_t errors = 0;</span><br><span class="line">	uint32_t hwm_kill = 0;</span><br><span class="line">	boolean_t sort_flag = TRUE;</span><br><span class="line">	boolean_t corpse_list_purged = FALSE;</span><br><span class="line">	int	jld_idle_kills = 0;</span><br><span class="line"></span><br><span class="line">	if (is_vm_privileged == FALSE) &#123;</span><br><span class="line">		/* 一些初始化工作 */</span><br><span class="line">		thread_wire(host_priv_self(), current_thread(), TRUE);</span><br><span class="line">		is_vm_privileged = TRUE;</span><br><span class="line">		</span><br><span class="line">		if (vm_restricted_to_single_processor == TRUE)</span><br><span class="line">			thread_vm_bind_group_add();</span><br><span class="line">		thread_set_thread_name(current_thread(), &quot;VM_memorystatus&quot;);</span><br><span class="line">		memorystatus_thread_block(0, memorystatus_thread);</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	// 真正的内存管理的循环</span><br><span class="line">	while (memorystatus_action_needed()) &#123;</span><br><span class="line">		boolean_t killed;</span><br><span class="line">		int32_t priority;</span><br><span class="line">		uint32_t cause;</span><br><span class="line">		uint64_t jetsam_reason_code = JETSAM_REASON_INVALID;</span><br><span class="line">		os_reason_t jetsam_reason = OS_REASON_NULL;</span><br><span class="line"></span><br><span class="line">		cause = kill_under_pressure_cause;</span><br><span class="line">		switch (cause) &#123;</span><br><span class="line">			case kMemorystatusKilledFCThrashing:</span><br><span class="line">				jetsam_reason_code = JETSAM_REASON_MEMORY_FCTHRASHING;</span><br><span class="line">				break;</span><br><span class="line">			case kMemorystatusKilledVMThrashing:</span><br><span class="line">				jetsam_reason_code = JETSAM_REASON_MEMORY_VMTHRASHING;</span><br><span class="line">				break;</span><br><span class="line">			case kMemorystatusKilledZoneMapExhaustion:</span><br><span class="line">				jetsam_reason_code = JETSAM_REASON_ZONE_MAP_EXHAUSTION;</span><br><span class="line">				break;</span><br><span class="line">			case kMemorystatusKilledVMPageShortage:</span><br><span class="line">				/* falls through */</span><br><span class="line">			default:</span><br><span class="line">				jetsam_reason_code = JETSAM_REASON_MEMORY_VMPAGESHORTAGE;</span><br><span class="line">				cause = kMemorystatusKilledVMPageShortage;</span><br><span class="line">				break;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		/* HIGHWATER类型的 OOM 触发 */</span><br><span class="line">		boolean_t is_critical = TRUE;</span><br><span class="line">		if (memorystatus_act_on_hiwat_processes(&amp;errors, &amp;hwm_kill, &amp;post_snapshot, &amp;is_critical)) &#123;</span><br><span class="line">			if (is_critical == FALSE) &#123;</span><br><span class="line">				/*</span><br><span class="line">				 * For now, don&apos;t kill any other processes.</span><br><span class="line">				 */</span><br><span class="line">				break;</span><br><span class="line">			&#125; else &#123;</span><br><span class="line">				goto done;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		jetsam_reason = os_reason_create(OS_REASON_JETSAM, jetsam_reason_code);</span><br><span class="line">		if (jetsam_reason == OS_REASON_NULL) &#123;</span><br><span class="line">			printf(&quot;memorystatus_thread: failed to allocate jetsam reason\n&quot;);</span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">		// 核心的 OOM 触发机制</span><br><span class="line">		if (memorystatus_act_aggressive(cause, jetsam_reason, &amp;jld_idle_kills, &amp;corpse_list_purged, &amp;post_snapshot)) &#123;</span><br><span class="line">			goto done;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		os_reason_ref(jetsam_reason);</span><br><span class="line"></span><br><span class="line">		/* LRU，干掉优先级最低的一个进程 */</span><br><span class="line">		killed = memorystatus_kill_top_process(TRUE, sort_flag, cause, jetsam_reason, &amp;priority, &amp;errors);</span><br><span class="line">		sort_flag = FALSE;</span><br><span class="line"></span><br><span class="line">		if (killed) &#123;</span><br><span class="line">			/* Jetsam Loop Detection */</span><br><span class="line">			if (memorystatus_jld_enabled == TRUE) &#123;</span><br><span class="line">				if ((priority == JETSAM_PRIORITY_IDLE) || (priority == system_procs_aging_band) || (priority == applications_aging_band)) &#123;</span><br><span class="line">					jld_idle_kills++;</span><br><span class="line">				&#125; </span><br><span class="line">			&#125;</span><br><span class="line"></span><br><span class="line">			if ((priority &gt;= JETSAM_PRIORITY_UI_SUPPORT) &amp;&amp; (total_corpses_count() &gt; 0) &amp;&amp; (corpse_list_purged == FALSE)) &#123;</span><br><span class="line">				task_purge_all_corpses();</span><br><span class="line">				corpse_list_purged = TRUE;</span><br><span class="line">			&#125;</span><br><span class="line">			goto done;</span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">		if (memorystatus_avail_pages_below_critical()) &#123;</span><br><span class="line">			/*</span><br><span class="line">			 * Still under pressure and unable to kill a process - purge corpse memory</span><br><span class="line">			 */</span><br><span class="line">			if (total_corpses_count() &gt; 0) &#123;</span><br><span class="line">				task_purge_all_corpses();</span><br><span class="line">				corpse_list_purged = TRUE;</span><br><span class="line">			&#125;</span><br><span class="line"></span><br><span class="line">			if (memorystatus_avail_pages_below_critical()) &#123;</span><br><span class="line">				/*</span><br><span class="line">				 * Still under pressure and unable to kill a process - panic</span><br><span class="line">				 */</span><br><span class="line">				panic(&quot;memorystatus_jetsam_thread: no victim! available pages:%llu\n&quot;, (uint64_t)memorystatus_available_pages);</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">			</span><br><span class="line">done:		</span><br><span class="line"></span><br><span class="line">		/*</span><br><span class="line">		 * We do not want to over-kill when thrashing has been detected.</span><br><span class="line">		 * To avoid that, we reset the flag here and notify the</span><br><span class="line">		 * compressor.</span><br><span class="line">		 */</span><br><span class="line">		if (is_reason_thrashing(kill_under_pressure_cause)) &#123;</span><br><span class="line">			kill_under_pressure_cause = 0;</span><br><span class="line">#if CONFIG_JETSAM</span><br><span class="line">			vm_thrashing_jetsam_done();</span><br><span class="line">#endif /* CONFIG_JETSAM */</span><br><span class="line">		&#125; else if (is_reason_zone_map_exhaustion(kill_under_pressure_cause)) &#123;</span><br><span class="line">			kill_under_pressure_cause = 0;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		os_reason_free(jetsam_reason);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	kill_under_pressure_cause = 0;</span><br><span class="line">	</span><br><span class="line">	if (errors) &#123;</span><br><span class="line">		memorystatus_clear_errors();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="准入条件"><a href="#准入条件" class="headerlink" title="准入条件"></a>准入条件</h4><p>我们可以看到真正核心的代码在<code>while (memorystatus_action_needed())</code>的循环里面，<code>memorystatus_action_needed</code>是触发 OOM 的核心判断条件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">/* Does cause indicate vm or fc thrashing? */</span><br><span class="line">static boolean_t</span><br><span class="line">is_reason_thrashing(unsigned cause)</span><br><span class="line">&#123;</span><br><span class="line">	switch (cause) &#123;</span><br><span class="line">	case kMemorystatusKilledVMThrashing:</span><br><span class="line">	case kMemorystatusKilledFCThrashing:</span><br><span class="line">		return TRUE;</span><br><span class="line">	default:</span><br><span class="line">		return FALSE;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">/* Is the zone map almost full? */</span><br><span class="line">static boolean_t</span><br><span class="line">is_reason_zone_map_exhaustion(unsigned cause)</span><br><span class="line">&#123;</span><br><span class="line">	if (cause == kMemorystatusKilledZoneMapExhaustion)</span><br><span class="line">		return TRUE;</span><br><span class="line">	return FALSE;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">static boolean_t</span><br><span class="line">memorystatus_action_needed(void)</span><br><span class="line">&#123;</span><br><span class="line">	return (is_reason_thrashing(kill_under_pressure_cause) ||</span><br><span class="line">			is_reason_zone_map_exhaustion(kill_under_pressure_cause) ||</span><br><span class="line">	       memorystatus_available_pages &lt;= memorystatus_available_pages_pressure);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以看当kill_under_pressure_cause值为<code>kMemorystatusKilledVMThrashing</code>,<code>kMemorystatusKilledFCThrashing</code>,<code>kMemorystatusKilledZoneMapExhaustion</code>时，或者当前可用内存 <code>memorystatus_available_pages</code> 小于阈值<code>memorystatus_available_pages_pressure</code>时，会走进去触发 OOM。</p>
+<h4 id="high-water"><a href="#high-water" class="headerlink" title="high-water"></a>high-water</h4><p>进入循环之后，可以看到<code>memorystatus_act_on_hiwat_processes</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">/* HIGHWATER类型的 OOM 触发 */</span><br><span class="line">boolean_t is_critical = TRUE;</span><br><span class="line">if (memorystatus_act_on_hiwat_processes(&amp;errors, &amp;hwm_kill, &amp;post_snapshot, &amp;is_critical)) &#123;</span><br><span class="line">	if (is_critical == FALSE) &#123;</span><br><span class="line">		/*</span><br><span class="line">		 * For now, don&apos;t kill any other processes.</span><br><span class="line">		 */</span><br><span class="line">		break;</span><br><span class="line">	&#125; else &#123;</span><br><span class="line">		goto done;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这是触发HIGHWATER类型 OOM 的关键方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">static boolean_t</span><br><span class="line">memorystatus_act_on_hiwat_processes(uint32_t *errors, uint32_t *hwm_kill, boolean_t *post_snapshot, __unused boolean_t *is_critical)</span><br><span class="line">&#123;</span><br><span class="line">	boolean_t killed = memorystatus_kill_hiwat_proc(errors);</span><br><span class="line"></span><br><span class="line">	if (killed) &#123;</span><br><span class="line">		*hwm_kill = *hwm_kill + 1;</span><br><span class="line">		*post_snapshot = TRUE;</span><br><span class="line">		return TRUE;</span><br><span class="line">	&#125; else &#123;</span><br><span class="line">		memorystatus_hwm_candidates = FALSE;</span><br><span class="line">	&#125;</span><br><span class="line">	return FALSE;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>memorystatus_act_on_hiwat_processes</code>会直接调用<code>memorystatus_kill_hiwat_proc</code>，核心代码都在<code>memorystatus_kill_hiwat_proc</code>中。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br></pre></td><td class="code"><pre><span class="line">static boolean_t</span><br><span class="line">memorystatus_kill_hiwat_proc(uint32_t *errors)</span><br><span class="line">&#123;</span><br><span class="line">	pid_t aPid = 0;</span><br><span class="line">	proc_t p = PROC_NULL, next_p = PROC_NULL;</span><br><span class="line">	boolean_t new_snapshot = FALSE, killed = FALSE;</span><br><span class="line">	int kill_count = 0;</span><br><span class="line">	unsigned int i = 0;</span><br><span class="line">	uint32_t aPid_ep;</span><br><span class="line">	uint64_t killtime = 0;</span><br><span class="line">        clock_sec_t     tv_sec;</span><br><span class="line">        clock_usec_t    tv_usec;</span><br><span class="line">        uint32_t        tv_msec;</span><br><span class="line">	os_reason_t jetsam_reason = OS_REASON_NULL;</span><br><span class="line">	</span><br><span class="line">	jetsam_reason = os_reason_create(OS_REASON_JETSAM, JETSAM_REASON_MEMORY_HIGHWATER);</span><br><span class="line">	proc_list_lock();</span><br><span class="line">	</span><br><span class="line">	next_p = memorystatus_get_first_proc_locked(&amp;i, TRUE);</span><br><span class="line">	while (next_p) &#123;</span><br><span class="line">		uint64_t footprint_in_bytes = 0;</span><br><span class="line">		uint64_t memlimit_in_bytes  = 0;</span><br><span class="line">		boolean_t skip = 0;</span><br><span class="line"></span><br><span class="line">		p = next_p;</span><br><span class="line">		next_p = memorystatus_get_next_proc_locked(&amp;i, p, TRUE);</span><br><span class="line">		</span><br><span class="line">		aPid = p-&gt;p_pid;</span><br><span class="line">		aPid_ep = p-&gt;p_memstat_effectivepriority;</span><br><span class="line">		</span><br><span class="line">		if (p-&gt;p_memstat_state  &amp; (P_MEMSTAT_ERROR | P_MEMSTAT_TERMINATED)) &#123;</span><br><span class="line">			continue;</span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">		/* skip if no limit set */</span><br><span class="line">		if (p-&gt;p_memstat_memlimit &lt;= 0) &#123;</span><br><span class="line">			continue;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		footprint_in_bytes = get_task_phys_footprint(p-&gt;task);</span><br><span class="line">		memlimit_in_bytes  = (((uint64_t)p-&gt;p_memstat_memlimit) * 1024ULL * 1024ULL);	/* convert MB to bytes */</span><br><span class="line">		skip = (footprint_in_bytes &lt;= memlimit_in_bytes);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">#if CONFIG_FREEZE</span><br><span class="line">		if (!skip) &#123;</span><br><span class="line">			if (p-&gt;p_memstat_state &amp; P_MEMSTAT_LOCKED) &#123;</span><br><span class="line">				skip = TRUE;</span><br><span class="line">			&#125; else &#123;</span><br><span class="line">				skip = FALSE;</span><br><span class="line">			&#125;				</span><br><span class="line">		&#125;</span><br><span class="line">#endif</span><br><span class="line"></span><br><span class="line">		if (skip) &#123;</span><br><span class="line">			continue;</span><br><span class="line">		&#125; else &#123;</span><br><span class="line">			if (memorystatus_jetsam_snapshot_count == 0) &#123;</span><br><span class="line">                </span><br><span class="line">			p-&gt;p_memstat_state |= P_MEMSTAT_TERMINATED;</span><br><span class="line"></span><br><span class="line">			killtime = mach_absolute_time();</span><br><span class="line">			absolutetime_to_microtime(killtime, &amp;tv_sec, &amp;tv_usec);</span><br><span class="line">			tv_msec = tv_usec / 1000;</span><br><span class="line">				</span><br><span class="line">			&#123;</span><br><span class="line">				memorystatus_update_jetsam_snapshot_entry_locked(p, kMemorystatusKilledHiwat, killtime);</span><br><span class="line">			        </span><br><span class="line">				if (proc_ref_locked(p) == p) &#123;</span><br><span class="line">					proc_list_unlock();</span><br><span class="line"></span><br><span class="line">					/*</span><br><span class="line">					 * memorystatus_do_kill drops a reference, so take another one so we can</span><br><span class="line">					 * continue to use this exit reason even after memorystatus_do_kill()</span><br><span class="line">					 * returns</span><br><span class="line">					 */</span><br><span class="line">					os_reason_ref(jetsam_reason);</span><br><span class="line"></span><br><span class="line">					killed = memorystatus_do_kill(p, kMemorystatusKilledHiwat, jetsam_reason);</span><br><span class="line"></span><br><span class="line">					/* Success? */</span><br><span class="line">					if (killed) &#123;</span><br><span class="line">						proc_rele(p);</span><br><span class="line">						kill_count++;</span><br><span class="line">						goto exit;</span><br><span class="line">					&#125;</span><br><span class="line"></span><br><span class="line">					proc_list_lock();</span><br><span class="line">					proc_rele_locked(p);</span><br><span class="line">					p-&gt;p_memstat_state &amp;= ~P_MEMSTAT_TERMINATED;</span><br><span class="line">					p-&gt;p_memstat_state |= P_MEMSTAT_ERROR;</span><br><span class="line">					*errors += 1;</span><br><span class="line">				&#125;</span><br><span class="line"></span><br><span class="line">				i = 0;</span><br><span class="line">				next_p = memorystatus_get_first_proc_locked(&amp;i, TRUE);</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	proc_list_unlock();</span><br><span class="line">	</span><br><span class="line">exit:</span><br><span class="line">	os_reason_free(jetsam_reason);</span><br><span class="line">	return killed;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>首先通过<code>memorystatus_get_first_proc_locked(&amp;i, TRUE)</code>去优先级队列里面取出优先级最低的进程。如果这个进程内存小于阈值<code>(footprint_in_bytes &lt;= memlimit_in_bytes)</code>，则跳过然后取下一个进程<code>memorystatus_get_next_proc_locked</code>,如果内存超过阈值，将通过<code>memorystatus_do_kill</code>干掉这个进程，并结束循环。</p>
+<p>我们可以看到这里计算内存的口径主要用的是phys_footprint，不过目前观察我自己手机上的 OOM 类型，从未见过high-water 类型的 OOM，猜测可能high-water的阈值比较高，比较难触发，大家也可以看看自己手机里的 OOM 类型，如果有 high-water 类型的 OOM，可以告诉我</p>
+<h4 id="normal-kill"><a href="#normal-kill" class="headerlink" title="normal kill"></a>normal kill</h4><p>如果没有high-water的进程，程序继续往下执行，走到<code>memorystatus_act_aggressive</code>方法里，这个方法是通常oom的触发方法，大部分OOM都在这里面触发。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br></pre></td><td class="code"><pre><span class="line">static boolean_t</span><br><span class="line">memorystatus_act_aggressive(uint32_t cause, os_reason_t jetsam_reason, int *jld_idle_kills, boolean_t *corpse_list_purged, boolean_t *post_snapshot)</span><br><span class="line">&#123;</span><br><span class="line">	if (memorystatus_jld_enabled == TRUE) &#123;</span><br><span class="line"></span><br><span class="line">		boolean_t killed;</span><br><span class="line">		uint32_t errors = 0;</span><br><span class="line"></span><br><span class="line">		/* Jetsam Loop Detection - locals */</span><br><span class="line">		memstat_bucket_t *bucket;</span><br><span class="line">		int		jld_bucket_count = 0;</span><br><span class="line">		struct timeval	jld_now_tstamp = &#123;0,0&#125;;</span><br><span class="line">		uint64_t 	jld_now_msecs = 0;</span><br><span class="line">		int		elevated_bucket_count = 0;</span><br><span class="line"></span><br><span class="line">		/* Jetsam Loop Detection - statics */</span><br><span class="line">		static uint64_t  jld_timestamp_msecs = 0;</span><br><span class="line">		static int	 jld_idle_kill_candidates = 0;	/* Number of available processes in band 0,1 at start */</span><br><span class="line">		static int	 jld_eval_aggressive_count = 0;		/* Bumps the max priority in aggressive loop */</span><br><span class="line">		static int32_t   jld_priority_band_max = JETSAM_PRIORITY_UI_SUPPORT;</span><br><span class="line"></span><br><span class="line">		microuptime(&amp;jld_now_tstamp);</span><br><span class="line"></span><br><span class="line">		jld_now_msecs = (jld_now_tstamp.tv_sec * 1000);</span><br><span class="line"></span><br><span class="line">		proc_list_lock();</span><br><span class="line">		switch (jetsam_aging_policy) &#123;</span><br><span class="line">		case kJetsamAgingPolicyLegacy:</span><br><span class="line">			bucket = &amp;memstat_bucket[JETSAM_PRIORITY_IDLE];</span><br><span class="line">			jld_bucket_count = bucket-&gt;count;</span><br><span class="line">			bucket = &amp;memstat_bucket[JETSAM_PRIORITY_AGING_BAND1];</span><br><span class="line">			jld_bucket_count += bucket-&gt;count;</span><br><span class="line">			break;</span><br><span class="line">		case kJetsamAgingPolicySysProcsReclaimedFirst:</span><br><span class="line">		case kJetsamAgingPolicyAppsReclaimedFirst:</span><br><span class="line">			bucket = &amp;memstat_bucket[JETSAM_PRIORITY_IDLE];</span><br><span class="line">			jld_bucket_count = bucket-&gt;count;</span><br><span class="line">			bucket = &amp;memstat_bucket[system_procs_aging_band];</span><br><span class="line">			jld_bucket_count += bucket-&gt;count;</span><br><span class="line">			bucket = &amp;memstat_bucket[applications_aging_band];</span><br><span class="line">			jld_bucket_count += bucket-&gt;count;</span><br><span class="line">			break;</span><br><span class="line">		case kJetsamAgingPolicyNone:</span><br><span class="line">		default:</span><br><span class="line">			bucket = &amp;memstat_bucket[JETSAM_PRIORITY_IDLE];</span><br><span class="line">			jld_bucket_count = bucket-&gt;count;</span><br><span class="line">			break;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		bucket = &amp;memstat_bucket[JETSAM_PRIORITY_ELEVATED_INACTIVE];</span><br><span class="line">		elevated_bucket_count = bucket-&gt;count;</span><br><span class="line"></span><br><span class="line">		proc_list_unlock();</span><br><span class="line"></span><br><span class="line">		if ( (jld_bucket_count == 0) || </span><br><span class="line">		     (jld_now_msecs &gt; (jld_timestamp_msecs + memorystatus_jld_eval_period_msecs))) &#123;</span><br><span class="line">			jld_timestamp_msecs	 = jld_now_msecs;</span><br><span class="line">            // 先回收优先级特别低的进程：JETSAM_PRIORITY_IDLE，system_procs_aging_band，applications_aging_band，这些进程回收后jld_bucket_count将等于0</span><br><span class="line">			jld_idle_kill_candidates = jld_bucket_count;</span><br><span class="line">			*jld_idle_kills		 = 0;</span><br><span class="line">			jld_eval_aggressive_count = 0;</span><br><span class="line">			jld_priority_band_max	= JETSAM_PRIORITY_UI_SUPPORT;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">        // 正常状态下先回收一些随时可以回收的线程：JETSAM_PRIORITY_IDLE，system_procs_aging_band，applications_aging_band，这些进程回收后才能走进这个判断里面</span><br><span class="line">		if (*jld_idle_kills &gt; jld_idle_kill_candidates) &#123;</span><br><span class="line">			jld_eval_aggressive_count++;</span><br><span class="line"></span><br><span class="line">			if ((jld_eval_aggressive_count == memorystatus_jld_eval_aggressive_count) &amp;&amp;</span><br><span class="line">			    (total_corpses_count() &gt; 0) &amp;&amp; (*corpse_list_purged == FALSE)) &#123;</span><br><span class="line">				task_purge_all_corpses();</span><br><span class="line">				*corpse_list_purged = TRUE;</span><br><span class="line">			&#125;</span><br><span class="line">			else if (jld_eval_aggressive_count &gt; memorystatus_jld_eval_aggressive_count) &#123;</span><br><span class="line">				if ((memorystatus_jld_eval_aggressive_priority_band_max &lt; 0) ||</span><br><span class="line">				    (memorystatus_jld_eval_aggressive_priority_band_max &gt;= MEMSTAT_BUCKET_COUNT)) &#123;</span><br><span class="line"></span><br><span class="line">				&#125; else &#123;</span><br><span class="line">					jld_priority_band_max = memorystatus_jld_eval_aggressive_priority_band_max;</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line"></span><br><span class="line">            // 先干掉后台线程</span><br><span class="line">			/* Visit elevated processes first */</span><br><span class="line">			while (elevated_bucket_count) &#123;</span><br><span class="line"></span><br><span class="line">				elevated_bucket_count--;</span><br><span class="line"></span><br><span class="line">				os_reason_ref(jetsam_reason);</span><br><span class="line">				killed = memorystatus_kill_elevated_process(</span><br><span class="line">					cause,</span><br><span class="line">					jetsam_reason,</span><br><span class="line">					jld_eval_aggressive_count,</span><br><span class="line">					&amp;errors);</span><br><span class="line"></span><br><span class="line">				if (killed) &#123;</span><br><span class="line">					*post_snapshot = TRUE;</span><br><span class="line">                    // 如果还是有压力，就继续杀App</span><br><span class="line">					if (memorystatus_avail_pages_below_pressure()) &#123;</span><br><span class="line">						/*</span><br><span class="line">						 * Still under pressure.</span><br><span class="line">						 * Find another pinned processes.</span><br><span class="line">						 */</span><br><span class="line">						continue;</span><br><span class="line">					&#125; else &#123;</span><br><span class="line">						return TRUE;</span><br><span class="line">					&#125;</span><br><span class="line">				&#125; else &#123;</span><br><span class="line">					break;</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line"></span><br><span class="line">            // 干掉前台线程</span><br><span class="line">			killed = memorystatus_kill_top_process_aggressive(</span><br><span class="line">				kMemorystatusKilledVMThrashing,</span><br><span class="line">				jld_eval_aggressive_count, </span><br><span class="line">				jld_priority_band_max, </span><br><span class="line">				&amp;errors);</span><br><span class="line">				</span><br><span class="line">			if (killed) &#123;</span><br><span class="line">				/* Always generate logs after aggressive kill */</span><br><span class="line">				*post_snapshot = TRUE;</span><br><span class="line">				*jld_idle_kills = 0;</span><br><span class="line">				return TRUE;</span><br><span class="line">			&#125; </span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		return FALSE;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	return FALSE;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/01/23/小笨狼漫谈多线程：GCD-queue/" rel="next" title="小笨狼漫谈多线程：GCD(一)">
+                <i class="fa fa-chevron-left"></i> 小笨狼漫谈多线程：GCD(一)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/07/15/block内嵌block的变量捕获/" rel="prev" title="">
+                 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">24</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">分类</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#OOM探究：XNU-内存状态管理"><span class="nav-number">1.</span> <span class="nav-text">OOM探究：XNU 内存状态管理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.1.</span> <span class="nav-text">前言</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#优先级队列"><span class="nav-number">1.1.1.</span> <span class="nav-text">优先级队列</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#OOM-类型"><span class="nav-number">1.1.2.</span> <span class="nav-text">OOM 类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#OOM-的触发方式"><span class="nav-number">1.1.3.</span> <span class="nav-text">OOM 的触发方式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#内存状态管理线程"><span class="nav-number">1.1.4.</span> <span class="nav-text">内存状态管理线程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#准入条件"><span class="nav-number">1.1.4.1.</span> <span class="nav-text">准入条件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#high-water"><span class="nav-number">1.1.4.2.</span> <span class="nav-text">high-water</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#normal-kill"><span class="nav-number">1.1.4.3.</span> <span class="nav-text">normal kill</span></a></li></ol></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
