@@ -81,14 +81,14 @@
 
 <meta name="description" content="OOM探究：XNU 内存状态管理前言OOM全称 Out Of Memory，指的是因为内存使用过多而导致的 APP 闪退。其实这本身是一种操作系统管理内存的机制。因为手机的内存是有限的，不可能无限制的使用，当内存不够时，需要将低优先级的进程kill，腾出内存以便高优先级的进程使用。这里发生的进程 kill，就是 OOM 了。 那OOM的触发机制到底是怎么样的呢？目前市上的资料说的都比较模糊，没有一">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Hexo">
+<meta property="og:title" content="OOM探究：XNU 内存状态管理">
 <meta property="og:url" content="http://yoursite.com/2018/06/25/OOM探究：XNU 内存状态管理/index.html">
 <meta property="og:site_name" content="Hexo">
 <meta property="og:description" content="OOM探究：XNU 内存状态管理前言OOM全称 Out Of Memory，指的是因为内存使用过多而导致的 APP 闪退。其实这本身是一种操作系统管理内存的机制。因为手机的内存是有限的，不可能无限制的使用，当内存不够时，需要将低优先级的进程kill，腾出内存以便高优先级的进程使用。这里发生的进程 kill，就是 OOM 了。 那OOM的触发机制到底是怎么样的呢？目前市上的资料说的都比较模糊，没有一">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-06-25T14:15:33.157Z">
+<meta property="og:updated_time" content="2018-07-15T10:14:48.937Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Hexo">
+<meta name="twitter:title" content="OOM探究：XNU 内存状态管理">
 <meta name="twitter:description" content="OOM探究：XNU 内存状态管理前言OOM全称 Out Of Memory，指的是因为内存使用过多而导致的 APP 闪退。其实这本身是一种操作系统管理内存的机制。因为手机的内存是有限的，不可能无限制的使用，当内存不够时，需要将低优先级的进程kill，腾出内存以便高优先级的进程使用。这里发生的进程 kill，就是 OOM 了。 那OOM的触发机制到底是怎么样的呢？目前市上的资料说的都比较模糊，没有一">
 
 
@@ -125,7 +125,7 @@
 
 
 
-  <title> | Hexo</title>
+  <title>OOM探究：XNU 内存状态管理 | Hexo</title>
   
 
 
@@ -249,7 +249,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline"></h1>
+          <h1 class="post-title" itemprop="name headline">OOM探究：XNU 内存状态管理</h1>
         
 
         <div class="post-meta">
@@ -261,7 +261,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-25T22:15:33+08:00">
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-25T10:51:45+08:00">
                 2018-06-25
               </time>
             
@@ -362,8 +362,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2016/01/23/小笨狼漫谈多线程：GCD-queue/" rel="next" title="小笨狼漫谈多线程：GCD(一)">
-                <i class="fa fa-chevron-left"></i> 小笨狼漫谈多线程：GCD(一)
+              <a href="/2018/05/30/block内嵌block的变量捕获/" rel="next" title="关于Block的几点思考">
+                <i class="fa fa-chevron-left"></i> 关于Block的几点思考
               </a>
             
           </div>
@@ -372,8 +372,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2018/07/15/block内嵌block的变量捕获/" rel="prev" title="">
-                 <i class="fa fa-chevron-right"></i>
+              <a href="/2018/07/15/谈nonatomic非线程安全问题/" rel="prev" title="谈nonatomic非线程安全问题">
+                谈nonatomic非线程安全问题 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -451,7 +451,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">24</span>
+                  <span class="site-state-item-count">25</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -462,7 +462,7 @@
               
               <div class="site-state-item site-state-categories">
                 
-                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-count">8</span>
                   <span class="site-state-item-name">分类</span>
                 
               </div>
